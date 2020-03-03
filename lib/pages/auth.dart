@@ -9,14 +9,18 @@ class AuthPage extends StatefulWidget {
 }
 
 class _AutoPageState extends State<AuthPage> {
-  String _emailValue = '';
-  String _passwordValue = '';
+  String _emailValue;
+  String _passwordValue;
 
   Widget _buildUserNameTextField() {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: TextField(
-        decoration: InputDecoration(labelText: 'שם משתמש:'),
+        decoration: InputDecoration(
+          labelText: 'שם משתמש:',
+          filled: true,
+          fillColor: Colors.white70,
+        ),
         keyboardType: TextInputType.emailAddress,
         textAlign: TextAlign.right,
         onChanged: ((String value) {
@@ -32,7 +36,11 @@ class _AutoPageState extends State<AuthPage> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: TextField(
-        decoration: InputDecoration(labelText: 'סיסמה:'),
+        decoration: InputDecoration(
+          labelText: 'סיסמה:',
+          filled: true,
+          fillColor: Colors.white70,
+        ),
         obscureText: true,
         textAlign: TextAlign.right,
         onChanged: ((String value) {
@@ -84,7 +92,15 @@ class _AutoPageState extends State<AuthPage> {
         title: Text('LOGIN'),
       ),
       body: Container(
-        margin: EdgeInsets.all(10.0),
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/background.jpg'),
+            fit: BoxFit.cover,
+            colorFilter: ColorFilter.mode(
+                Colors.black.withOpacity(0.55), BlendMode.dstATop),
+          ),
+        ),
+        padding: EdgeInsets.all(10.0),
         child: GestureDetector(
           onTap: () {
             FocusScope.of(context).requestFocus(FocusNode());
@@ -96,13 +112,22 @@ class _AutoPageState extends State<AuthPage> {
                 height: 200,
               ),
               _buildUserNameTextField(),
+              SizedBox(
+                height: 10.0,
+              ),
               _buildPasswordTextField(),
               SizedBox(
                 height: 10.0,
               ),
               FlatButton(
-                child: Text('?שכחת סיסמה'),
-                textColor: Theme.of(context).primaryColor,
+                child: Text(
+                  '?שכחת סיסמה',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w900,
+                    decoration: TextDecoration.underline
+                  ),
+                ),
+                textColor: Colors.black, //Theme.of(context).primaryColor,
                 onPressed: () {},
               ),
               SizedBox(
@@ -127,7 +152,12 @@ class _AutoPageState extends State<AuthPage> {
                     },
                   ),
                   SizedBox(width: 10.0),
-                  Text('?אינך רשומ/ה')
+                  Text(
+                    '?אינך רשומ/ה',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
                 ],
               )
             ],

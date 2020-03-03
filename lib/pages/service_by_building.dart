@@ -8,8 +8,8 @@ class ServiceByBuilding extends StatefulWidget {
 }
 
 class _ServiceByBuildingState extends State<ServiceByBuilding> {
-  String buildingNumber = '';
-  String message = '';
+  int buildingNumber;
+  String message;
 
   @override
   Widget build(BuildContext context) {
@@ -26,8 +26,8 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
                   child: Text('הצג'),
                   onPressed: () {
                     setState(() {
-                      if (buildingNumber != '') {
-                        message = ':כל השירותים בבניין' + ' ' + buildingNumber;
+                      if (buildingNumber != null) {
+                        message = ':כל השירותים בבניין' + ' ' + buildingNumber.toString();
                       } else {
                         message = '';
                       }
@@ -41,7 +41,7 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
                 keyboardType: TextInputType.number,
                 textAlign: TextAlign.right,
                 maxLength: 4,
-                onChanged: (String value) => buildingNumber = value,
+                onChanged: (String value) => buildingNumber = int.parse(value),
               ),
             ),
             Text(
