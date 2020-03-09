@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
-import './home.dart';
+import 'package:scoped_model/scoped_model.dart';
+import 'package:http/http.dart' as http;
+import '../scoped-models/main.dart';
+
+enum AuthMode { SignUp, Login }
 
 class AuthPage extends StatefulWidget {
   @override
@@ -11,6 +15,8 @@ class AuthPage extends StatefulWidget {
 class _AutoPageState extends State<AuthPage> {
   final Map<String, dynamic> _formData = {'email': null, 'password': null};
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController _passwordTextController = TextEditingController();
+  AuthMode _authMode = AuthMode.Login;
 
   void _submitForm(Function login) {
     if (!_formKey.currentState.validate()) {
@@ -32,53 +38,69 @@ class _AutoPageState extends State<AuthPage> {
     );
   }
 
-  Widget _buildUserNameTextField() {
-    return Directionality(
-      textDirection: TextDirection.rtl,
-      child: TextFormField(
-        decoration: InputDecoration(
-          labelText: 'דוא"ל:',
-          filled: true,
-          fillColor: Colors.white70,
-        ),
-        keyboardType: TextInputType.emailAddress,
-        textAlign: TextAlign.right,
-        validator: (String value) {
-          if (value.isEmpty ||
-              !RegExp(r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
-                  .hasMatch(value)) {
-            return 'בבקשה הכנס כתובת דוא"ל תקינה';
-          }
-          return '';
-        },
-        onSaved: (String value) {
-          _formData['email'] = value;
-        },
+  Widget _buildEmailTextField() {
+    return TextFormField(
+      decoration: InputDecoration(
+        labelText: 'דוא"ל:',
+        suffixIcon: Icon(Icons.email),
+        filled: true,
+        fillColor: Colors.white70,
       ),
+      keyboardType: TextInputType.emailAddress,
+      textAlign: TextAlign.right,
+      validator: (String value) {
+        if (value.isEmpty ||
+            !RegExp(r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
+                .hasMatch(value)) {
+          return 'הכנס כתובת דוא"ל תקינה';
+        }
+      },
+      onSaved: (String value) {
+        _formData['email'] = value;
+      },
     );
   }
 
   Widget _buildPasswordTextField() {
-    return Directionality(
-      textDirection: TextDirection.rtl,
-      child: TextFormField(
-        decoration: InputDecoration(
-          labelText: 'סיסמה:',
-          filled: true,
-          fillColor: Colors.white70,
-        ),
-        obscureText: true,
-        textAlign: TextAlign.right,
-        validator: (String value) {
-          if (value.isEmpty || value.length < 6) {
-            return 'סיסמה לא תקינה';
-          }
-          return '';
-        },
-        onSaved: (String value) {
-          _formData['password'] = value;
-        },
+    return TextFormField(
+      decoration: InputDecoration(
+        labelText: 'סיסמה:',
+        suffixIcon: Icon(Icons.lock),
+        filled: true,
+        fillColor: Colors.white70,
       ),
+      controller: _passwordTextController,
+      obscureText: true,
+      textAlign: TextAlign.right,
+      validator: (String value) {
+        if (value.isEmpty || value.length < 6) {
+          return 'סיסמה לא תקינה';
+        }
+      },
+      onSaved: (String value) {
+        _formData['password'] = value;
+      },
+    );
+  }
+
+  Widget _buildPasswordConfirmTextField() {
+    return TextFormField(
+      decoration: InputDecoration(
+        labelText: 'אימות סיסמה:',
+        suffixIcon: Icon(Icons.lock),
+        filled: true,
+        fillColor: Colors.white70,
+      ),
+      obscureText: true,
+      textAlign: TextAlign.right,
+      validator: (String value) {
+        if (_passwordTextController.text != value) {
+          return 'הסיסמאות אינן תואמות';
+        }
+      },
+      onSaved: (String value) {
+        _formData['password'] = value;
+      },
     );
   }
 
@@ -86,6 +108,22 @@ class _AutoPageState extends State<AuthPage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
+        ScopedModelDescendant<MainModel>(
+          builder: (BuildContext context, Widget child, MainModel model) {
+            return RaisedButton(
+              color: Theme.of(context).primaryColor,
+              child: Text(
+                'התחברות',
+                style: TextStyle(fontSize: 20.0),
+              ),
+              textColor: Colors.white,
+              onPressed: () => _submitForm(model.login),
+            );
+          },
+        ),
+        SizedBox(
+          width: 10.0,
+        ),
         RaisedButton(
           color: Theme.of(context).primaryColor,
           child: Text(
@@ -97,93 +135,123 @@ class _AutoPageState extends State<AuthPage> {
             Navigator.pushReplacementNamed(context, '/home');
           },
         ),
-        SizedBox(
-          width: 10.0,
-        ),
-        RaisedButton(
-          color: Theme.of(context).primaryColor,
-          child: Text(
-            'התחברות',
-            style: TextStyle(fontSize: 20.0),
-          ),
-          textColor: Colors.white,
-          onPressed: () => _submitForm(model.login),
-        ),
       ],
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('LOGIN'),
-      ),
-      body: Container(
-        decoration: BoxDecoration(
-          image: _buildBackgroungImage(),
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            'כניסה',
+          ),
         ),
-        padding: EdgeInsets.all(10.0),
-        child: GestureDetector(
-          onTap: () {
-            FocusScope.of(context).requestFocus(FocusNode());
-          },
-          child: ListView(
-            children: <Widget>[
-              CircleAvatar(),
-              Image.asset(
-                'assets/Bar_Iland_line.png',
-                height: 200,
-              ),
-              _buildUserNameTextField(),
-              SizedBox(
-                height: 10.0,
-              ),
-              _buildPasswordTextField(),
-              SizedBox(
-                height: 10.0,
-              ),
-              FlatButton(
-                child: Text(
-                  '?שכחת סיסמה',
-                  style: TextStyle(
-                      fontWeight: FontWeight.w900,
-                      decoration: TextDecoration.underline),
-                ),
-                textColor: Colors.black, //Theme.of(context).primaryColor,
-                onPressed: () {},
-              ),
-              SizedBox(
-                height: 10.0,
-              ),
-              _buildConnectionButtons(),
-              SizedBox(
-                height: 40.0,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+        body: Container(
+          decoration: BoxDecoration(
+            image: _buildBackgroungImage(),
+          ),
+          padding: EdgeInsets.all(10.0),
+          child: GestureDetector(
+            onTap: () {
+              FocusScope.of(context).requestFocus(FocusNode());
+            },
+            child: Form(
+              key: _formKey,
+              child: ListView(
                 children: <Widget>[
-                  RaisedButton(
-                    //color: ,
-                    child: Text(
-                      'יצירת חשבון',
-                      style: TextStyle(fontSize: 12.0),
-                    ),
-                    //textColor: Colors.white,
-                    onPressed: () {
-                      Navigator.pushReplacementNamed(context, '/home');
-                    },
+                  Image.asset(
+                    'assets/Bar_Iland_line.png',
+                    height: 200,
                   ),
-                  SizedBox(width: 10.0),
-                  Text(
-                    '?אינך רשומ/ה',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w900,
-                    ),
+                  _buildEmailTextField(),
+                  SizedBox(
+                    height: 10.0,
                   ),
+                  _buildPasswordTextField(),
+                  SizedBox(
+                    height: 10.0,
+                  ),
+                  _authMode == AuthMode.SignUp
+                      ? _buildPasswordConfirmTextField()
+                      : Container(),
+                  SizedBox(
+                    height: 10.0,
+                  ),
+                  _authMode == AuthMode.Login
+                      ? FlatButton(
+                          child: Text(
+                            'שכחת סיסמה?',
+                            style: TextStyle(
+                                fontWeight: FontWeight.w900,
+                                decoration: TextDecoration.underline),
+                          ),
+                          textColor: Colors.black,
+                          onPressed: () {},
+                        )
+                      : Container(),
+                  SizedBox(
+                    height: 10.0,
+                  ),
+                  _authMode == AuthMode.Login
+                      ? _buildConnectionButtons()
+                      : Container(),
+                  SizedBox(
+                    height: 40.0,
+                  ),
+                  _authMode == AuthMode.Login
+                      ? Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Text(
+                              'אינך רשומ/ה?',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
+                            SizedBox(width: 10.0),
+                            RaisedButton(
+                              child: Text(
+                                'יצירת חשבון',
+                                style: TextStyle(fontSize: 12.0),
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _authMode = _authMode == AuthMode.Login
+                                      ? AuthMode.SignUp
+                                      : AuthMode.Login;
+                                });
+                              },
+                            ),
+                          ],
+                        )
+                      : Container(),
+                  _authMode == AuthMode.SignUp
+                      ? RaisedButton(
+                          color: Theme.of(context).primaryColor,
+                          child: Text(
+                            'סיים הרשמה',
+                            style: TextStyle(fontSize: 20.0),
+                          ),
+                          textColor: Colors.white,
+                          onPressed: () {
+                            if (!_formKey.currentState.validate()) {
+                              return;
+                            }
+                            _formKey.currentState.save();
+                            setState(() {
+                              _authMode = _authMode == AuthMode.Login
+                                  ? AuthMode.SignUp
+                                  : AuthMode.Login;
+                            });
+                          },
+                        )
+                      : Container(),
                 ],
-              )
-            ],
+              ),
+            ),
           ),
         ),
       ),
