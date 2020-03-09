@@ -9,25 +9,51 @@ class AuthPage extends StatefulWidget {
 }
 
 class _AutoPageState extends State<AuthPage> {
-  String _emailValue;
-  String _passwordValue;
+  final Map<String, dynamic> _formData = {'email': null, 'password': null};
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  void _submitForm(Function login) {
+    if (!_formKey.currentState.validate()) {
+      return;
+    }
+    _formKey.currentState.save();
+    login(_formData['email'], _formData['password']);
+    Navigator.pushReplacementNamed(context, '/home');
+  }
+
+  DecorationImage _buildBackgroungImage() {
+    return DecorationImage(
+      image: AssetImage('assets/background.jpg'),
+      fit: BoxFit.cover,
+      colorFilter: ColorFilter.mode(
+        Colors.black.withOpacity(0.55),
+        BlendMode.dstATop,
+      ),
+    );
+  }
 
   Widget _buildUserNameTextField() {
     return Directionality(
       textDirection: TextDirection.rtl,
-      child: TextField(
+      child: TextFormField(
         decoration: InputDecoration(
-          labelText: 'שם משתמש:',
+          labelText: 'דוא"ל:',
           filled: true,
           fillColor: Colors.white70,
         ),
         keyboardType: TextInputType.emailAddress,
         textAlign: TextAlign.right,
-        onChanged: ((String value) {
-          setState(() {
-            _emailValue = value;
-          });
-        }),
+        validator: (String value) {
+          if (value.isEmpty ||
+              !RegExp(r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
+                  .hasMatch(value)) {
+            return 'בבקשה הכנס כתובת דוא"ל תקינה';
+          }
+          return '';
+        },
+        onSaved: (String value) {
+          _formData['email'] = value;
+        },
       ),
     );
   }
@@ -35,7 +61,7 @@ class _AutoPageState extends State<AuthPage> {
   Widget _buildPasswordTextField() {
     return Directionality(
       textDirection: TextDirection.rtl,
-      child: TextField(
+      child: TextFormField(
         decoration: InputDecoration(
           labelText: 'סיסמה:',
           filled: true,
@@ -43,11 +69,15 @@ class _AutoPageState extends State<AuthPage> {
         ),
         obscureText: true,
         textAlign: TextAlign.right,
-        onChanged: ((String value) {
-          setState(() {
-            _passwordValue = value;
-          });
-        }),
+        validator: (String value) {
+          if (value.isEmpty || value.length < 6) {
+            return 'סיסמה לא תקינה';
+          }
+          return '';
+        },
+        onSaved: (String value) {
+          _formData['password'] = value;
+        },
       ),
     );
   }
@@ -77,9 +107,7 @@ class _AutoPageState extends State<AuthPage> {
             style: TextStyle(fontSize: 20.0),
           ),
           textColor: Colors.white,
-          onPressed: () {
-            Navigator.pushReplacementNamed(context, '/home');
-          },
+          onPressed: () => _submitForm(model.login),
         ),
       ],
     );
@@ -93,12 +121,7 @@ class _AutoPageState extends State<AuthPage> {
       ),
       body: Container(
         decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/background.jpg'),
-            fit: BoxFit.cover,
-            colorFilter: ColorFilter.mode(
-                Colors.black.withOpacity(0.55), BlendMode.dstATop),
-          ),
+          image: _buildBackgroungImage(),
         ),
         padding: EdgeInsets.all(10.0),
         child: GestureDetector(
@@ -107,6 +130,7 @@ class _AutoPageState extends State<AuthPage> {
           },
           child: ListView(
             children: <Widget>[
+              CircleAvatar(),
               Image.asset(
                 'assets/Bar_Iland_line.png',
                 height: 200,
@@ -123,9 +147,8 @@ class _AutoPageState extends State<AuthPage> {
                 child: Text(
                   '?שכחת סיסמה',
                   style: TextStyle(
-                    fontWeight: FontWeight.w900,
-                    decoration: TextDecoration.underline
-                  ),
+                      fontWeight: FontWeight.w900,
+                      decoration: TextDecoration.underline),
                 ),
                 textColor: Colors.black, //Theme.of(context).primaryColor,
                 onPressed: () {},
