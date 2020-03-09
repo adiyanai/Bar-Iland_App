@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:scoped_model/scoped_model.dart';
+import './scoped-models/main.dart';
 import './pages/auth.dart';
 import './pages/home.dart';
-import './service_manager.dart';
 
 void main() => runApp(MyApp());
 
@@ -15,12 +16,15 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      //home: AuthPage(),
-      routes: {
-        '/': (BuildContext context) => AuthPage(),
-        '/home': (BuildContext context) => HomePage(),
-      },
+    return ScopedModel<MainModel>(
+      model: MainModel(),
+      child: MaterialApp(
+        //home: AuthPage(),
+        routes: {
+          '/': (BuildContext context) => AuthPage(),
+          '/home': (BuildContext context) => HomePage(),
+        },
+      ),
     );
   }
 }
