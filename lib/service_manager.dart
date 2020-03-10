@@ -9,7 +9,12 @@ class ServiceManager extends StatelessWidget {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
+          // leading: FlatButton(child: Icon(Icons.home, color: Colors.white,), onPressed: (){},),
+          centerTitle: true,
           title: Center(child: Text('שירותים באוניברסיטה')),
+          actions: <Widget>[ButtonTheme(minWidth: 80, child: FlatButton(child: Icon(Icons.arrow_forward, color: Colors.white, size: 26,), onPressed: (){
+            Navigator.pushReplacementNamed(context, '/home');
+          },))],
           bottom: TabBar(
             tabs: <Widget>[
               Tab(

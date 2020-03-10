@@ -27,6 +27,13 @@ class _MyAppState extends State<MyApp> {
           '/signUp': (BuildContext context) => SignUp(),
         },
       ),
+    return MaterialApp(
+      //home: AuthPage(),
+      routes: {
+        '/': (BuildContext context) => AuthPage(),
+        '/home': (BuildContext context) => HomePage(),
+        '/service_manager': (BuildContext context) => ServiceManager(),
+      },
     );
   }
 }

@@ -9,7 +9,26 @@ class ServiceByBuilding extends StatefulWidget {
 
 class _ServiceByBuildingState extends State<ServiceByBuilding> {
   int buildingNumber;
-  String message;
+  String message = '';
+  List <String> _services = ["מכונת צילום", "קולר", "מכונת קפה", "מכונת חטיפים", "מכונת שתייה", "מיקרוגל", "מקרר", "קופי טיים", "מיחזורית"];
+
+  Widget _showServices() {
+    return Column(children: _services.map((service){
+      return new Container(
+      padding: EdgeInsets.all(5),
+      margin: EdgeInsets.all(8),
+      decoration: new BoxDecoration(
+        shape: BoxShape.rectangle,
+        color: Color.fromARGB(60, 20, 200, 250),
+        border: new Border.all(
+          color: Colors.black,
+          width: 1.0, 
+        ),
+      ),
+      child: new Text(service, textAlign: TextAlign.right,),
+    width: MediaQuery.of(context).size.width,);
+    }).toList());
+  } 
 
   @override
   Widget build(BuildContext context) {
@@ -53,6 +72,7 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
         Center(
           child: Text(message),
         ),
+        _showServices()
       ],
     );
   }
