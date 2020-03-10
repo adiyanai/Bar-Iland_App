@@ -20,6 +20,7 @@ class _MyAppState extends State<MyApp> {
       routes: {
         '/': (BuildContext context) => AuthPage(),
         '/home': (BuildContext context) => HomePage(),
+        '/service_manager': (BuildContext context) => ServiceManager(),
       },
     );
   }
