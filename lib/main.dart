@@ -4,6 +4,7 @@ import './scoped-models/main.dart';
 import './pages/auth.dart';
 import './pages/home.dart';
 import './pages/sign_up.dart';
+import './service_manager.dart';
 
 void main() => runApp(MyApp());
 
