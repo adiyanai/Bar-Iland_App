@@ -16,7 +16,6 @@ class _AutoPageState extends State<AuthPage> {
   final Map<String, dynamic> _formData = {'email': null, 'password': null};
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _passwordTextController = TextEditingController();
-  AuthMode _authMode = AuthMode.Login;
 
   void _submitForm(Function login) {
     if (!_formKey.currentState.validate()) {
@@ -75,27 +74,6 @@ class _AutoPageState extends State<AuthPage> {
       validator: (String value) {
         if (value.isEmpty || value.length < 6) {
           return 'סיסמה לא תקינה';
-        }
-      },
-      onSaved: (String value) {
-        _formData['password'] = value;
-      },
-    );
-  }
-
-  Widget _buildPasswordConfirmTextField() {
-    return TextFormField(
-      decoration: InputDecoration(
-        labelText: 'אימות סיסמה:',
-        suffixIcon: Icon(Icons.lock),
-        filled: true,
-        fillColor: Colors.white70,
-      ),
-      obscureText: true,
-      textAlign: TextAlign.right,
-      validator: (String value) {
-        if (_passwordTextController.text != value) {
-          return 'הסיסמאות אינן תואמות';
         }
       },
       onSaved: (String value) {
@@ -174,81 +152,44 @@ class _AutoPageState extends State<AuthPage> {
                   SizedBox(
                     height: 10.0,
                   ),
-                  _authMode == AuthMode.SignUp
-                      ? _buildPasswordConfirmTextField()
-                      : Container(),
+                  FlatButton(
+                    child: Text(
+                      'שכחת סיסמה?',
+                      style: TextStyle(
+                          fontWeight: FontWeight.w900,
+                          decoration: TextDecoration.underline),
+                    ),
+                    textColor: Colors.black,
+                    onPressed: () {},
+                  ),
                   SizedBox(
                     height: 10.0,
                   ),
-                  _authMode == AuthMode.Login
-                      ? FlatButton(
-                          child: Text(
-                            'שכחת סיסמה?',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w900,
-                                decoration: TextDecoration.underline),
-                          ),
-                          textColor: Colors.black,
-                          onPressed: () {},
-                        )
-                      : Container(),
-                  SizedBox(
-                    height: 10.0,
-                  ),
-                  _authMode == AuthMode.Login
-                      ? _buildConnectionButtons()
-                      : Container(),
+                  _buildConnectionButtons(),
                   SizedBox(
                     height: 40.0,
                   ),
-                  _authMode == AuthMode.Login
-                      ? Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Text(
-                              'אינך רשומ/ה?',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w900,
-                              ),
-                            ),
-                            SizedBox(width: 10.0),
-                            RaisedButton(
-                              child: Text(
-                                'יצירת חשבון',
-                                style: TextStyle(fontSize: 12.0),
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  _authMode = _authMode == AuthMode.Login
-                                      ? AuthMode.SignUp
-                                      : AuthMode.Login;
-                                });
-                              },
-                            ),
-                          ],
-                        )
-                      : Container(),
-                  _authMode == AuthMode.SignUp
-                      ? RaisedButton(
-                          color: Theme.of(context).primaryColor,
-                          child: Text(
-                            'סיים הרשמה',
-                            style: TextStyle(fontSize: 20.0),
-                          ),
-                          textColor: Colors.white,
-                          onPressed: () {
-                            if (!_formKey.currentState.validate()) {
-                              return;
-                            }
-                            _formKey.currentState.save();
-                            setState(() {
-                              _authMode = _authMode == AuthMode.Login
-                                  ? AuthMode.SignUp
-                                  : AuthMode.Login;
-                            });
-                          },
-                        )
-                      : Container(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text(
+                        'אינך רשומ/ה?',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                      SizedBox(width: 10.0),
+                      RaisedButton(
+                        child: Text(
+                          'יצירת חשבון',
+                          style: TextStyle(fontSize: 12.0),
+                        ),
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/signUp');
+                        },
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
