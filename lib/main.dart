@@ -3,6 +3,7 @@ import 'package:scoped_model/scoped_model.dart';
 import './scoped-models/main.dart';
 import './pages/auth.dart';
 import './pages/home.dart';
+import './pages/sign_up.dart';
 
 void main() => runApp(MyApp());
 
@@ -23,6 +24,7 @@ class _MyAppState extends State<MyApp> {
         routes: {
           '/': (BuildContext context) => AuthPage(),
           '/home': (BuildContext context) => HomePage(),
+          '/signUp': (BuildContext context) => SignUp(),
         },
       ),
     );
