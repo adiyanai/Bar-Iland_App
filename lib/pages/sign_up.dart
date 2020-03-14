@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:scoped_model/scoped_model.dart';
+import '../scoped-models/main.dart';
 
 class SignUp extends StatefulWidget {
   @override
@@ -11,6 +13,39 @@ class _SignUpState extends State<SignUp> {
   final Map<String, dynamic> _formData = {'email': null, 'password': null};
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _passwordTextController = TextEditingController();
+
+  void _submitForm(Function signUp) async {
+    if (!_formKey.currentState.validate()) {
+      return;
+    }
+    _formKey.currentState.save();
+    final Map<String, dynamic> successInformation =
+        await signUp(_formData['email'], _formData['password']);
+    if (successInformation['success']) {
+      Navigator.pop(context);
+    } else {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Directionality(
+            textDirection: TextDirection.rtl,
+            child: AlertDialog(
+              title: Text('אירעה שגיאה'),
+              content: Text(successInformation['message']),
+              actions: <Widget>[
+                FlatButton(
+                  child: Text('אישור'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    }
+  }
 
   DecorationImage _buildBackgroungImage() {
     return DecorationImage(
@@ -26,7 +61,7 @@ class _SignUpState extends State<SignUp> {
   Widget _buildEmailTextField() {
     return TextFormField(
       decoration: InputDecoration(
-        labelText: 'דוא"ל:',
+        labelText: 'דוא"ל',
         suffixIcon: Icon(Icons.email),
         filled: true,
         fillColor: Colors.white70,
@@ -49,7 +84,7 @@ class _SignUpState extends State<SignUp> {
   Widget _buildPasswordTextField() {
     return TextFormField(
       decoration: InputDecoration(
-        labelText: 'סיסמה:',
+        labelText: 'סיסמה',
         suffixIcon: Icon(Icons.lock),
         filled: true,
         fillColor: Colors.white70,
@@ -71,7 +106,7 @@ class _SignUpState extends State<SignUp> {
   Widget _buildPasswordConfirmTextField() {
     return TextFormField(
       decoration: InputDecoration(
-        labelText: 'אימות סיסמה:',
+        labelText: 'אימות סיסמה',
         suffixIcon: Icon(Icons.lock),
         filled: true,
         fillColor: Colors.white70,
@@ -82,9 +117,6 @@ class _SignUpState extends State<SignUp> {
         if (_passwordTextController.text != value) {
           return 'הסיסמאות אינן תואמות';
         }
-      },
-      onSaved: (String value) {
-        _formData['password'] = value;
       },
     );
   }
@@ -128,19 +160,25 @@ class _SignUpState extends State<SignUp> {
                   SizedBox(
                     height: 50.0,
                   ),
-                  RaisedButton(
-                    color: Theme.of(context).primaryColor,
-                    child: Text(
-                      'סיים הרשמה',
-                      style: TextStyle(fontSize: 20.0),
-                    ),
-                    textColor: Colors.white,
-                    onPressed: () {
-                      if (!_formKey.currentState.validate()) {
-                        return;
-                      }
-                      _formKey.currentState.save();
-                      Navigator.pushNamed(context, '/');
+                  ScopedModelDescendant<MainModel>(
+                    builder:
+                        (BuildContext context, Widget child, MainModel model) {
+                      return model.isLoading
+                          ? Center(child: CircularProgressIndicator())
+                          : Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                RaisedButton(
+                                  color: Theme.of(context).primaryColor,
+                                  child: Text(
+                                    'סיים הרשמה',
+                                    style: TextStyle(fontSize: 20.0),
+                                  ),
+                                  textColor: Colors.white,
+                                  onPressed: () => _submitForm(model.signUp),
+                                ),
+                              ],
+                            );
                     },
                   ),
                 ],
