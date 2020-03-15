@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import '../scoped-models/main.dart';
+import '../models/auth.dart';
 
 class SignUp extends StatefulWidget {
   @override
@@ -14,13 +15,13 @@ class _SignUpState extends State<SignUp> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _passwordTextController = TextEditingController();
 
-  void _submitForm(Function signUp) async {
+  void _submitForm(Function authenticate) async {
     if (!_formKey.currentState.validate()) {
       return;
     }
     _formKey.currentState.save();
     final Map<String, dynamic> successInformation =
-        await signUp(_formData['email'], _formData['password']);
+        await authenticate(_formData['email'], _formData['password'], AuthMode.SignUp);
     if (successInformation['success']) {
       Navigator.pop(context);
     } else {
@@ -175,7 +176,7 @@ class _SignUpState extends State<SignUp> {
                                     style: TextStyle(fontSize: 20.0),
                                   ),
                                   textColor: Colors.white,
-                                  onPressed: () => _submitForm(model.signUp),
+                                  onPressed: () => _submitForm(model.authenticate),
                                 ),
                               ],
                             );
