@@ -20,8 +20,8 @@ class _SignUpState extends State<SignUp> {
       return;
     }
     _formKey.currentState.save();
-    final Map<String, dynamic> successInformation =
-        await authenticate(_formData['email'], _formData['password'], AuthMode.SignUp);
+    final Map<String, dynamic> successInformation = await authenticate(
+        _formData['email'], _formData['password'], AuthMode.SignUp);
     if (successInformation['success']) {
       Navigator.pop(context);
     } else {
@@ -166,19 +166,17 @@ class _SignUpState extends State<SignUp> {
                         (BuildContext context, Widget child, MainModel model) {
                       return model.isLoading
                           ? Center(child: CircularProgressIndicator())
-                          : Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                RaisedButton(
-                                  color: Theme.of(context).primaryColor,
-                                  child: Text(
-                                    'סיים הרשמה',
-                                    style: TextStyle(fontSize: 20.0),
-                                  ),
-                                  textColor: Colors.white,
-                                  onPressed: () => _submitForm(model.authenticate),
+                          : Center(
+                              child: RaisedButton(
+                                color: Theme.of(context).primaryColor,
+                                child: Text(
+                                  'סיים הרשמה',
+                                  style: TextStyle(fontSize: 20.0),
                                 ),
-                              ],
+                                textColor: Colors.white,
+                                onPressed: () =>
+                                    _submitForm(model.authenticate),
+                              ),
                             );
                     },
                   ),
