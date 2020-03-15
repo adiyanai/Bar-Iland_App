@@ -13,7 +13,7 @@ class ServiceManager extends StatelessWidget {
           centerTitle: true,
           title: Center(child: Text('שירותים באוניברסיטה')),
           actions: <Widget>[ButtonTheme(minWidth: 80, child: FlatButton(child: Icon(Icons.arrow_forward, color: Colors.white, size: 26,), onPressed: (){
-            Navigator.pushReplacementNamed(context, '/home');
+            Navigator.pushReplacementNamed(context, '/');
           },))],
           bottom: TabBar(
             tabs: <Widget>[

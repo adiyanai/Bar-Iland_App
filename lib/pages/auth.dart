@@ -20,10 +20,10 @@ class _AutoPageState extends State<AuthPage> {
       return;
     }
     _formKey.currentState.save();
-    final Map<String, dynamic> successInformation =
-        await authenticate(_formData['email'], _formData['password'], AuthMode.Login);
+    final Map<String, dynamic> successInformation = await authenticate(
+        _formData['email'], _formData['password'], AuthMode.Login);
     if (successInformation['success']) {
-      Navigator.pushReplacementNamed(context, '/home');
+      Navigator.pushReplacementNamed(context, '/');
     } else {
       showDialog(
         context: context,
@@ -134,7 +134,7 @@ class _AutoPageState extends State<AuthPage> {
           ),
           textColor: Colors.white,
           onPressed: () {
-            Navigator.pushReplacementNamed(context, '/home');
+            Navigator.pushReplacementNamed(context, '/');
           },
         ),
       ],
@@ -176,15 +176,17 @@ class _AutoPageState extends State<AuthPage> {
                   SizedBox(
                     height: 10.0,
                   ),
-                  FlatButton(
-                    child: Text(
-                      'שכחת סיסמה?',
-                      style: TextStyle(
-                          fontWeight: FontWeight.w900,
-                          decoration: TextDecoration.underline),
+                  Center(
+                    child: FlatButton(
+                      child: Text(
+                        'שכחת סיסמה?',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w900,
+                            decoration: TextDecoration.underline),
+                      ),
+                      textColor: Colors.black,
+                      onPressed: () {},
                     ),
-                    textColor: Colors.black,
-                    onPressed: () {},
                   ),
                   SizedBox(
                     height: 10.0,
