@@ -17,10 +17,16 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   final MainModel _model = MainModel();
+  bool _isAuthenticated = false;
 
   @override
   void initState() {
     _model.autoAuthenticate();
+    _model.userSubject.listen((bool isAuthenticated) {
+      setState(() {
+        _isAuthenticated = isAuthenticated;
+      });
+    });
     super.initState();
   }
 
@@ -31,14 +37,9 @@ class _MyAppState extends State<MyApp> {
       child: MaterialApp(
         //home: AuthPage(),
         routes: {
-          '/': (BuildContext context) => ScopedModelDescendant(
-                builder: (BuildContext context, Widget child, MainModel model) {
-                  return model.user == null ? AuthPage() : HomePage();
-                },
-              ),
-          '/home': (BuildContext context) => HomePage(),
-          '/signUp': (BuildContext context) => SignUp(),
-          '/service_manager': (BuildContext context) => ServiceManager(),
+          '/': (BuildContext context) => !_isAuthenticated ? AuthPage() : HomePage(),
+          '/signUp': (BuildContext context) => !_isAuthenticated ? AuthPage() : SignUp(),
+          '/service_manager': (BuildContext context) => !_isAuthenticated ? AuthPage() : ServiceManager(),
         },
       ),
     );
