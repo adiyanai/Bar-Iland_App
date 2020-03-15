@@ -3,6 +3,39 @@ import 'package:scoped_model/scoped_model.dart';
 import '../scoped-models/main.dart';
 
 class HomePage extends StatelessWidget {
+  Widget _buildDrawer() {
+    return Drawer(
+      child: Directionality(
+        textDirection: TextDirection.rtl,
+        child: Column(
+          children: <Widget>[
+            AppBar(
+              automaticallyImplyLeading: false,
+            ),
+            ListTile(
+              leading: Icon(Icons.school),
+              title: Text('סטודנט'),
+              onTap: () {},
+            ),
+            Divider(),
+            ListTile(
+              leading: Icon(Icons.person),
+              title: Text('אורח'),
+              onTap: () {},
+            ),
+            Divider(),
+            //Expanded(
+            //  child: Align(
+            //    alignment: Alignment.bottomCenter,
+            //    child: _buildLogoutListTile(),
+            //  ),
+            //),
+            _buildLogoutListTile(),
+          ],
+        ),
+      ),
+    );
+  }
 
   Widget _buildLogoutListTile() {
     return ScopedModelDescendant(
@@ -12,7 +45,6 @@ class HomePage extends StatelessWidget {
           title: Text('התנתק'),
           onTap: () {
             model.logout();
-            Navigator.of(context).pushReplacementNamed('/');
           },
         );
       },
@@ -22,37 +54,18 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: Drawer(
-        child: Directionality(
-          textDirection: TextDirection.rtl,
-          child: Column(
-            children: <Widget>[
-              AppBar(
-                automaticallyImplyLeading: false,
-              ),
-              ListTile(
-                leading: Icon(Icons.school),
-                title: Text('סטודנט'),
-                onTap: () {},
-              ),
-              Divider(),
-              ListTile(
-                leading: Icon(Icons.person),
-                title: Text('אורח'),
-                onTap: () {},
-              ),
-              Divider(),
-              _buildLogoutListTile(),
-            ],
-          ),
-        ),
-      ),
+      drawer: _buildDrawer(),
       appBar: AppBar(
-        title: Text('Bar-Iland'),
+        title: Image.asset(
+          'assets/Bar_Iland_line.png',
+          height: 40,
+        ),
+        centerTitle: true,
         leading: Builder(
           builder: (context) => IconButton(
             icon: Icon(
               Icons.account_circle,
+              //color: Colors.black54,
               size: 30,
             ),
             onPressed: () => Scaffold.of(context).openDrawer(),
