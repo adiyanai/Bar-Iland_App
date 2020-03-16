@@ -185,7 +185,9 @@ class _AutoPageState extends State<AuthPage> {
                             decoration: TextDecoration.underline),
                       ),
                       textColor: Colors.black,
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/forgetPassword');
+                      },
                     ),
                   ),
                   SizedBox(
