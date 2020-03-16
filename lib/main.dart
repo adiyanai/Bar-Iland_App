@@ -4,6 +4,7 @@ import './scoped-models/main.dart';
 import './pages/auth.dart';
 import './pages/home.dart';
 import './pages/sign_up.dart';
+import './pages/forget_password.dart';
 import './service_manager.dart';
 
 void main() => runApp(MyApp());
@@ -38,7 +39,8 @@ class _MyAppState extends State<MyApp> {
         //home: AuthPage(),
         routes: {
           '/': (BuildContext context) => !_isAuthenticated ? AuthPage() : HomePage(),
-          '/signUp': (BuildContext context) => !_isAuthenticated ? AuthPage() : SignUp(),
+          '/signUp': (BuildContext context) => SignUp(),
+          '/forgetPassword': (BuildContext context) => ForgetPassword(),
           '/service_manager': (BuildContext context) => !_isAuthenticated ? AuthPage() : ServiceManager(),
         },
       ),
