@@ -1,28 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import '../scoped-models/main.dart';
-import '../models/auth.dart';
 
-class SignUp extends StatefulWidget {
+class ForgetPassword extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    return _SignUpState();
+    return _ForgetPasswordState();
   }
 }
 
-class _SignUpState extends State<SignUp> {
-  final Map<String, dynamic> _formData = {'email': null, 'password': null};
+class _ForgetPasswordState extends State<ForgetPassword> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final TextEditingController _passwordTextController = TextEditingController();
+  String _email = null;
 
-  void _submitForm(Function authenticate) async {
+  void _submitForm(Function resetPassword) async {
+    print('here!!!!');
     if (!_formKey.currentState.validate()) {
       return;
     }
     _formKey.currentState.save();
-    final Map<String, dynamic> successInformation = await authenticate(
-        _formData['email'], _formData['password'], AuthMode.SignUp);
+    final Map<String, dynamic> successInformation = await resetPassword(_email);
     if (successInformation['success']) {
+      print('success!!!');
       Navigator.pop(context);
     } else {
       showDialog(
@@ -77,47 +76,7 @@ class _SignUpState extends State<SignUp> {
         }
       },
       onSaved: (String value) {
-        _formData['email'] = value;
-      },
-    );
-  }
-
-  Widget _buildPasswordTextField() {
-    return TextFormField(
-      decoration: InputDecoration(
-        labelText: 'סיסמה',
-        suffixIcon: Icon(Icons.lock),
-        filled: true,
-        fillColor: Colors.white70,
-      ),
-      controller: _passwordTextController,
-      obscureText: true,
-      textAlign: TextAlign.right,
-      validator: (String value) {
-        if (value.isEmpty || value.length < 6) {
-          return 'סיסמה לא תקינה';
-        }
-      },
-      onSaved: (String value) {
-        _formData['password'] = value;
-      },
-    );
-  }
-
-  Widget _buildPasswordConfirmTextField() {
-    return TextFormField(
-      decoration: InputDecoration(
-        labelText: 'אימות סיסמה',
-        suffixIcon: Icon(Icons.lock),
-        filled: true,
-        fillColor: Colors.white70,
-      ),
-      obscureText: true,
-      textAlign: TextAlign.right,
-      validator: (String value) {
-        if (_passwordTextController.text != value) {
-          return 'הסיסמאות אינן תואמות';
-        }
+        _email = value;
       },
     );
   }
@@ -129,7 +88,7 @@ class _SignUpState extends State<SignUp> {
       child: Scaffold(
         appBar: AppBar(
           title: Text(
-            'הרשמה',
+            'שחזור סיסמה',
           ),
         ),
         body: Container(
@@ -152,15 +111,7 @@ class _SignUpState extends State<SignUp> {
                   ),
                   _buildEmailTextField(),
                   SizedBox(
-                    height: 10.0,
-                  ),
-                  _buildPasswordTextField(),
-                  SizedBox(
-                    height: 10.0,
-                  ),
-                  _buildPasswordConfirmTextField(),
-                  SizedBox(
-                    height: 50.0,
+                    height: 20.0,
                   ),
                   ScopedModelDescendant<MainModel>(
                     builder:
@@ -171,12 +122,13 @@ class _SignUpState extends State<SignUp> {
                               child: RaisedButton(
                                 color: Theme.of(context).primaryColor,
                                 child: Text(
-                                  'סיים הרשמה',
+                                  'שחזר',
                                   style: TextStyle(fontSize: 20.0),
                                 ),
                                 textColor: Colors.white,
-                                onPressed: () =>
-                                    _submitForm(model.authenticate),
+                                onPressed: () {
+                                  _submitForm(model.resetPassword);
+                                },
                               ),
                             );
                     },

@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
-import 'package:http/http.dart' as http;
 import '../scoped-models/main.dart';
-
-enum AuthMode { SignUp, Login }
+import '../models/auth.dart';
 
 class AuthPage extends StatefulWidget {
   @override
@@ -17,13 +15,37 @@ class _AutoPageState extends State<AuthPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _passwordTextController = TextEditingController();
 
-  void _submitForm(Function login) {
+  void _submitForm(Function authenticate) async {
     if (!_formKey.currentState.validate()) {
       return;
     }
     _formKey.currentState.save();
-    login(_formData['email'], _formData['password']);
-    Navigator.pushReplacementNamed(context, '/home');
+    final Map<String, dynamic> successInformation = await authenticate(
+        _formData['email'], _formData['password'], AuthMode.Login);
+    if (successInformation['success']) {
+      Navigator.pushReplacementNamed(context, '/');
+    } else {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Directionality(
+            textDirection: TextDirection.rtl,
+            child: AlertDialog(
+              title: Text('אירעה שגיאה'),
+              content: Text(successInformation['message']),
+              actions: <Widget>[
+                FlatButton(
+                  child: Text('אישור'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    }
   }
 
   DecorationImage _buildBackgroungImage() {
@@ -40,7 +62,7 @@ class _AutoPageState extends State<AuthPage> {
   Widget _buildEmailTextField() {
     return TextFormField(
       decoration: InputDecoration(
-        labelText: 'דוא"ל:',
+        labelText: 'דוא"ל',
         suffixIcon: Icon(Icons.email),
         filled: true,
         fillColor: Colors.white70,
@@ -63,7 +85,7 @@ class _AutoPageState extends State<AuthPage> {
   Widget _buildPasswordTextField() {
     return TextFormField(
       decoration: InputDecoration(
-        labelText: 'סיסמה:',
+        labelText: 'סיסמה',
         suffixIcon: Icon(Icons.lock),
         filled: true,
         fillColor: Colors.white70,
@@ -88,15 +110,17 @@ class _AutoPageState extends State<AuthPage> {
       children: <Widget>[
         ScopedModelDescendant<MainModel>(
           builder: (BuildContext context, Widget child, MainModel model) {
-            return RaisedButton(
-              color: Theme.of(context).primaryColor,
-              child: Text(
-                'התחברות',
-                style: TextStyle(fontSize: 20.0),
-              ),
-              textColor: Colors.white,
-              onPressed: () => _submitForm(model.login),
-            );
+            return model.isLoading
+                ? CircularProgressIndicator()
+                : RaisedButton(
+                    color: Theme.of(context).primaryColor,
+                    child: Text(
+                      'התחברות',
+                      style: TextStyle(fontSize: 20.0),
+                    ),
+                    textColor: Colors.white,
+                    onPressed: () => _submitForm(model.authenticate),
+                  );
           },
         ),
         SizedBox(
@@ -110,7 +134,7 @@ class _AutoPageState extends State<AuthPage> {
           ),
           textColor: Colors.white,
           onPressed: () {
-            Navigator.pushReplacementNamed(context, '/home');
+            Navigator.pushReplacementNamed(context, '/');
           },
         ),
       ],
@@ -143,6 +167,7 @@ class _AutoPageState extends State<AuthPage> {
                   Image.asset(
                     'assets/Bar_Iland_line.png',
                     height: 200,
+                    color: Colors.black.withOpacity(0.80),
                   ),
                   _buildEmailTextField(),
                   SizedBox(
@@ -152,15 +177,19 @@ class _AutoPageState extends State<AuthPage> {
                   SizedBox(
                     height: 10.0,
                   ),
-                  FlatButton(
-                    child: Text(
-                      'שכחת סיסמה?',
-                      style: TextStyle(
-                          fontWeight: FontWeight.w900,
-                          decoration: TextDecoration.underline),
+                  Center(
+                    child: FlatButton(
+                      child: Text(
+                        'שכחת סיסמה?',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w900,
+                            decoration: TextDecoration.underline),
+                      ),
+                      textColor: Colors.black,
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/forgetPassword');
+                      },
                     ),
-                    textColor: Colors.black,
-                    onPressed: () {},
                   ),
                   SizedBox(
                     height: 10.0,

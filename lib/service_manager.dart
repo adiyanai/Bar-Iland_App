@@ -15,16 +15,9 @@ class ServiceManager extends StatelessWidget {
         appBar: AppBar(
           centerTitle: true,
           title: Center(child: Text('שירותים באוניברסיטה')),
-          actions: <Widget>[
-            ButtonTheme(
-                minWidth: 80,
-                child: FlatButton(
-                  child: Text(""),
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/home');
-                  },
-                ))
-          ],
+          actions: <Widget>[ButtonTheme(minWidth: 80, child: FlatButton(child: Icon(Icons.arrow_forward, color: Colors.white, size: 26,), onPressed: (){
+            Navigator.pushReplacementNamed(context, '/');
+          },))],
           bottom: TabBar(
             tabs: <Widget>[
               Tab(
