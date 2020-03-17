@@ -8,18 +8,25 @@ import './pages/forget_password.dart';
 import './service_manager.dart';
 
 void main() => runApp(MyApp());
-
 class MyApp extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
     return _MyAppState();
   }
 }
-
 class _MyAppState extends State<MyApp> {
   final MainModel _model = MainModel();
   bool _isAuthenticated = false;
-
+  @override
+  void initState() {
+    _model.autoAuthenticate();
+    _model.userSubject.listen((bool isAuthenticated) {
+      setState(() {
+        _isAuthenticated = isAuthenticated;
+      });
+    });
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return ScopedModel<MainModel>(
@@ -28,6 +35,7 @@ class _MyAppState extends State<MyApp> {
         //home: AuthPage(),
         routes: {
           '/': (BuildContext context) => !_isAuthenticated ? AuthPage() : HomePage(),
+          '/signUp': (BuildContext context) => !_isAuthenticated ? AuthPage() : SignUp(),
           '/signUp': (BuildContext context) => SignUp(),
           '/forgetPassword': (BuildContext context) => ForgetPassword(),
           '/service_manager': (BuildContext context) => !_isAuthenticated ? AuthPage() : ServiceManager(_model),
