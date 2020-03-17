@@ -167,6 +167,7 @@ class _AutoPageState extends State<AuthPage> {
                   Image.asset(
                     'assets/Bar_Iland_line.png',
                     height: 200,
+                    color: Colors.black.withOpacity(0.80),
                   ),
                   _buildEmailTextField(),
                   SizedBox(
