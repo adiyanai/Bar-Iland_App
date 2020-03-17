@@ -16,17 +16,18 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  final MainModel _model = MainModel();
   @override
   Widget build(BuildContext context) {
     return ScopedModel<MainModel>(
-      model: MainModel(),
+      model: _model,
       child: MaterialApp(
         //home: AuthPage(),
         routes: {
           '/': (BuildContext context) => AuthPage(),
           '/home': (BuildContext context) => HomePage(),
           '/signUp': (BuildContext context) => SignUp(),
-          '/service_manager': (BuildContext context) => ServiceManager(),
+          '/service_manager': (BuildContext context) => ServiceManager(_model),
         },
       ),
     );

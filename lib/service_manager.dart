@@ -1,20 +1,30 @@
+import 'package:bar_iland_app/scoped-models/main.dart';
 import 'package:flutter/material.dart';
 import './pages/service_by_building.dart';
 import './pages/service_by_type.dart';
 
 class ServiceManager extends StatelessWidget {
+  final MainModel model;
+  ServiceManager(this.model);
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          // leading: FlatButton(child: Icon(Icons.home, color: Colors.white,), onPressed: (){},),
           centerTitle: true,
           title: Center(child: Text('שירותים באוניברסיטה')),
-          actions: <Widget>[ButtonTheme(minWidth: 80, child: FlatButton(child: Icon(Icons.arrow_forward, color: Colors.white, size: 26,), onPressed: (){
-            Navigator.pushReplacementNamed(context, '/home');
-          },))],
+          actions: <Widget>[
+            ButtonTheme(
+                minWidth: 80,
+                child: FlatButton(
+                  child: Text(""),
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/home');
+                  },
+                ))
+          ],
           bottom: TabBar(
             tabs: <Widget>[
               Tab(
@@ -29,7 +39,7 @@ class ServiceManager extends StatelessWidget {
           ),
         ),
         body: TabBarView(
-          children: <Widget>[ServiceByBuilding(), ServiceByType()],
+          children: <Widget>[ServiceByBuilding(model), ServiceByType()],
         ),
       ),
     );
