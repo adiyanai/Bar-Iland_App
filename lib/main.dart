@@ -35,7 +35,7 @@ class _MyAppState extends State<MyApp> {
         //home: AuthPage(),
         routes: {
           '/': (BuildContext context) => !_isAuthenticated ? AuthPage() : HomePage(),
-          '/signUp': (BuildContext context) => !_isAuthenticated ? AuthPage() : SignUp(),
+          '/home': (BuildContext context) => HomePage(),
           '/signUp': (BuildContext context) => SignUp(),
           '/forgetPassword': (BuildContext context) => ForgetPassword(),
           '/service_manager': (BuildContext context) => !_isAuthenticated ? AuthPage() : ServiceManager(_model),
