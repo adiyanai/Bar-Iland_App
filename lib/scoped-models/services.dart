@@ -8,6 +8,7 @@ import '../models/service.dart';
 import '../models/user.dart';
 
 class ConnectedServicesModel extends Model {
+  List<String> _buildingNumbers = [];
   List<Service> _services = [];
   int _selServiceId;
   User _authenticatedUser;
@@ -15,8 +16,12 @@ class ConnectedServicesModel extends Model {
 }
 
 class ServicesModel extends ConnectedServicesModel {
-  List<Service> get services {
+  List<Service> get Services {
     return List.from(_services);
+  }
+
+   List<String> get BuildingNumbers {
+    return List.from(_buildingNumbers);
   }
 
   /*
@@ -46,8 +51,11 @@ class ServicesModel extends ConnectedServicesModel {
     notifyListeners();
   }
   */
-
+  
     buildingsServices.forEach((String buildingNumber, dynamic buildingData) {
+      if (!_buildingNumbers.contains(buildingNumber)) {
+        _buildingNumbers.add(buildingNumber);
+      }
       buildingData.forEach((String type, dynamic servicesData) {
         if (type == "self-service-facilities") {
           servicesData.forEach((dynamic serviceData) {

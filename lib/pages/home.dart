@@ -80,7 +80,7 @@ class HomePage extends StatelessWidget {
             style: TextStyle(fontSize: 15.0),
           ),
           onPressed: () {
-            Navigator.pushReplacementNamed(context, '/service_manager');
+            Navigator.pushNamed(context, '/service_manager');
           },
         ),
       ),

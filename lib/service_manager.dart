@@ -11,13 +11,10 @@ class ServiceManager extends StatelessWidget {
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 2,
-      child: Scaffold(
+      child: Directionality(textDirection: TextDirection.rtl, child: Scaffold(
         appBar: AppBar(
           centerTitle: true,
           title: Center(child: Text('שירותים באוניברסיטה')),
-          actions: <Widget>[ButtonTheme(minWidth: 80, child: FlatButton(child: Icon(Icons.arrow_forward, color: Colors.white, size: 26,), onPressed: (){
-            Navigator.pushReplacementNamed(context, '/');
-          },))],
           bottom: TabBar(
             tabs: <Widget>[
               Tab(
@@ -35,6 +32,6 @@ class ServiceManager extends StatelessWidget {
           children: <Widget>[ServiceByBuilding(model), ServiceByType()],
         ),
       ),
-    );
+    ));
   }
 }
