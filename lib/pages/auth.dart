@@ -134,7 +134,7 @@ class _AutoPageState extends State<AuthPage> {
           ),
           textColor: Colors.white,
           onPressed: () {
-            Navigator.pushReplacementNamed(context, '/');
+            Navigator.pushReplacementNamed(context, '/home');
           },
         ),
       ],
