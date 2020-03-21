@@ -18,18 +18,18 @@ class ServiceManager extends StatelessWidget {
           bottom: TabBar(
             tabs: <Widget>[
               Tab(
-                icon: Icon(Icons.business),
-                text: 'לפי בניין',
-              ),
-              Tab(
                 icon: Icon(Icons.list),
                 text: 'לפי סוג שירות',
+              ),
+              Tab(
+                icon: Icon(Icons.business),
+                text: 'לפי בניין',
               ),
             ],
           ),
         ),
         body: TabBarView(
-          children: <Widget>[ServiceByBuilding(model), ServiceByType()],
+          children: <Widget>[ServiceByType(), ServiceByBuilding(model)],
         ),
       ),
     ));
