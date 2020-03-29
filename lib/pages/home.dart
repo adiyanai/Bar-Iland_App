@@ -126,7 +126,6 @@ class HomePage extends StatelessWidget {
                                   ),
                                 ),
                               ),
-
                               SizedBox.fromSize(
                                 size: Size(90, 90), // button width and height
                                 child: ClipOval(
@@ -138,7 +137,7 @@ class HomePage extends StatelessWidget {
                                       child: Column(
                                         mainAxisAlignment: MainAxisAlignment.center,
                                         children: <Widget>[
-                                          Icon(Icons.build), // icon
+                                          Icon(Icons.business), // icon
                                           Text('שירותים באוניברסיטה',
                                           style: TextStyle(fontSize: 13),
                                           textAlign: TextAlign.center,)
@@ -148,7 +147,6 @@ class HomePage extends StatelessWidget {
                                   ),
                                 ),
                               ),
-
                         ],),
                       SizedBox(height: 15),      
                       Row(
