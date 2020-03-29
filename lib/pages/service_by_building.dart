@@ -65,23 +65,7 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
     }
     return Column(
         children: services_info.map((service) {
-      return new Container(
-        padding: EdgeInsets.all(5),
-        margin: EdgeInsets.all(8),
-        decoration: new BoxDecoration(
-          shape: BoxShape.rectangle,
-          color: Color.fromARGB(60, 20, 200, 250),
-          border: new Border.all(
-            color: Colors.black,
-            width: 1.0,
-          ),
-        ),
-        child: new Text(
-          service,
-          textAlign: TextAlign.right,
-        ),
-        width: MediaQuery.of(context).size.width,
-      );
+      return new ExpansionTile(title: Text(service));
     }).toList());
   }
 
@@ -106,7 +90,7 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
           )),
       SingleChildScrollView(
         child: Container(
-          height: 120,
+            height: 120,
             padding: EdgeInsets.all(10),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -129,7 +113,7 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
 
                 Container(
                   width: 70,
-                  
+
                   /*child: SearchableDropdown.single(
                       keyboardType: TextInputType.number,
                       iconSize: 24,
@@ -156,9 +140,9 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
                     */
                   child: textField = AutoCompleteTextField<String>(
                     inputFormatters: [
-                          WhitelistingTextInputFormatter.digitsOnly,
-                          LengthLimitingTextInputFormatter(4)
-                        ],
+                      WhitelistingTextInputFormatter.digitsOnly,
+                      LengthLimitingTextInputFormatter(4)
+                    ],
                     key: key,
                     keyboardType: TextInputType.number,
                     clearOnSubmit: false,
@@ -166,8 +150,7 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
                     suggestions: widget.model.buildingNumbers,
                     style: TextStyle(color: Colors.black, fontSize: 20.0),
                     decoration: InputDecoration(
-                      contentPadding:
-                          EdgeInsets.fromLTRB(0,0,10,0),
+                      contentPadding: EdgeInsets.fromLTRB(0, 0, 10, 0),
                     ),
                     itemFilter: (item, query) {
                       return item.toLowerCase().startsWith(query.toLowerCase());
@@ -190,7 +173,8 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
                     },
                     itemBuilder: (context, item) {
                       // ui for the autocomplete row
-                      return Center(child: Container(
+                      return Center(
+                          child: Container(
                         padding: const EdgeInsets.only(bottom: 8.0),
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
