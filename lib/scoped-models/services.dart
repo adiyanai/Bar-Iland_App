@@ -8,27 +8,27 @@ import '../models/service.dart';
 import '../models/user.dart';
 
 class ConnectedServicesModel extends Model {
-  List<String> _buildingNumbers = [];
-  List<Service> _services = [];
+  List<String> buildingNumbers = [];
+  List<Service> services = [];
   int _selServiceId;
   User _authenticatedUser;
   bool _isLoading = false;
 }
 
 class ServicesModel extends ConnectedServicesModel {
-  List<Service> get Services {
-    return List.from(_services);
-  }
+  
+  /*List<Service> get Services {
+    return List.from(services);
+  }*/
 
    List<String> get BuildingNumbers {
-    return List.from(_buildingNumbers);
+    return List.from(buildingNumbers);
   }
 
   /*
   int get selectedServiceId {
     return _selServiceId;
   }
-
   Service get selectedService {
     if (selectedServiceId == null) {
       return null;
@@ -53,8 +53,8 @@ class ServicesModel extends ConnectedServicesModel {
   */
   
     buildingsServices.forEach((String buildingNumber, dynamic buildingData) {
-      if (!_buildingNumbers.contains(buildingNumber)) {
-        _buildingNumbers.add(buildingNumber);
+      if (!buildingNumbers.contains(buildingNumber)) {
+        buildingNumbers.add(buildingNumber);
       }
       buildingData.forEach((String type, dynamic servicesData) {
         if (type == "self-service-facilities") {
@@ -78,7 +78,7 @@ class ServicesModel extends ConnectedServicesModel {
         }
       });
     });
-    _services = List.from(fetchedServiceList);
+    services = List.from(fetchedServiceList);
     _isLoading = false;
     notifyListeners();
     _selServiceId = null;

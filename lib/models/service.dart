@@ -4,7 +4,7 @@ class Service {
   final String serviceType;
   final String buildingNumber;
   final String location;
-  final String availability;
+  final int availability;
 
   Service(
       {@required this.serviceType,
@@ -24,7 +24,7 @@ class Service {
     return location;
   }
 
-  String get Availabilty {
+  int get Availabilty {
     return availability;
   }
 }
