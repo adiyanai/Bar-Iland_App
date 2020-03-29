@@ -1,3 +1,5 @@
+import 'package:autocomplete_textfield/autocomplete_textfield.dart';
+import 'package:flutter/services.dart';
 import 'package:searchable_dropdown/searchable_dropdown.dart';
 
 import 'package:bar_iland_app/scoped-models/services.dart';
@@ -21,8 +23,11 @@ class ServiceByBuilding extends StatefulWidget {
 class _ServiceByBuildingState extends State<ServiceByBuilding> {
   int buildingNumber;
   String message = '';
-
+  AutoCompleteTextField<String> textField;
   Future<List<Service>> _servicesList;
+  List<String> _buildingsList = [];
+  GlobalKey<AutoCompleteTextFieldState<String>> key = new GlobalKey();
+  final focusNode = FocusNode();
 
   String _selectedBuilding;
 
@@ -87,9 +92,10 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
   }
 
   Widget _buildPage(List<Service> services) {
+    FocusScope.of(context).autofocus(focusNode);
     return Stack(children: <Widget>[
       Container(
-          padding: EdgeInsets.fromLTRB(0, 100, 0, 0),
+          padding: EdgeInsets.fromLTRB(0, 90, 0, 0),
           child: ListView(
             children: <Widget>[
               Center(
@@ -100,10 +106,11 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
           )),
       SingleChildScrollView(
         child: Container(
-            padding: EdgeInsets.all(20),
+          height: 120,
+            padding: EdgeInsets.all(10),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 Text(
                   'מספר בניין:',
@@ -119,9 +126,11 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
                   onChanged: (String value) => buildingNumber = int.parse(value),
                 ),
               ),*/
+
                 Container(
-                    width: 140,
-                    child: SearchableDropdown.single(
+                  width: 70,
+                  
+                  /*child: SearchableDropdown.single(
                       keyboardType: TextInputType.number,
                       iconSize: 24,
                       dialogBox: false,
@@ -144,24 +153,53 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
                         });
                       },
                     )),
+                    */
+                  child: textField = AutoCompleteTextField<String>(
+                    inputFormatters: [
+                          WhitelistingTextInputFormatter.digitsOnly,
+                          LengthLimitingTextInputFormatter(4)
+                        ],
+                    key: key,
+                    keyboardType: TextInputType.number,
+                    clearOnSubmit: false,
+                    focusNode: focusNode,
+                    suggestions: widget.model.buildingNumbers,
+                    style: TextStyle(color: Colors.black, fontSize: 20.0),
+                    decoration: InputDecoration(
+                      contentPadding:
+                          EdgeInsets.fromLTRB(0,0,10,0),
+                    ),
+                    itemFilter: (item, query) {
+                      return item.toLowerCase().startsWith(query.toLowerCase());
+                    },
+                    itemSorter: (a, b) {
+                      return int.parse(a).compareTo(int.parse(b));
+                    },
+                    itemSubmitted: (item) {
+                      setState(() {
+                        FocusScope.of(context).requestFocus(new FocusNode());
+                        textField.textField.controller.text = item;
 
-                /*Container(
-                  width: 60,
-                  child: RaisedButton(
-                      //color: Colors.blue,
-                      //color: Theme.of(context).accentColor,
-                      child: Text('הצג'),
-                      onPressed: () {
-                        setState(() {
-                          if (_selectedBuilding != null) {
-                            displayedServices =
-                                _showServices(services, _selectedBuilding);
-                          } else {
-                            message = '';
-                          }
-                        });
-                      }),
-                ),*/
+                        if (item != null) {
+                          displayedServices =
+                              _showServices(widget.model.services, item);
+                        } else {
+                          message = '';
+                        }
+                      });
+                    },
+                    itemBuilder: (context, item) {
+                      // ui for the autocomplete row
+                      return Center(child: Container(
+                        padding: const EdgeInsets.only(bottom: 8.0),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text('$item'),
+                        ),
+                      ));
+                    },
+                  ),
+                )
               ],
             )),
       )
@@ -172,7 +210,7 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
   Widget build(BuildContext context) {
     return ScopedModelDescendant<MainModel>(
       builder: (BuildContext context, Widget child, MainModel model) {
-        return _buildPage(model.Services);
+        return _buildPage(model.services);
       },
     );
   }
