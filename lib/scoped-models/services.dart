@@ -66,15 +66,6 @@ class ServicesModel extends ConnectedServicesModel {
                 availability: serviceData['availability']);
             fetchedServiceList.add(service);
           });
-        } else if (type == "business-services") {
-          servicesData.forEach((dynamic serviceData) {
-            Service service = Service(
-                serviceType: serviceData['service-type'],
-                buildingNumber: buildingNumber,
-                location: serviceData['location'],
-                availability: serviceData['availability']);
-            fetchedServiceList.add(service);
-          });
         }
       });
     });

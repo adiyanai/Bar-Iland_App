@@ -1,18 +1,15 @@
 import 'package:autocomplete_textfield/autocomplete_textfield.dart';
 import 'package:flutter/services.dart';
-import 'package:searchable_dropdown/searchable_dropdown.dart';
 
-import 'package:bar_iland_app/scoped-models/services.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 import '../models/service.dart';
 import '../scoped-models/main.dart';
 
 class ServiceByBuilding extends StatefulWidget {
-  final MainModel model;
-  ServiceByBuilding(this.model);
+  final MainModel _model;
+  ServiceByBuilding(this._model);
 
   @override
   State<StatefulWidget> createState() {
@@ -21,75 +18,69 @@ class ServiceByBuilding extends StatefulWidget {
 }
 
 class _ServiceByBuildingState extends State<ServiceByBuilding> {
-  int buildingNumber;
-  String message = '';
-  AutoCompleteTextField<String> textField;
+  AutoCompleteTextField<String> _textField;
+  GlobalKey<AutoCompleteTextFieldState<String>> _key = new GlobalKey();
+  final _focusNode = FocusNode();
+  String _selectedBuildingNumber;
+  bool _isNotPressable = true;
+  Color _buttonColor = Colors.grey;
   Future<List<Service>> _servicesList;
-  List<String> _buildingsList = [];
-  GlobalKey<AutoCompleteTextFieldState<String>> key = new GlobalKey();
-  final focusNode = FocusNode();
-
-  String _selectedBuilding;
-
-  static Widget emptyWidget() {
-    return Column();
-  }
-
-  Widget displayedServices = emptyWidget();
-
-  List<DropdownMenuItem<String>> buildDropdownMenuItems() {
-    List<DropdownMenuItem<String>> items = List();
-    for (String building in widget.model.BuildingNumbers) {
-      items.add(
-        DropdownMenuItem(
-          value: building,
-          child: Container(alignment: Alignment.center, child: Text(building)),
-        ),
-      );
-    }
-    return items;
-  }
+  Column _displayedServices = Column();
 
   Widget _showServices(List<Service> services, String buildingNumber) {
-    List<String> services_info = [];
+    List<Service> servicesInBuilding = [];
     for (int i = 0; i < services.length; i++) {
       if (services[i].BuildingNumber == buildingNumber) {
-        services_info
-            .add(services[i].serviceType + ', ' + services[i].Location);
+        servicesInBuilding.add(services[i]);
       }
     }
-    if (services_info.length == 0) {
+    if (servicesInBuilding.length == 0) {
       return Center(
         child: Text('לא נמצאו שירותים בבניין ' + buildingNumber.toString()),
       );
     }
     return Column(
-        children: services_info.map((service) {
-      return new ExpansionTile(title: Text(service));
+        children: servicesInBuilding.map((service) {
+      Container availability = Container();
+      if (service.Availabilty == 0) {
+        availability = Container(
+          padding: EdgeInsets.all(15),
+          child: Row(
+            children: <Widget>[
+              new IconTheme(
+                data: new IconThemeData(color: Colors.red),
+                child: new Icon(Icons.cancel),
+              ),
+              Text("לא זמין", style: TextStyle(color: Colors.red))
+            ],
+          ),
+        );
+      }
+      return new ExpansionTile(
+        title: Text(service.ServiceType + ", " + service.Location),
+        children: <Widget>[availability],
+      );
     }).toList());
   }
 
   @override
   void initState() {
     super.initState();
-    _servicesList = widget.model.fetchServices();
+    _servicesList = widget._model.fetchServices();
   }
 
   Widget _buildPage(List<Service> services) {
-    FocusScope.of(context).autofocus(focusNode);
-    return Stack(children: <Widget>[
-      Container(
+    FocusScope.of(context).autofocus(_focusNode);
+    return Stack(
+      children: <Widget>[
+        Container(
           padding: EdgeInsets.fromLTRB(0, 90, 0, 0),
           child: ListView(
-            children: <Widget>[
-              Center(
-                child: Text(message),
-              ),
-              displayedServices
-            ],
-          )),
-      SingleChildScrollView(
-        child: Container(
+            children: <Widget>[_displayedServices],
+          ),
+        ),
+        SingleChildScrollView(
+          child: Container(
             height: 120,
             padding: EdgeInsets.all(10),
             child: Row(
@@ -100,94 +91,99 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
                   'מספר בניין:',
                   style: TextStyle(fontSize: 20),
                 ),
-                /*Container(
-                width: 60,
-                margin: EdgeInsets.all(10.0),
-                child: TextField(
-                  keyboardType: TextInputType.number,
-                  textAlign: TextAlign.right,
-                  maxLength: 4,
-                  onChanged: (String value) => buildingNumber = int.parse(value),
-                ),
-              ),*/
-
                 Container(
                   width: 70,
-
-                  /*child: SearchableDropdown.single(
-                      keyboardType: TextInputType.number,
-                      iconSize: 24,
-                      dialogBox: false,
-                      menuConstraints:
-                          BoxConstraints.tight(Size.fromHeight(110)),
-                      items: buildDropdownMenuItems(),
-                      value: _selectedBuilding,
-                      closeButton: SizedBox.shrink(),
-                      displayClearIcon: false,
-                      isExpanded: true,
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedBuilding = value;
-                          if (_selectedBuilding != null) {
-                            displayedServices =
-                                _showServices(services, _selectedBuilding);
-                          } else {
-                            message = '';
-                          }
-                        });
-                      },
-                    )),
-                    */
-                  child: textField = AutoCompleteTextField<String>(
+                  child: _textField = AutoCompleteTextField<String>(
                     inputFormatters: [
                       WhitelistingTextInputFormatter.digitsOnly,
                       LengthLimitingTextInputFormatter(4)
                     ],
-                    key: key,
+                    key: _key,
                     keyboardType: TextInputType.number,
                     clearOnSubmit: false,
-                    focusNode: focusNode,
-                    suggestions: widget.model.buildingNumbers,
+                    focusNode: _focusNode,
+                    suggestions: widget._model.buildingNumbers,
                     style: TextStyle(color: Colors.black, fontSize: 20.0),
                     decoration: InputDecoration(
                       contentPadding: EdgeInsets.fromLTRB(0, 0, 10, 0),
                     ),
-                    itemFilter: (item, query) {
-                      return item.toLowerCase().startsWith(query.toLowerCase());
+                    itemFilter: (buildingNumber, query) {
+                      return buildingNumber.startsWith(query) &&
+                          buildingNumber.length > query.length;
                     },
-                    itemSorter: (a, b) {
-                      return int.parse(a).compareTo(int.parse(b));
+                    itemSorter: (buildingNumber1, buildingNumber2) {
+                      return int.parse(buildingNumber1)
+                          .compareTo(int.parse(buildingNumber2));
                     },
-                    itemSubmitted: (item) {
+                    itemSubmitted: (buildingNumber) {
                       setState(() {
                         FocusScope.of(context).requestFocus(new FocusNode());
-                        textField.textField.controller.text = item;
-
-                        if (item != null) {
-                          displayedServices =
-                              _showServices(widget.model.services, item);
-                        } else {
-                          message = '';
-                        }
+                        _textField.textField.controller.text = buildingNumber;
+                        _selectedBuildingNumber = buildingNumber;
+                        _isNotPressable = false;
+                        _buttonColor = Colors.blue;
                       });
                     },
-                    itemBuilder: (context, item) {
-                      // ui for the autocomplete row
-                      return Center(
-                          child: Container(
-                        padding: const EdgeInsets.only(bottom: 8.0),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text('$item'),
-                        ),
-                      ));
+                    textChanged: (buildingNumber) {
+                      _selectedBuildingNumber = buildingNumber;
+                      if (widget._model.buildingNumbers
+                          .contains(_selectedBuildingNumber)) {
+                        setState(() {
+                          _isNotPressable = false;
+                          _buttonColor = Colors.blue;
+                        });
+                      } else {
+                        setState(() {
+                          _isNotPressable = true;
+                          _buttonColor = Colors.grey;
+                        });
+                      }
                     },
+                    itemBuilder: (context, buildingNumber) {
+                      // UI for the autocomplete row
+                      return Center(
+                        child: Container(
+                          padding: const EdgeInsets.only(bottom: 8.0),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text('$buildingNumber'),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.fromLTRB(0, 10, 15, 0),
+                  width: 70,
+                  child: IgnorePointer(
+                    ignoring: _isNotPressable,
+                    child: RaisedButton(
+                        color: _buttonColor,
+                        //color: Theme.of(context).accentColor,
+                        child: Text(
+                          'אישור',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            FocusScope.of(context)
+                                .requestFocus(new FocusNode());
+                            if (_selectedBuildingNumber != null) {
+                              _displayedServices = _showServices(
+                                  widget._model.services,
+                                  _selectedBuildingNumber);
+                            }
+                          });
+                        }),
                   ),
                 )
               ],
-            )),
-      )
-    ]);
+            ),
+          ),
+        )
+      ],
+    );
   }
 
   @override
