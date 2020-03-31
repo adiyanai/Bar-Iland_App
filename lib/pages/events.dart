@@ -14,7 +14,20 @@ class _EventsPageState extends State<EventsPage> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        appBar: AppBar(),
+        appBar: AppBar(
+          title: Row(children: [
+            Text(
+              'לוח אירועים',
+            ),
+            SizedBox(
+              width: 87,
+            ),
+            Image.asset(
+              'assets/Bar_Iland_line.png',
+              height: 35,
+            ),
+          ]),
+        ),
         body: CalendarCarousel(
           weekendTextStyle: TextStyle(
             color: Colors.black,
