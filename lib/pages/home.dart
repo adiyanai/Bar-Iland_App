@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import '../scoped-models/main.dart';
+import '../models/connection.dart';
 
 class HomePage extends StatelessWidget {
   Widget _buildDrawer() {
@@ -44,7 +45,11 @@ class HomePage extends StatelessWidget {
           leading: Icon(Icons.exit_to_app),
           title: Text('התנתק'),
           onTap: () {
-            model.logout();
+            if (model.connectionMode == ConnectionMode.RegisteredUser) {
+              model.logout();
+            } else {
+              Navigator.pushReplacementNamed(context, '/');
+            }
           },
         );
       },
