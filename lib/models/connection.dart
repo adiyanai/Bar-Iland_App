@@ -1,0 +1,4 @@
+enum ConnectionMode {
+  RegisteredUser,
+  GuestUser
+}
