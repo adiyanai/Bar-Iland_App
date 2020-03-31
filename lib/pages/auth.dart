@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import '../scoped-models/main.dart';
 import '../models/auth.dart';
+import '../models/connection.dart';
 
 class AuthPage extends StatefulWidget {
   @override
@@ -119,22 +120,30 @@ class _AutoPageState extends State<AuthPage> {
                       style: TextStyle(fontSize: 20.0),
                     ),
                     textColor: Colors.white,
-                    onPressed: () => _submitForm(model.authenticate),
+                    onPressed: () {
+                      model.connectionMode = ConnectionMode.RegisteredUser;
+                      _submitForm(model.authenticate);
+                    },
                   );
           },
         ),
         SizedBox(
           width: 10.0,
         ),
-        RaisedButton(
-          color: Theme.of(context).primaryColor,
-          child: Text(
-            'כניסה כאורח/ת',
-            style: TextStyle(fontSize: 15.0),
-          ),
-          textColor: Colors.white,
-          onPressed: () {
-            Navigator.pushReplacementNamed(context, '/home');
+        ScopedModelDescendant<MainModel>(
+          builder: (BuildContext context, Widget child, MainModel model) {
+            return RaisedButton(
+              color: Theme.of(context).primaryColor,
+              child: Text(
+                'כניסה כאורח/ת',
+                style: TextStyle(fontSize: 15.0),
+              ),
+              textColor: Colors.white,
+              onPressed: () {
+                model.connectionMode = ConnectionMode.GuestUser;
+                Navigator.pushReplacementNamed(context, '/home');
+              },
+            );
           },
         ),
       ],
