@@ -47,9 +47,8 @@ class HomePage extends StatelessWidget {
           onTap: () {
             if (model.connectionMode == ConnectionMode.RegisteredUser) {
               model.logout();
-            } else {
-              Navigator.pushReplacementNamed(context, '/');
             }
+            Navigator.pushReplacementNamed(context, '/');
           },
         );
       },
