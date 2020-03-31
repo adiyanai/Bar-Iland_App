@@ -6,15 +6,18 @@ import './pages/home.dart';
 import './pages/sign_up.dart';
 import './pages/forget_password.dart';
 import './service_manager.dart';
+import './pages/events.dart';
 
 void main() => runApp(MyApp());
 
 class MyApp extends StatefulWidget {
+
   @override
   State<StatefulWidget> createState() {
     return _MyAppState();
   }
 }
+
 class _MyAppState extends State<MyApp> {
   final MainModel _model = MainModel();
   bool _isAuthenticated = false;
@@ -28,6 +31,7 @@ class _MyAppState extends State<MyApp> {
     });
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     return ScopedModel<MainModel>(
@@ -35,11 +39,13 @@ class _MyAppState extends State<MyApp> {
       child: MaterialApp(
         //home: AuthPage(),
         routes: {
-          '/': (BuildContext context) => !_isAuthenticated ? AuthPage() : HomePage(),
+          '/': (BuildContext context) =>
+              !_isAuthenticated ? AuthPage() : HomePage(),
           '/home': (BuildContext context) => HomePage(),
           '/signUp': (BuildContext context) => SignUp(),
           '/forgetPassword': (BuildContext context) => ForgetPassword(),
-          '/service_manager': (BuildContext context) => !_isAuthenticated ? AuthPage() : ServiceManager(_model),
+          '/service_manager': (BuildContext context) => ServiceManager(_model),
+          '/events': (BuildContext context) => EventsPage(),
         },
       ),
     );
