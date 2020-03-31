@@ -6,13 +6,19 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rxdart/subjects.dart';
 import '../models/user.dart';
 import '../models/auth.dart';
+import '../models/connection.dart';
 
 class UserModel extends Model {
   final API_KEY = 'AIzaSyBePDkpa3WV4UVazs9tRi0WnicXHsj2Ui0';
   User _authenticatedUser;
   bool _isLoading = false;
   Timer _authTimer;
+  ConnectionMode _connectionMode = ConnectionMode.GuestUser;
   PublishSubject<bool> _userSubject = PublishSubject();
+
+  ConnectionMode get connectionMode {
+    return _connectionMode;
+  }
 
   PublishSubject<bool> get userSubject {
     return _userSubject;
