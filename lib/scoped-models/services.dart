@@ -16,42 +16,18 @@ class ConnectedServicesModel extends Model {
 }
 
 class ServicesModel extends ConnectedServicesModel {
-  
-  /*List<Service> get Services {
-    return List.from(services);
-  }*/
 
    List<String> get BuildingNumbers {
     return List.from(buildingNumbers);
   }
 
-  /*
-  int get selectedServiceId {
-    return _selServiceId;
-  }
-  Service get selectedService {
-    if (selectedServiceId == null) {
-      return null;
-    }
-    return _services[selectedServiceId];
-  }
-  */
-
-  Future<List<Service>> fetchServices() async {
+  Future<Null> fetchServices() async {
     _isLoading = true;
     notifyListeners();
     final http.Response response =
         await http.get('https://bar-iland-app.firebaseio.com/services.json');
     final List<Service> fetchedServiceList = [];
     Map<String, dynamic> buildingsServices = json.decode(response.body);
-
-    /*    
-  if (buildingsServices == null) {
-    _isLoading = false;
-    notifyListeners();
-  }
-  */
-  
     buildingsServices.forEach((String buildingNumber, dynamic buildingData) {
       if (!buildingNumbers.contains(buildingNumber)) {
         buildingNumbers.add(buildingNumber);
@@ -73,14 +49,15 @@ class ServicesModel extends ConnectedServicesModel {
     _isLoading = false;
     notifyListeners();
     _selServiceId = null;
-    return fetchedServiceList;
   }
 }
 
-/*
+void availabiltyReport() {
+
+}
+
 class UtilityModel extends ConnectedServicesModel {
   bool get isLoading {
     return _isLoading;
   }
 }
-*/
