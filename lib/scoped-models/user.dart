@@ -20,6 +20,10 @@ class UserModel extends Model {
     return _connectionMode;
   }
 
+  void set connectionMode(ConnectionMode cM) {
+    _connectionMode = cM;
+  }
+
   PublishSubject<bool> get userSubject {
     return _userSubject;
   }
