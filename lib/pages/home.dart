@@ -122,7 +122,7 @@ class HomePage extends StatelessWidget {
                     child: InkWell(
                       splashColor: Colors.cyanAccent, // splash color
                       onTap: () {
-                        Navigator.pushNamed(context, '/events');
+                        Navigator.pushNamed(context, '/eventsCalendar');
                       }, // button pressed
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
