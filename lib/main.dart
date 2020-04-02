@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import './scoped-models/main.dart';
 import './pages/auth.dart';
 import './pages/home.dart';
 import './pages/sign_up.dart';
 import './pages/forget_password.dart';
 import './service_manager.dart';
-import './pages/events.dart';
+import './pages/events_calendar.dart';
 
-void main() => runApp(MyApp());
+void main() {
+  initializeDateFormatting().then((_) => runApp(MyApp()));
+}
 
 class MyApp extends StatefulWidget {
 
@@ -45,7 +48,7 @@ class _MyAppState extends State<MyApp> {
           '/signUp': (BuildContext context) => SignUp(),
           '/forgetPassword': (BuildContext context) => ForgetPassword(),
           '/service_manager': (BuildContext context) => ServiceManager(_model),
-          '/events': (BuildContext context) => EventsPage(),
+          '/eventsCalendar': (BuildContext context) => EventsCalendar(_model),
         },
       ),
     );
