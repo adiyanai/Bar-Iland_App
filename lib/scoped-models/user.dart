@@ -62,7 +62,7 @@ class UserModel extends Model {
 
     final Map<String, dynamic> responseData = json.decode(response.body);
     bool hasError = true;
-    String message = 'Something went worng';
+    String message = 'נא הזן את הפרטים בשנית';
     if (responseData.containsKey('idToken')) {
       hasError = false;
       message = 'Authenticaion succeeded!';
