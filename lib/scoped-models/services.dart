@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:async';
+import 'dart:io';
 
 import 'package:scoped_model/scoped_model.dart';
 import 'package:http/http.dart' as http;
@@ -10,14 +11,13 @@ import '../models/user.dart';
 class ConnectedServicesModel extends Model {
   List<String> buildingNumbers = [];
   List<Service> services = [];
-  int _selServiceId;
-  User _authenticatedUser;
   bool _isLoading = false;
+  //int _selServiceId;
+  //User _authenticatedUser;
 }
 
 class ServicesModel extends ConnectedServicesModel {
-
-   List<String> get BuildingNumbers {
+  List<String> get BuildingNumbers {
     return List.from(buildingNumbers);
   }
 
@@ -34,8 +34,9 @@ class ServicesModel extends ConnectedServicesModel {
       }
       buildingData.forEach((String type, dynamic servicesData) {
         if (type == "self-service-facilities") {
-          servicesData.forEach((dynamic serviceData) {
+          servicesData.forEach((String id, dynamic serviceData) {
             Service service = Service(
+                id: id,
                 serviceType: serviceData['service-type'],
                 buildingNumber: buildingNumber,
                 location: serviceData['location'],
@@ -45,15 +46,74 @@ class ServicesModel extends ConnectedServicesModel {
         }
       });
     });
-    services = List.from(fetchedServiceList);
+    services = fetchedServiceList;
     _isLoading = false;
     notifyListeners();
-    _selServiceId = null;
   }
-}
 
-void availabiltyReport() {
+  /*Future<bool> addService(
+      {int availability = 1,
+      String location = "קומה 1-, חדר רווחה",
+      String serviceType = "מיקרוגל בשרי"}) async {
+    _isLoading = true;
+    notifyListeners();
+    final Map<String, dynamic> serviceData = {
+      'availability': availability,
+      'location': location,
+      'service-type': serviceType,
+    };
 
+    final http.Response response = await http.post(
+        'https://bar-iland-app.firebaseio.com/services/211/self-service-facilities.json',
+        body: json.encode(serviceData));
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+    //final Map<String, dynamic> responseData = json.decode(response.body);
+
+    _isLoading = false;
+    notifyListeners();
+    return true;
+  }*/
+
+  Future<bool> availabiltyReport(
+      String _selectedBuildingNumber, Service service) async {
+    _isLoading = true;
+    notifyListeners();
+    int updatedAvailability;
+    if (service.Availability == 0) {
+      updatedAvailability = 1;
+    } else {
+      updatedAvailability = 0;
+    }
+    final Map<String, dynamic> updatedData = {
+      'availability': updatedAvailability,
+      'location': service.location,
+      'service-type': service.serviceType,
+    };
+
+    final http.Response response = await http.put(
+        'https://bar-iland-app.firebaseio.com/services/${_selectedBuildingNumber}/self-service-facilities/${service.Id}.json',
+        body: json.encode(updatedData));
+    final Map<String, dynamic> responseData = json.decode(response.body);
+    final Service updatedService = Service(
+        id: service.Id,
+        buildingNumber: _selectedBuildingNumber,
+        availability: updatedAvailability,
+        location: responseData['location'],
+        serviceType: responseData['service-type']);
+
+    for (int i = 0; i < services.length; i++) {
+      if (services[i].Id == service.Id) {
+        services[i] = updatedService;
+        break;
+      }
+    }
+    notifyListeners();
+    return true;
+  }
 }
 
 class UtilityModel extends ConnectedServicesModel {

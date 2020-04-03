@@ -62,6 +62,7 @@ class _AutoPageState extends State<AuthPage> {
 
   Widget _buildEmailTextField() {
     return TextFormField(
+
       decoration: InputDecoration(
         labelText: 'דוא"ל',
         suffixIcon: Icon(Icons.email),

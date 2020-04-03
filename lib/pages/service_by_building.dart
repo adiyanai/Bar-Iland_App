@@ -1,4 +1,5 @@
 import 'package:autocomplete_textfield/autocomplete_textfield.dart';
+import 'package:draggable_scrollbar/draggable_scrollbar.dart';
 import 'package:flutter/services.dart';
 
 import 'package:flutter/material.dart';
@@ -8,8 +9,8 @@ import '../models/service.dart';
 import '../scoped-models/main.dart';
 
 class ServiceByBuilding extends StatefulWidget {
-  final MainModel _model;
-  ServiceByBuilding(this._model);
+  final MainModel model;
+  ServiceByBuilding(this.model);
 
   @override
   State<StatefulWidget> createState() {
@@ -20,16 +21,21 @@ class ServiceByBuilding extends StatefulWidget {
 class _ServiceByBuildingState extends State<ServiceByBuilding> {
   AutoCompleteTextField<String> _textField;
   GlobalKey<AutoCompleteTextFieldState<String>> _key = new GlobalKey();
+  final ScrollController scrollController = ScrollController();
   final _focusNode = FocusNode();
-  String _selectedBuildingNumber;
+  String _selectedBuildingNumber = "";
   bool _isNotPressable = true;
+  bool isOkPressed = false;
+  // bool isScrollBar = false;
   Color _buttonColor = Colors.grey;
   Future<List<Service>> _servicesList;
-  Column _displayedServices = Column();
+  Widget _displayedServices = Column();
+  Widget addingButton = Container();
+  Widget title = Container();
 
-  void availabilityAlert(int availabilty) {
+  void availabilityAlert(Service service) {
     String alertText = "";
-    if (availabilty == 0) {
+    if (service.Availability == 0) {
       alertText = "השירות יוצג כפעיל";
     } else {
       alertText = "השירות יוצג כלא פעיל";
@@ -46,11 +52,12 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
               child: (Column(
                 children: <Widget>[
                   Container(
-                      margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                      child: Text(
-                        alertText,
-                        style: TextStyle(fontSize: 16),
-                      )),
+                    margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                    child: Text(
+                      alertText,
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ),
                   Container(
                     margin: EdgeInsets.fromLTRB(0, 40, 0, 0),
                     child: Row(
@@ -63,6 +70,11 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
                             style: TextStyle(color: Colors.blue),
                           ),
                           onPressed: () {
+                            setState(() {
+                              widget.model.availabiltyReport(
+                                  _selectedBuildingNumber, service);
+                              widget.model.fetchServices();
+                            });
                             Navigator.of(context).pop();
                           },
                         ),
@@ -108,7 +120,7 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
               keyboardType: TextInputType.number,
               clearOnSubmit: false,
               focusNode: _focusNode,
-              suggestions: widget._model.buildingNumbers,
+              suggestions: widget.model.buildingNumbers,
               style: TextStyle(color: Colors.black, fontSize: 20.0),
               decoration: InputDecoration(
                 contentPadding: EdgeInsets.fromLTRB(0, 0, 10, 0),
@@ -124,15 +136,21 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
               itemSubmitted: (buildingNumber) {
                 setState(() {
                   FocusScope.of(context).requestFocus(new FocusNode());
-                  _textField.textField.controller.text = buildingNumber;
+                  isOkPressed = false;
+                  title = Container();
                   _selectedBuildingNumber = buildingNumber;
+                  _textField.textField.controller.text =
+                      _selectedBuildingNumber;
                   _isNotPressable = false;
                   _buttonColor = Colors.blue;
                 });
               },
               textChanged: (buildingNumber) {
+                isOkPressed = false;
+                title = Container();
+
                 _selectedBuildingNumber = buildingNumber;
-                if (widget._model.buildingNumbers
+                if (widget.model.buildingNumbers
                     .contains(_selectedBuildingNumber)) {
                   setState(() {
                     _isNotPressable = false;
@@ -174,9 +192,35 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
                   onPressed: () {
                     setState(() {
                       FocusScope.of(context).requestFocus(new FocusNode());
+                      title = Container(
+                          margin: EdgeInsets.fromLTRB(0, 120, 10, 0),
+                          child: Text(
+                            "השירותים בבניין " + _selectedBuildingNumber + ":",
+                            style: TextStyle(
+                                color: Colors.blue,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold),
+                          ));
+                      isOkPressed = true;
+                      _textField.textField.controller.text = "";
+                      _buttonColor = Colors.grey;
                       if (_selectedBuildingNumber != null) {
-                        _displayedServices = _showServices(
-                            widget._model.services, _selectedBuildingNumber);
+                        addingButton = Container(
+                          padding: EdgeInsets.fromLTRB(0, 430, 270, 0),
+                          child: RawMaterialButton(
+                            shape: new CircleBorder(),
+                            fillColor: Colors.blue,
+                            padding: const EdgeInsets.all(3),
+                            onPressed: () {
+                              //widget._model.addService();
+                            },
+                            child: Icon(
+                              Icons.add,
+                              color: Colors.white,
+                              size: 24,
+                            ),
+                          ),
+                        );
                       }
                     });
                   }),
@@ -187,75 +231,89 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
     );
   }
 
-  Widget _showServices(List<Service> services, String buildingNumber) {
+  Widget _showServices(String buildingNumber, List<Service> services) {
     List<Service> servicesInBuilding = [];
     for (int i = 0; i < services.length; i++) {
       if (services[i].BuildingNumber == buildingNumber) {
         servicesInBuilding.add(services[i]);
       }
     }
+    /*
+    if(servicesInBuilding.length >= 5) {
+      isScrollBar = true;
+    }
+    */
+
+    if (!isOkPressed) {
+      return Column();
+    }
+
     if (servicesInBuilding.length == 0) {
       return Center(
         child: Text('לא נמצאו שירותים בבניין ' + buildingNumber.toString()),
       );
     }
+
     return Column(
         children: servicesInBuilding.map((service) {
-      Container availabilityInfo = Container();
-      Container reportButton = Container();
-      if (service.Availabilty == 0) {
-        availabilityInfo = Container(
-          width: 110,
-          padding: EdgeInsets.all(15),
-          child: Row(
-            children: <Widget>[
-              new IconTheme(
-                data: new IconThemeData(color: Colors.red),
-                child: new Icon(Icons.cancel),
-              ),
-              Text("לא פעיל", style: TextStyle(color: Colors.red))
-            ],
-          ),
+      Widget availabilityInfo = Container();
+      Widget availabilityLabel;
+      Widget reportButton = Container();
+      if (service.Availability == 0) {
+        availabilityLabel = Row(
+          children: <Widget>[
+            new IconTheme(
+              data: new IconThemeData(color: Colors.red),
+              child: new Icon(Icons.cancel),
+            ),
+            Text("לא פעיל", style: TextStyle(color: Colors.red))
+          ],
         );
         reportButton = Container(
-            margin: EdgeInsets.only(right: 100),
-            child: FlatButton(
-              child: Text(
-                "השירות חזר לפעול?",
-                style: TextStyle(
-                    color: Colors.blue, decoration: TextDecoration.underline),
-              ),
-              onPressed: () {
-                availabilityAlert(service.Availabilty);
-              },
-            ));
+          margin: EdgeInsets.only(right: 100),
+          child: FlatButton(
+            child: Text(
+              "השירות חזר לפעול?",
+              style: TextStyle(
+                  color: Colors.blue, decoration: TextDecoration.underline),
+            ),
+            onPressed: () {
+              setState(() {
+                availabilityAlert(service);
+              });
+            },
+          ),
+        );
       } else {
-        availabilityInfo = Container(
-          width: 100,
-          padding: EdgeInsets.all(15),
-          child: Row(
-            children: <Widget>[
-              new IconTheme(
-                data: new IconThemeData(color: Colors.green),
-                child: new Icon(Icons.check_box),
-              ),
-              Text("פעיל", style: TextStyle(color: Colors.green))
-            ],
+        availabilityLabel = Row(
+          children: <Widget>[
+            new IconTheme(
+              data: new IconThemeData(color: Colors.green),
+              child: new Icon(Icons.check_box),
+            ),
+            Text("פעיל", style: TextStyle(color: Colors.green))
+          ],
+        );
+
+        reportButton = Container(
+          margin: EdgeInsets.only(right: 90),
+          child: FlatButton(
+            child: Text(
+              "השירות לא פעיל כרגע?",
+              style: TextStyle(
+                  color: Colors.blue, decoration: TextDecoration.underline),
+            ),
+            onPressed: () {
+              availabilityAlert(service);
+            },
           ),
         );
-        reportButton = Container(
-            margin: EdgeInsets.only(right: 90),
-            child: FlatButton(
-              child: Text(
-                "השירות לא פעיל כרגע?",
-                style: TextStyle(
-                    color: Colors.blue, decoration: TextDecoration.underline),
-              ),
-              onPressed: () {
-                availabilityAlert(service.Availabilty);
-              },
-            ));
       }
+      availabilityInfo = Container(
+        width: 100,
+        padding: EdgeInsets.all(10),
+        child: availabilityLabel,
+      );
       return new ExpansionTile(
         title: Text(service.ServiceType + ", " + service.Location),
         children: <Widget>[
@@ -268,19 +326,34 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
   @override
   void initState() {
     super.initState();
-    _servicesList = widget._model.fetchServices();
+    widget.model.fetchServices();
   }
 
   Widget _buildPage(List<Service> services) {
     FocusScope.of(context).autofocus(_focusNode);
     return Stack(
       children: <Widget>[
+        title,
         Container(
-          padding: EdgeInsets.fromLTRB(0, 90, 0, 0),
+          padding: EdgeInsets.fromLTRB(0, 150, 0, 0),
+          height: 430,
+          //child: DraggableScrollbar.arrows(
+          //heightScrollThumb: 100,
+          //scrollbarAnimationDuration: Duration(milliseconds: 3000),
+          //controller: scrollController,
+          //alwaysVisibleScrollThumb: isScrollBar,
+          //backgroundColor: Colors.blue,
           child: ListView(
-            children: <Widget>[_displayedServices],
+            //controller: scrollController,
+            children: <Widget>[
+              _displayedServices = _showServices(
+                _selectedBuildingNumber,
+                services,
+              )
+            ],
           ),
         ),
+        //addingButton,
         SingleChildScrollView(
           child: buildSearchField(),
         )
@@ -292,13 +365,13 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
   Widget build(BuildContext context) {
     return ScopedModelDescendant<MainModel>(
       builder: (BuildContext context, Widget child, MainModel model) {
-         Widget content;
-        if(model.isLoading) {
-          content = Center(child: CircularProgressIndicator()); 
+        Widget content;
+        if (model.isLoading) {
+          content = Center(child: CircularProgressIndicator());
         } else {
           content = _buildPage(model.services);
         }
-        return RefreshIndicator(onRefresh: model.fetchServices, child: content,);
+        return content;
       },
     );
   }

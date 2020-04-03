@@ -1,16 +1,22 @@
 import 'package:flutter/material.dart';
 
 class Service {
+  final String id;
   final String serviceType;
   final String buildingNumber;
   final String location;
-  final int availability;
+  int availability;
 
   Service(
-      {@required this.serviceType,
+      {@required this.id,
+      @required this.serviceType,
       @required this.buildingNumber,
       @required this.location,
       @required this.availability});
+
+   String get Id {
+    return id;
+  }
 
   String get ServiceType {
     return serviceType;
@@ -24,7 +30,11 @@ class Service {
     return location;
   }
 
-  int get Availabilty {
+  int get Availability {
     return availability;
+  }
+
+  void set Availability(int updatedAvailability) {
+    availability = updatedAvailability;
   }
 }
