@@ -9,6 +9,7 @@ class ServiceManager extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    model.fetchServices();
     return DefaultTabController(
       length: 2,
       child: Directionality(textDirection: TextDirection.rtl, child: Scaffold(
@@ -29,7 +30,7 @@ class ServiceManager extends StatelessWidget {
           ),
         ),
         body: TabBarView(
-          children: <Widget>[ServiceByType(), ServiceByBuilding(model)],
+          children: <Widget>[ServiceByType(model), ServiceByBuilding(model)],
         ),
       ),
     ));
