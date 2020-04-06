@@ -14,7 +14,7 @@ class Service {
       @required this.location,
       @required this.availability});
 
-   String get Id {
+  String get Id {
     return id;
   }
 
@@ -36,5 +36,26 @@ class Service {
 
   void set Availability(int updatedAvailability) {
     availability = updatedAvailability;
+  }
+}
+
+class RefrigeratorService extends Service {
+  final int milk;
+  RefrigeratorService(
+      {@required String id,
+      @required String serviceType,
+      @required String buildingNumber,
+      @required String location,
+      @required int availability,
+      @required this.milk})
+      : super(
+            id: id,
+            serviceType: serviceType,
+            buildingNumber: buildingNumber,
+            location: location,
+            availability: availability);
+
+  int get Milk {
+    return milk;
   }
 }

@@ -6,7 +6,7 @@ import './pages/auth.dart';
 import './pages/home.dart';
 import './pages/sign_up.dart';
 import './pages/forget_password.dart';
-import './service_manager.dart';
+import './services_manager.dart';
 import './pages/events_calendar.dart';
 
 void main() {

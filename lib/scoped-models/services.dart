@@ -35,12 +35,23 @@ class ServicesModel extends ConnectedServicesModel {
       buildingData.forEach((String type, dynamic servicesData) {
         if (type == "self-service-facilities") {
           servicesData.forEach((String id, dynamic serviceData) {
-            Service service = Service(
-                id: id,
-                serviceType: serviceData['service-type'],
-                buildingNumber: buildingNumber,
-                location: serviceData['location'],
-                availability: serviceData['availability']);
+            Service service;
+            if (serviceData['service-type'] == "מקרר") {
+              service = RefrigeratorService(
+                  milk: serviceData['milk'],
+                  id: id,
+                  serviceType: serviceData['service-type'],
+                  buildingNumber: buildingNumber,
+                  location: serviceData['location'],
+                  availability: serviceData['availability']);
+            } else {
+              service = Service(
+                  id: id,
+                  serviceType: serviceData['service-type'],
+                  buildingNumber: buildingNumber,
+                  location: serviceData['location'],
+                  availability: serviceData['availability']);
+            }
             fetchedServiceList.add(service);
           });
         }
@@ -90,8 +101,8 @@ class ServicesModel extends ConnectedServicesModel {
     }
     final Map<String, dynamic> updatedData = {
       'availability': updatedAvailability,
-      'location': service.location,
-      'service-type': service.serviceType,
+      'location': service.Location,
+      'service-type': service.ServiceType,
     };
 
     final http.Response response = await http.put(
@@ -108,6 +119,45 @@ class ServicesModel extends ConnectedServicesModel {
     for (int i = 0; i < services.length; i++) {
       if (services[i].Id == service.Id) {
         services[i] = updatedService;
+        break;
+      }
+    }
+    notifyListeners();
+    return true;
+  }
+
+  Future<bool> milkReport(
+      String _selectedBuildingNumber, RefrigeratorService refrigerator) async {
+    _isLoading = true;
+    notifyListeners();
+    int updatedMilkAvailability;
+    if (refrigerator.Milk == 0) {
+      updatedMilkAvailability = 1;
+    } else {
+      updatedMilkAvailability = 0;
+    }
+    final Map<String, dynamic> updatedData = {
+      'availability': refrigerator.Availability,
+      'location': refrigerator.Location,
+      'service-type': refrigerator.ServiceType,
+      'milk': updatedMilkAvailability
+    };
+
+    final http.Response response = await http.put(
+        'https://bar-iland-app.firebaseio.com/services/${_selectedBuildingNumber}/self-service-facilities/${refrigerator.Id}.json',
+        body: json.encode(updatedData));
+    final Map<String, dynamic> responseData = json.decode(response.body);
+    final RefrigeratorService updatedRefrigerator = RefrigeratorService(
+        id: refrigerator.Id,
+        buildingNumber: _selectedBuildingNumber,
+        availability: responseData['availability'],
+        location: responseData['location'],
+        serviceType: responseData['service-type'],
+        milk: updatedMilkAvailability);
+
+    for (int i = 0; i < services.length; i++) {
+      if (services[i].Id == refrigerator.Id) {
+        services[i] = updatedRefrigerator;
         break;
       }
     }
