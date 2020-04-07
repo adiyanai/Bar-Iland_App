@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:scoped_model/scoped_model.dart';
 import '../scoped-models/main.dart';
 import '../models/connection.dart';
@@ -55,9 +56,22 @@ class HomePage extends StatelessWidget {
     );
   }
 
+DecorationImage _buildBackgroungImage() {
+    return DecorationImage(
+      image: AssetImage('assets/background.jpg'),
+      fit: BoxFit.cover,
+      colorFilter: ColorFilter.mode(
+        Colors.black.withOpacity(0.55),
+        BlendMode.dstATop,
+      ),
+    );
+  }
+  
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Scaffold(
       drawer: _buildDrawer(),
       appBar: AppBar(
         title: Image.asset(
@@ -76,7 +90,16 @@ class HomePage extends StatelessWidget {
           ),
         ),
       ),
-      body: ListView(
+      body:
+        Container(
+          decoration: BoxDecoration(
+            image: _buildBackgroungImage(),
+          ),
+          child: GestureDetector(
+            onTap: () {
+              FocusScope.of(context).requestFocus(FocusNode());
+            },        
+          child: ListView(
         children: <Widget>[
           Image.asset(
             'assets/Bar_Iland_line.png',
@@ -242,8 +265,23 @@ class HomePage extends StatelessWidget {
               ),
             ],
           ),
-        ],
+          Container(
+            alignment: Alignment.bottomRight ,
+            margin: EdgeInsets.only(bottom:10,top:150,right: 10),
+            child: RaisedButton(
+              color: Colors.lightBlue[200], // button color
+              splashColor: Colors.cyanAccent, // splash color
+              onPressed: (){},
+              child: Text('מפת הקמפוס',
+              style: TextStyle(fontSize:14),
+              textAlign: TextAlign.center),
+            ), 
+          )
+          ],
       ),
+        ),
+      ),
+      )
     );
   }
 }
