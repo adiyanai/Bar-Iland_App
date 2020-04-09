@@ -8,7 +8,7 @@ import './pages/sign_up.dart';
 import './pages/forget_password.dart';
 import './services_manager.dart';
 import './pages/events_calendar.dart';
-
+import './pages/campusMap.dart';
 void main() {
   initializeDateFormatting().then((_) => runApp(MyApp()));
 }
@@ -49,6 +49,7 @@ class _MyAppState extends State<MyApp> {
           '/forgetPassword': (BuildContext context) => ForgetPassword(),
           '/service_manager': (BuildContext context) => ServiceManager(model),
           '/eventsCalendar': (BuildContext context) => EventsCalendar(model),
+          '/campusMap': (BuildContext context) => CampusMap()
         },
       ),
     );
