@@ -8,7 +8,7 @@ import './pages/sign_up.dart';
 import './pages/forget_password.dart';
 import './services_manager.dart';
 import './pages/events_calendar.dart';
-import './pages/campusMap.dart';
+import './pages/CampusMap.dart';
 void main() {
   initializeDateFormatting().then((_) => runApp(MyApp()));
 }

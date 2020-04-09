@@ -12,7 +12,9 @@ class CampusMap extends StatelessWidget {
             centerTitle: true,
             title: Center(child: Text('מפת הקמפוס')),
           ),
-          body: PhotoView(imageProvider: AssetImage('assets/Bar_Ilan_Map.jpg')),
+          body: PhotoView(
+            imageProvider: AssetImage('assets/Bar_Ilan_Map.jpg')
+          ),
         ));
   }
 }
