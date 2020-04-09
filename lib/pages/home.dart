@@ -1,8 +1,10 @@
+import 'package:bar_iland_app/pages/campusMap.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:scoped_model/scoped_model.dart';
 import '../scoped-models/main.dart';
 import '../models/connection.dart';
+import 'campusMap.dart';
 
 class HomePage extends StatelessWidget {
   Widget _buildDrawer() {
@@ -100,18 +102,18 @@ DecorationImage _buildBackgroungImage() {
               FocusScope.of(context).requestFocus(FocusNode());
             },        
           child: ListView(
-        children: <Widget>[
-          Image.asset(
-            'assets/Bar_Iland_line.png',
-            height: 150,
-            width: 30,
-            color: Colors.black,
-          ),
-          SizedBox(height: 1),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              SizedBox.fromSize(
+            children: <Widget>[
+              Image.asset(
+                'assets/Bar_Iland_line.png',
+                height: 150,
+                width: 30,
+                color: Colors.black,
+              ),
+              SizedBox(height: 1),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  SizedBox.fromSize(
                 size: Size(90, 90), // button width and height
                 child: ClipOval(
                   child: Material(
@@ -137,7 +139,7 @@ DecorationImage _buildBackgroungImage() {
                   ),
                 ),
               ),
-              SizedBox.fromSize(
+                  SizedBox.fromSize(
                 size: Size(90, 90), // button width and height
                 child: ClipOval(
                   child: Material(
@@ -162,7 +164,7 @@ DecorationImage _buildBackgroungImage() {
                   ),
                 ),
               ),
-              SizedBox.fromSize(
+                  SizedBox.fromSize(
                 size: Size(90, 90), // button width and height
                 child: ClipOval(
                   child: Material(
@@ -187,14 +189,13 @@ DecorationImage _buildBackgroungImage() {
                   ),
                 ),
               ),
-            ],
-          ),
-          SizedBox(height: 15),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              SizedBox.fromSize(
+                ]),
+              SizedBox(height: 15),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  SizedBox.fromSize(
                 size: Size(90, 90), // button width and height
                 child: ClipOval(
                   child: Material(
@@ -217,7 +218,7 @@ DecorationImage _buildBackgroungImage() {
                   ),
                 ),
               ),
-              SizedBox.fromSize(
+                  SizedBox.fromSize(
                 size: Size(90, 90), // button width and height
                 child: ClipOval(
                   child: Material(
@@ -240,7 +241,7 @@ DecorationImage _buildBackgroungImage() {
                   ),
                 ),
               ),
-              SizedBox.fromSize(
+                  SizedBox.fromSize(
                 size: Size(90, 90), // button width and height
                 child: ClipOval(
                   child: Material(
@@ -263,24 +264,26 @@ DecorationImage _buildBackgroungImage() {
                   ),
                 ),
               ),
-            ],
+                ]),
+              Container(
+                alignment: Alignment.bottomRight ,
+                margin: EdgeInsets.only(bottom:10,top:150,right: 10),
+                  child: RaisedButton(
+                    color: Colors.lightBlue[200], // button color
+                    splashColor: Colors.cyanAccent, // splash color
+                    onPressed: () => Navigator.push(
+                      context ,
+                      MaterialPageRoute(
+                        builder: (BuildContext context) => campusMap(),
+                        ),),
+                    child: Text('מפת הקמפוס',
+                    style: TextStyle(fontSize:14),
+                    textAlign: TextAlign.center),
+                )
+              )], 
+            ),
           ),
-          Container(
-            alignment: Alignment.bottomRight ,
-            margin: EdgeInsets.only(bottom:10,top:150,right: 10),
-            child: RaisedButton(
-              color: Colors.lightBlue[200], // button color
-              splashColor: Colors.cyanAccent, // splash color
-              onPressed: (){},
-              child: Text('מפת הקמפוס',
-              style: TextStyle(fontSize:14),
-              textAlign: TextAlign.center),
-            ), 
-          )
-          ],
-      ),
         ),
-      ),
       )
     );
   }

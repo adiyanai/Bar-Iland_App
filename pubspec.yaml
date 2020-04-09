@@ -19,6 +19,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  photo_view: any
+  
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -69,7 +71,8 @@ flutter:
     - assets/background.jpg
     - assets/available_milk.png
     - assets/unavailable_milk.png
-  #  - images/a_dot_ham.jpeg
+    - assets/Bar_Ilan_Map.jpg
+    #  - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
