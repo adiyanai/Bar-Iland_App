@@ -52,6 +52,7 @@ class Service {
 class RefrigeratorService extends Service {
   int milk;
   String milkReportDate;
+  String milkReportTime;
   RefrigeratorService(
       {@required String id,
       @required String serviceType,
@@ -59,7 +60,7 @@ class RefrigeratorService extends Service {
       @required String location,
       @required int availability,
       @required String availabilityReportDate,
-      @required this.milk, @required this.milkReportDate})
+      @required this.milk, @required this.milkReportDate, @required this.milkReportTime})
       : super(
             id: id,
             serviceType: serviceType,
@@ -80,7 +81,14 @@ class RefrigeratorService extends Service {
     return milkReportDate;
   }
 
-    void set MilkReportDate(updatedReportDate) {
+  void set MilkReportDate(updatedReportDate) {
     milkReportDate = updatedReportDate;
+  }
+
+  String get MilkReportTime {
+    return milkReportTime;
+  }
+  void set MilkReportTime(updatedReportTime) {
+    milkReportTime = updatedReportTime;
   }
 }
