@@ -21,45 +21,54 @@ class ServicesModel extends ConnectedServicesModel {
     return List.from(buildingNumbers);
   }
 
-  Future<Null> fetchServices() async {
+  Future<Null> fetchServices() {
     _isLoading = true;
     notifyListeners();
-    final http.Response response =
-        await http.get('https://bar-iland-app.firebaseio.com/services.json');
-    final List<Service> fetchedServiceList = [];
-    Map<String, dynamic> buildingsServices = json.decode(response.body);
-    buildingsServices.forEach((String buildingNumber, dynamic buildingData) {
-      if (!buildingNumbers.contains(buildingNumber)) {
-        buildingNumbers.add(buildingNumber);
-      }
-      buildingData.forEach((String type, dynamic servicesData) {
-        if (type == "self-service-facilities") {
-          servicesData.forEach((String id, dynamic serviceData) {
-            Service service;
-            if (serviceData['service-type'] == "מקרר") {
-              service = RefrigeratorService(
-                  milk: serviceData['milk'],
-                  id: id,
-                  serviceType: serviceData['service-type'],
-                  buildingNumber: buildingNumber,
-                  location: serviceData['location'],
-                  availability: serviceData['availability']);
-            } else {
-              service = Service(
-                  id: id,
-                  serviceType: serviceData['service-type'],
-                  buildingNumber: buildingNumber,
-                  location: serviceData['location'],
-                  availability: serviceData['availability']);
-            }
-            fetchedServiceList.add(service);
-          });
+    return http
+        .get('https://bar-iland-app.firebaseio.com/services.json')
+        .then<Null>((http.Response response) {
+      final List<Service> fetchedServiceList = [];
+      Map<String, dynamic> buildingsServices = json.decode(response.body);
+      buildingsServices.forEach((String buildingNumber, dynamic buildingData) {
+        if (!buildingNumbers.contains(buildingNumber)) {
+          buildingNumbers.add(buildingNumber);
         }
+        buildingData.forEach((String type, dynamic servicesData) {
+          if (type == "self-service-facilities") {
+            servicesData.forEach((String id, dynamic serviceData) {
+              Service service;
+              if (serviceData['service-type'] == "מקרר") {
+                service = RefrigeratorService(
+                  id: id,
+                  serviceType: serviceData['service-type'],
+                  buildingNumber: buildingNumber,
+                  location: serviceData['location'],
+                  availability: serviceData['availability'],
+                  availabilityReportDate:
+                      serviceData['availability-report-date'],
+                  milk: serviceData['milk'],
+                  milkReportDate: serviceData['milk-report-date'],
+                );
+              } else {
+                service = Service(
+                  id: id,
+                  serviceType: serviceData['service-type'],
+                  buildingNumber: buildingNumber,
+                  location: serviceData['location'],
+                  availability: serviceData['availability'],
+                  availabilityReportDate:
+                      serviceData['availability-report-date'],
+                );
+              }
+              fetchedServiceList.add(service);
+            });
+          }
+        });
       });
+      services = fetchedServiceList;
+      _isLoading = false;
+      notifyListeners();
     });
-    services = fetchedServiceList;
-    _isLoading = false;
-    notifyListeners();
   }
 
   /*Future<bool> addService(
@@ -89,80 +98,85 @@ class ServicesModel extends ConnectedServicesModel {
     return true;
   }*/
 
-  Future<bool> availabiltyReport(
-      String _selectedBuildingNumber, Service service) async {
+  Future<bool> refrigeratorReport(
+      String _selectedBuildingNumber,
+      RefrigeratorService refrigerator,
+      int updatedAvailability,
+      int milkAvailability) {
     _isLoading = true;
-    notifyListeners();
-    int updatedAvailability;
-    if (service.Availability == 0) {
-      updatedAvailability = 1;
-    } else {
-      updatedAvailability = 0;
-    }
-    final Map<String, dynamic> updatedData = {
+    DateTime today = new DateTime.now();
+    String currentDate =
+        "${today.day.toString()}/${today.month.toString().padLeft(2, '0')}/${today.year.toString().padLeft(2, '0')}";
+    Map<String, dynamic> updatedData = {
+      'service-type': refrigerator.ServiceType,
+      'location': refrigerator.Location,
       'availability': updatedAvailability,
-      'location': service.Location,
-      'service-type': service.ServiceType,
+      'availability-report-date': currentDate,
+      'milk': milkAvailability,
+      'milk-report-date': currentDate
     };
-
-    final http.Response response = await http.put(
-        'https://bar-iland-app.firebaseio.com/services/${_selectedBuildingNumber}/self-service-facilities/${service.Id}.json',
-        body: json.encode(updatedData));
-    final Map<String, dynamic> responseData = json.decode(response.body);
-    final Service updatedService = Service(
-        id: service.Id,
-        buildingNumber: _selectedBuildingNumber,
-        availability: updatedAvailability,
-        location: responseData['location'],
-        serviceType: responseData['service-type']);
-
-    for (int i = 0; i < services.length; i++) {
-      if (services[i].Id == service.Id) {
-        services[i] = updatedService;
-        break;
+    return http
+        .put(
+            'https://bar-iland-app.firebaseio.com/services/${_selectedBuildingNumber}/self-service-facilities/${refrigerator.Id}.json',
+            body: json.encode(updatedData))
+        .then((http.Response response) {
+      final Map<String, dynamic> responseData = json.decode(response.body);
+      refrigerator.Availability = updatedAvailability;
+      refrigerator.AvailabilityReportDate =
+          responseData['availability-report-date'];
+      refrigerator.Milk = milkAvailability;
+      refrigerator.MilkReportDate = responseData['milk-report-date'];
+      for (int i = 0; i < services.length; i++) {
+        if (services[i].Id == refrigerator.Id) {
+          services[i] = refrigerator;
+          notifyListeners();
+          break;
+        }
       }
-    }
-    notifyListeners();
-    return true;
+      _isLoading = false;
+      return true;
+    });
   }
 
-  Future<bool> milkReport(
-      String _selectedBuildingNumber, RefrigeratorService refrigerator) async {
+  Future<bool> availabiltyReport(String _selectedBuildingNumber,
+      Service service, int updatedAvailability) {
     _isLoading = true;
     notifyListeners();
-    int updatedMilkAvailability;
-    if (refrigerator.Milk == 0) {
-      updatedMilkAvailability = 1;
-    } else {
-      updatedMilkAvailability = 0;
-    }
-    final Map<String, dynamic> updatedData = {
-      'availability': refrigerator.Availability,
-      'location': refrigerator.Location,
-      'service-type': refrigerator.ServiceType,
-      'milk': updatedMilkAvailability
+    DateTime today = new DateTime.now();
+    String currentDate =
+        "${today.day.toString()}/${today.month.toString().padLeft(2, '0')}/${today.year.toString().padLeft(2, '0')}";
+    Map<String, dynamic> updatedData = {
+      'availability': updatedAvailability,
+      'service-type': service.ServiceType,
+      'location': service.Location,
+      'availability-report-date': currentDate
     };
+    return http
+        .put(
+            'https://bar-iland-app.firebaseio.com/services/${_selectedBuildingNumber}/self-service-facilities/${service.Id}.json',
+            body: json.encode(updatedData))
+        .then((http.Response response) {
+      final Map<String, dynamic> responseData = json.decode(response.body);
 
-    final http.Response response = await http.put(
-        'https://bar-iland-app.firebaseio.com/services/${_selectedBuildingNumber}/self-service-facilities/${refrigerator.Id}.json',
-        body: json.encode(updatedData));
-    final Map<String, dynamic> responseData = json.decode(response.body);
-    final RefrigeratorService updatedRefrigerator = RefrigeratorService(
-        id: refrigerator.Id,
-        buildingNumber: _selectedBuildingNumber,
-        availability: responseData['availability'],
-        location: responseData['location'],
-        serviceType: responseData['service-type'],
-        milk: updatedMilkAvailability);
+      final Service updatedService = Service(
+          id: service.Id,
+          serviceType: responseData['service-type'],
+          buildingNumber: _selectedBuildingNumber,
+          availability: updatedAvailability,
+          location: responseData['location'],
+          availabilityReportDate: currentDate);
 
-    for (int i = 0; i < services.length; i++) {
-      if (services[i].Id == refrigerator.Id) {
-        services[i] = updatedRefrigerator;
-        break;
+      for (int i = 0; i < services.length; i++) {
+        if (services[i].Id == service.Id) {
+          services[i] = updatedService;
+          notifyListeners();
+          break;
+        }
       }
-    }
-    notifyListeners();
-    return true;
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    });
   }
 }
 

@@ -20,14 +20,12 @@ class ServiceByBuilding extends StatefulWidget {
 }
 
 class _ServiceByBuildingState extends State<ServiceByBuilding> {
-  //final ScrollController _scrollController = ScrollController();
   AutoCompleteTextField<String> _textField;
   GlobalKey<AutoCompleteTextFieldState<String>> _key = new GlobalKey();
   final FocusNode _focusNode = FocusNode();
   String _selectedBuildingNumber = "";
   bool _isNotPressable = true;
   bool _isOkPressed = false;
-  // bool isScrollBar = false;
   Color _buttonColor = Colors.grey;
   Future<List<Service>> _servicesList;
   Widget _displayedServices = Column();
@@ -63,6 +61,52 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
         });
   }
 
+  void _registeredUserRefrigeratorReport(
+      Service service, int updatedAvailability) {
+    if (updatedAvailability == 1) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Directionality(
+            textDirection: TextDirection.rtl,
+            child: AlertDialog(
+              title: Text('דיווח על זמינות החלב'),
+              content: Text('האם יש חלב במקרר?'),
+              actions: <Widget>[
+                FlatButton(
+                  child: Text('כן'),
+                  onPressed: () {
+                    setState(() {
+                      RefrigeratorService refrigeratorReport = service;
+                      widget.model.refrigeratorReport(_selectedBuildingNumber,
+                          refrigeratorReport, updatedAvailability, 1);
+                      Navigator.of(context).pop();
+                    });
+                  },
+                ),
+                FlatButton(
+                  child: Text('לא'),
+                  onPressed: () {
+                    setState(() {
+                      widget.model.refrigeratorReport(_selectedBuildingNumber,
+                          service, updatedAvailability, 0);
+                      Navigator.of(context).pop();
+                    });
+                  },
+                )
+              ],
+            ),
+          );
+        },
+      );
+    } else {
+      setState(() {
+        widget.model.refrigeratorReport(
+            _selectedBuildingNumber, service, updatedAvailability, 0);
+      });
+    }
+  }
+
   void _registeredUserAvailabilityReport(Service service) {
     String alertText = "";
     if (service.Availability == 0) {
@@ -70,37 +114,52 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
     } else {
       alertText = "השירות יוצג כלא פעיל";
     }
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return Directionality(
-          textDirection: TextDirection.rtl,
-          child: AlertDialog(
-            title: Text('דיווח על זמינות השירות'),
-            content: Text(alertText),
-            actions: <Widget>[
-              FlatButton(
-                child: Text('אישור'),
-                onPressed: () {
-                  setState(() {
-                    widget.model
-                        .availabiltyReport(_selectedBuildingNumber, service);
-                    widget.model.fetchServices();
-                  });
-                  Navigator.of(context).pop();
-                },
-              ),
-              FlatButton(
-                child: Text('ביטול'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              )
-            ],
-          ),
-        );
-      },
-    );
+    setState(() {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          int updatedAvailability;
+          return Directionality(
+            textDirection: TextDirection.rtl,
+            child: AlertDialog(
+              title: Text('דיווח על זמינות השירות'),
+              content: Text(alertText),
+              actions: <Widget>[
+                FlatButton(
+                  child: Text('אישור'),
+                  onPressed: () {
+                    if (service.Availability == 0) {
+                      updatedAvailability = 1;
+                    } else {
+                      updatedAvailability = 0;
+                    }
+                    if (service.ServiceType == "מקרר") {
+                      Navigator.of(context).pop();
+                      setState(() {
+                        _registeredUserRefrigeratorReport(
+                            service, updatedAvailability);
+                      });
+                    } else {
+                      setState(() {
+                        widget.model.availabiltyReport(_selectedBuildingNumber,
+                            service, updatedAvailability);
+                        Navigator.of(context).pop();
+                      });
+                    }
+                  },
+                ),
+                FlatButton(
+                  child: Text('ביטול'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                )
+              ],
+            ),
+          );
+        },
+      );
+    });
   }
 
   void _guestUserMilkReport() {
@@ -125,9 +184,10 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
         });
   }
 
-  void _registeredUserMilkReport(RefrigeratorService refrigerator) {
+  void _registeredUserMilkReport(
+      RefrigeratorService refrigerator, int updatedMilkAvailability) {
     String alertText = "";
-    if (refrigerator.Milk == 1) {
+    if (updatedMilkAvailability == 0) {
       alertText = "החלב במקרר יוצג כלא זמין";
     } else {
       alertText = "החלב במקרר יוצג כזמין";
@@ -145,9 +205,8 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
                 child: Text('אישור'),
                 onPressed: () {
                   setState(() {
-                    widget.model
-                        .milkReport(_selectedBuildingNumber, refrigerator);
-                    widget.model.fetchServices();
+                    widget.model.refrigeratorReport(_selectedBuildingNumber,
+                        refrigerator, 1, updatedMilkAvailability);
                     Navigator.of(context).pop();
                   });
                 },
@@ -314,7 +373,9 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
     serviceTypeToIcon["מיקרוגל חלבי"] = Icon(MdiIcons.microwave);
     serviceTypeToIcon["מיקרוגל בשרי"] = Icon(MdiIcons.microwave);
     serviceTypeToIcon["מים חמים"] = Icon(MdiIcons.kettleSteam);
-    serviceTypeToIcon["מכונת חטיפים"] = Icon(MdiIcons.cookie);
+    serviceTypeToIcon["מכונת חטיפים"] = Icon(
+      MdiIcons.cookie,
+    );
     serviceTypeToIcon["מכונת שתייה"] = Icon(MdiIcons.bottleSodaClassicOutline);
     serviceTypeToIcon["מכונת צילום והדפסה"] = Icon(MdiIcons.printer);
     return serviceTypeToIcon;
@@ -327,7 +388,10 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
     Widget milkIcon;
     Widget milkReportButton;
     Widget milkReportText;
-    if (refrigerator.milk == 1) {
+    if (refrigerator.Availability == 0) {
+      return Row();
+    }
+    if (refrigerator.Milk == 1) {
       milkText = Text(
         "יש חלב במקרר",
         style: TextStyle(
@@ -355,7 +419,7 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
         ),
       );
       milkReportText = Text(
-        "המקרר התמלא בחלב?",
+        "מלאי החלב התחדש?",
         style:
             TextStyle(color: Colors.blue, decoration: TextDecoration.underline),
       );
@@ -370,8 +434,15 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
             child: milkReportText,
             onPressed: () {
               setState(() {
+                int updatedMilkAvailability;
+                if (refrigerator.Milk == 1) {
+                  updatedMilkAvailability = 0;
+                } else {
+                  updatedMilkAvailability = 1;
+                }
                 _connectionMode == ConnectionMode.RegisteredUser
-                    ? _registeredUserMilkReport(refrigerator)
+                    ? _registeredUserMilkReport(
+                        refrigerator, updatedMilkAvailability)
                     : _guestUserMilkReport();
               });
             },
@@ -387,7 +458,19 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
         children: <Widget>[milkIcon, milkText],
       ),
     );
-    return Row(children: <Widget>[milkInfo, milkReportButton]);
+    return Column(
+      children: <Widget>[
+        Row(children: <Widget>[milkInfo, milkReportButton]),
+        Container(
+          padding: EdgeInsets.only(right: 20),
+          child: Row(
+            children: <Widget>[
+              Text("דווח לאחרונה: " + refrigerator.MilkReportDate)
+            ],
+          ),
+        )
+      ],
+    );
   }
 
   Widget _availabilityUI(Service service) {
@@ -447,7 +530,19 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
       ),
     );
 
-    return Row(children: <Widget>[availabilityInfo, availabilityReportButton]);
+    return Column(
+      children: <Widget>[
+        Row(children: <Widget>[availabilityInfo, availabilityReportButton]),
+        Container(
+          padding: EdgeInsets.only(right: 20),
+          child: Row(
+            children: <Widget>[
+              Text("דווח לאחרונה: " + service.AvailabilityReportDate)
+            ],
+          ),
+        )
+      ],
+    );
   }
 
   Widget _showServices(String buildingNumber, List<Service> services) {
@@ -544,12 +639,15 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
     return ScopedModelDescendant<MainModel>(
       builder: (BuildContext context, Widget child, MainModel model) {
         Widget content;
-        if (model.isLoading) {
-          content = Center(child: CircularProgressIndicator());
-        } else {
+        if (!model.isLoading) {
           content = _buildPage(model.services);
+        } else if (model.isLoading) {
+          content = Center(child: CircularProgressIndicator());
         }
-        return content;
+        return RefreshIndicator(
+          onRefresh: model.fetchServices,
+          child: content,
+        );
       },
     );
   }

@@ -116,7 +116,10 @@ class HomePage extends StatelessWidget {
                               color: Colors.lightBlue[200], // button color
                               child: InkWell(
                                 splashColor: Colors.cyanAccent, // splash color
-                                onTap: () {}, // button pressed
+                                onTap: () {
+                                  Navigator.pushNamed(
+                                      context, '/service_manager');
+                                }, // button pressed
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: <Widget>[
@@ -165,10 +168,7 @@ class HomePage extends StatelessWidget {
                               color: Colors.lightBlue[200], // button color
                               child: InkWell(
                                 splashColor: Colors.cyanAccent, // splash color
-                                onTap: () {
-                                  Navigator.pushNamed(
-                                      context, '/service_manager');
-                                }, // button pressed
+                                onTap: () {}, // button pressed
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: <Widget>[
@@ -269,7 +269,8 @@ class HomePage extends StatelessWidget {
                       child: RaisedButton(
                         color: Colors.lightBlue[200], // button color
                         splashColor: Colors.cyanAccent, // splash color
-                        onPressed: () => Navigator.pushNamed(context, '/campusMap'),
+                        onPressed: () =>
+                            Navigator.pushNamed(context, '/campusMap'),
                         child: Text('מפת הקמפוס',
                             style: TextStyle(fontSize: 14),
                             textAlign: TextAlign.center),
