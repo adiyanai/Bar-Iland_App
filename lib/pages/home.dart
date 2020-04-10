@@ -1,10 +1,8 @@
-import 'package:bar_iland_app/pages/campusMap.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:scoped_model/scoped_model.dart';
 import '../scoped-models/main.dart';
 import '../models/connection.dart';
-import 'campusMap.dart';
 
 class HomePage extends StatelessWidget {
   Widget _buildDrawer() {
