@@ -15,8 +15,8 @@ class CampusMap extends StatelessWidget {
           body: PhotoView(
             imageProvider: AssetImage('assets/Bar_Ilan_Map.jpg'),
             minScale: PhotoViewComputedScale.contained,
-            maxScale: PhotoViewComputedScale.covered * 1.8,
-            initialScale: PhotoViewComputedScale.contained * 1.1,
+            maxScale: PhotoViewComputedScale.covered * 4.8,
+            initialScale: PhotoViewComputedScale.contained,
           ),
         ));
   }
