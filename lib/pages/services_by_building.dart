@@ -465,7 +465,10 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
           padding: EdgeInsets.only(right: 20),
           child: Row(
             children: <Widget>[
-              Text("דווח לאחרונה: " + refrigerator.MilkReportDate)
+              Text("דווח לאחרונה: " +
+                  refrigerator.MilkReportDate +
+                  ", " +
+                  refrigerator.MilkReportTime)
             ],
           ),
         )
@@ -568,6 +571,8 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
       } else {
         milkInfo = Row();
       }
+      String serviceLocation = service.Location;
+      serviceLocation = serviceLocation.replaceAll("קומה -1", "קומה 1-");
       Map<String, Icon> serviceTypeToIcon = mapServicesToIcons();
       return new Container(
         color: Color.fromRGBO(179, 238, 255, 0.5),
@@ -593,7 +598,7 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
                       size: 22,
                     ),
                     Text(
-                      service.Location,
+                      serviceLocation,
                       style: TextStyle(fontSize: 16),
                     )
                   ],

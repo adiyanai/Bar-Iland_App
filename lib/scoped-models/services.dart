@@ -48,6 +48,7 @@ class ServicesModel extends ConnectedServicesModel {
                       serviceData['availability-report-date'],
                   milk: serviceData['milk'],
                   milkReportDate: serviceData['milk-report-date'],
+                  milkReportTime: serviceData['milk-report-time'],
                 );
               } else {
                 service = Service(
@@ -64,6 +65,14 @@ class ServicesModel extends ConnectedServicesModel {
             });
           }
         });
+      });
+      fetchedServiceList.sort((service1, service2) {
+        int result = service1.Location.compareTo(service2.Location);
+        if (result != 0 ) {
+          return result;
+        } else {
+          return service1.ServiceType.compareTo(service2.ServiceType);
+        }
       });
       services = fetchedServiceList;
       _isLoading = false;
@@ -107,13 +116,16 @@ class ServicesModel extends ConnectedServicesModel {
     DateTime today = new DateTime.now();
     String currentDate =
         "${today.day.toString()}/${today.month.toString().padLeft(2, '0')}/${today.year.toString().padLeft(2, '0')}";
+    String currentTime =
+        "${today.hour.toString()}:${today.minute.toString().padLeft(2, '0')}";
     Map<String, dynamic> updatedData = {
       'service-type': refrigerator.ServiceType,
       'location': refrigerator.Location,
       'availability': updatedAvailability,
       'availability-report-date': currentDate,
       'milk': milkAvailability,
-      'milk-report-date': currentDate
+      'milk-report-date': currentDate,
+      'milk-report-time': currentTime
     };
     return http
         .put(
@@ -126,6 +138,7 @@ class ServicesModel extends ConnectedServicesModel {
           responseData['availability-report-date'];
       refrigerator.Milk = milkAvailability;
       refrigerator.MilkReportDate = responseData['milk-report-date'];
+      refrigerator.MilkReportTime = responseData['milk-report-time'];
       for (int i = 0; i < services.length; i++) {
         if (services[i].Id == refrigerator.Id) {
           services[i] = refrigerator;
