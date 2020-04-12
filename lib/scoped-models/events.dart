@@ -37,12 +37,20 @@ class EventsModel extends Model {
     });
   }
 
+  String encodeDateTime(DateTime date) {
+    return date.toString();
+  }
+
+  DateTime decodeDateTime(String date) {
+    return DateTime.parse(date);
+  }
+
   Future<bool> addEvent(
       DateTime date, String eventType, String eventDescription) async {
     _isLoading = true;
     notifyListeners();
     final Map<String, dynamic> eventData = {
-      'date': date,
+      'date': encodeDateTime(date),
       'eventType': eventType,
       'eventDescription': eventDescription
     };
@@ -57,10 +65,14 @@ class EventsModel extends Model {
         return false;
       }
 
-      //final Map<String, dynamic> responseData = json.decode(response.body);
+      final Map<String, dynamic> responseData = json.decode(response.body);
       final Event newEvent = Event(
-          date: date, eventType: eventType, eventDescription: eventDescription);
+          id: responseData['name'],
+          date: date,
+          eventType: eventType,
+          eventDescription: eventDescription);
       _events.add(newEvent);
+      _selEventId = responseData['name'];
       _isLoading = false;
       notifyListeners();
       return true;
@@ -93,5 +105,30 @@ class EventsModel extends Model {
   Future<Null> fetchEvents() {
     _isLoading = true;
     notifyListeners();
+    return http.get(databaseURL).then<Null>((http.Response response) {
+      final List<Event> fetchedEventsList = [];
+      final Map<String, dynamic> eventsData = json.decode(response.body);
+      if (eventsData == null) {
+        _isLoading = false;
+        notifyListeners();
+        return;
+      }
+      eventsData.forEach((String eventId, dynamic eventData) {
+        final Event event = Event(
+            id: eventId,
+            date: decodeDateTime(eventData['date']),
+            eventType: eventData['eventType'],
+            eventDescription: eventData['eventDescription']);
+        fetchedEventsList.add(event);
+      });
+      _events = fetchedEventsList;
+      _isLoading = false;
+      notifyListeners();
+      _selEventId = null;
+    }).catchError((error) {
+      _isLoading = false;
+      notifyListeners();
+      return;
+    });
   }
 }
