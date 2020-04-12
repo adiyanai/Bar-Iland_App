@@ -104,6 +104,7 @@ class UserModel extends Model {
         notifyListeners();
         return;
       }
+      _connectionMode = ConnectionMode.RegisteredUser;
       final String userEmail = prefs.getString('userEmail');
       final String userId = prefs.getString('userId');
       final int tokenLifespan = parsedExpiryTime.difference(now).inSeconds;
