@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../models/connection.dart';
 import '../scoped-models/main.dart';
+import '../models/event.dart';
 
 class EventsCalendar extends StatefulWidget {
   final MainModel _model;
@@ -28,22 +29,24 @@ class _EventsCalendarState extends State<EventsCalendar> {
     _eventController = TextEditingController();
     _selectedEvents = [];
     _events = {};
+    initEvents();
   }
 
-  Map<String, dynamic> encodeMap(Map<DateTime, dynamic> map) {
-    Map<String, dynamic> newMap = {};
-    map.forEach((key, value) {
-      newMap[key.toString()] = map[key];
+  void initEvents() async {
+    await widget._model.fetchEvents();
+    setState(() {
+      final List<Event> eventsData = widget._model.allEvents;
+      if (!eventsData.isEmpty) {
+        eventsData.forEach((Event event) {
+          if (_events.containsKey(event.date)) {
+            _events[event.date].add(event);
+          } else {
+            _events[event.date] = [];
+            _events[event.date].add(event);
+          }
+        });
+      }
     });
-    return newMap;
-  }
-
-  Map<DateTime, dynamic> decodeMap(Map<String, dynamic> map) {
-    Map<DateTime, dynamic> newMap = {};
-    map.forEach((key, value) {
-      newMap[DateTime.parse(key)] = map[key];
-    });
-    return newMap;
   }
 
   void _registeredUserAddEvent() {
@@ -63,12 +66,18 @@ class _EventsCalendarState extends State<EventsCalendar> {
                 onPressed: () {
                   if (_eventController.text.isEmpty) return;
                   setState(() {
+                    widget._model.addEvent(_calendarController.selectedDay,
+                        'סוג אירוע', _eventController.text);
+                    final Event newEvent = Event(
+                        id: widget._model.selectedEventId,
+                        date: _calendarController.selectedDay,
+                        eventType: 'סוג אירוע',
+                        eventDescription: _eventController.text);
                     if (_events[_calendarController.selectedDay] != null) {
-                      _events[_calendarController.selectedDay]
-                          .add(_eventController.text);
+                      _events[_calendarController.selectedDay].add(newEvent);
                     } else {
                       _events[_calendarController.selectedDay] = [
-                        _eventController.text
+                        newEvent
                       ];
                     }
                     _eventController.clear();
@@ -105,7 +114,6 @@ class _EventsCalendarState extends State<EventsCalendar> {
       },
     );
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -162,14 +170,16 @@ class _EventsCalendarState extends State<EventsCalendar> {
                 },
               ),
               ..._selectedEvents.map((event) => ListTile(
-                    title: Text(event),
+                    title: Text(event.EventDescription),
                   )),
             ],
           ),
         ),
         floatingActionButton: FloatingActionButton(
           child: Icon(Icons.add),
-          onPressed: _connectionMode == ConnectionMode.RegisteredUser ?  _registeredUserAddEvent : _guestUserAddEvent,
+          onPressed: _connectionMode == ConnectionMode.RegisteredUser
+              ? _registeredUserAddEvent
+              : _guestUserAddEvent,
         ),
       ),
     );
