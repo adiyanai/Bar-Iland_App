@@ -34,13 +34,14 @@ class ServicesModel extends ConnectedServicesModel {
           buildingNumbers.add(buildingNumber);
         }
         buildingData.forEach((String type, dynamic servicesData) {
-          if (type == "self-service-facilities") {
-            servicesData.forEach((String id, dynamic serviceData) {
-              Service service;
-              if (serviceData['service-type'] == "מקרר") {
+          Service service;
+          servicesData.forEach((String id, dynamic serviceData) {
+            if (type == "self-service-facilities") {
+              if (serviceData['subtype'] == "מקרר") {
                 service = RefrigeratorService(
                   id: id,
-                  serviceType: serviceData['service-type'],
+                  type: type,
+                  subtype: serviceData['subtype'],
                   buildingNumber: buildingNumber,
                   location: serviceData['location'],
                   availability: serviceData['availability'],
@@ -51,9 +52,10 @@ class ServicesModel extends ConnectedServicesModel {
                   milkReportTime: serviceData['milk-report-time'],
                 );
               } else {
-                service = Service(
+                service = MachineService(
                   id: id,
-                  serviceType: serviceData['service-type'],
+                  type: type,
+                  subtype: serviceData['subtype'],
                   buildingNumber: buildingNumber,
                   location: serviceData['location'],
                   availability: serviceData['availability'],
@@ -62,16 +64,29 @@ class ServicesModel extends ConnectedServicesModel {
                 );
               }
               fetchedServiceList.add(service);
-            });
-          }
+            } else if (type == "welfare-rooms") {
+              List<String> contained = [];
+              (serviceData['contains']).forEach((service) {
+                contained.add(service);
+              });
+              service = WelfareRoomService(
+                  id: id,
+                  type: type,
+                  subtype: serviceData['subtype'],
+                  buildingNumber: buildingNumber,
+                  location: serviceData['location'],
+                  contains: contained);
+              fetchedServiceList.add(service);
+            }
+          });
         });
       });
       fetchedServiceList.sort((service1, service2) {
         int result = service1.Location.compareTo(service2.Location);
-        if (result != 0 ) {
+        if (result != 0) {
           return result;
         } else {
-          return service1.ServiceType.compareTo(service2.ServiceType);
+          return service1.Subtype.compareTo(service2.Subtype);
         }
       });
       services = fetchedServiceList;
@@ -89,7 +104,7 @@ class ServicesModel extends ConnectedServicesModel {
     final Map<String, dynamic> serviceData = {
       'availability': availability,
       'location': location,
-      'service-type': serviceType,
+      'subtype': serviceType,
     };
 
     final http.Response response = await http.post(
@@ -106,6 +121,56 @@ class ServicesModel extends ConnectedServicesModel {
     notifyListeners();
     return true;
   }*/
+  
+  /*
+  Future<bool> addService({
+    String location = "חדר 320",
+    String subtype = "חדר הנקה",
+  }) async {
+    _isLoading = true;
+    notifyListeners();
+    final Map<String, dynamic> serviceData = {
+      'location': location,
+      'subtype': subtype,
+    };
+
+    final http.Response response = await http.post(
+        'https://bar-iland-app.firebaseio.com/services/211/welfare-rooms.json',
+        body: json.encode(serviceData));
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+    _isLoading = false;
+    notifyListeners();
+    return true;
+  }
+*/
+
+Future<bool> addService({
+    String location = "חדר 320",
+    String subtype = "חדר הנקה",
+  }) async {
+    _isLoading = true;
+    notifyListeners();
+    final Map<String, dynamic> serviceData = {
+      'location': location,
+      'subtype': subtype,
+    };
+
+    final http.Response response = await http.post(
+        'https://bar-iland-app.firebaseio.com/services/211/welfare-rooms.json',
+        body: json.encode(serviceData));
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+    _isLoading = false;
+    notifyListeners();
+    return true;
+  }
 
   Future<bool> refrigeratorReport(
       String _selectedBuildingNumber,
@@ -119,7 +184,7 @@ class ServicesModel extends ConnectedServicesModel {
     String currentTime =
         "${today.hour.toString()}:${today.minute.toString().padLeft(2, '0')}";
     Map<String, dynamic> updatedData = {
-      'service-type': refrigerator.ServiceType,
+      'subtype': refrigerator.Subtype,
       'location': refrigerator.Location,
       'availability': updatedAvailability,
       'availability-report-date': currentDate,
@@ -160,7 +225,7 @@ class ServicesModel extends ConnectedServicesModel {
         "${today.day.toString()}/${today.month.toString().padLeft(2, '0')}/${today.year.toString().padLeft(2, '0')}";
     Map<String, dynamic> updatedData = {
       'availability': updatedAvailability,
-      'service-type': service.ServiceType,
+      'subtype': service.Subtype,
       'location': service.Location,
       'availability-report-date': currentDate
     };
@@ -171,9 +236,10 @@ class ServicesModel extends ConnectedServicesModel {
         .then((http.Response response) {
       final Map<String, dynamic> responseData = json.decode(response.body);
 
-      final Service updatedService = Service(
+      final Service updatedService = MachineService(
           id: service.Id,
-          serviceType: responseData['service-type'],
+          type: "self-service-facilities",
+          subtype: responseData['subtype'],
           buildingNumber: _selectedBuildingNumber,
           availability: updatedAvailability,
           location: responseData['location'],

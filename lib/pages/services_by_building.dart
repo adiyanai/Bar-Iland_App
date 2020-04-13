@@ -1,8 +1,10 @@
 import 'package:autocomplete_textfield/autocomplete_textfield.dart';
 import 'package:bar_iland_app/models/connection.dart';
+import 'package:bar_iland_app/services_icons.dart';
 import 'package:flutter/services.dart';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:scoped_model/scoped_model.dart';
 
@@ -62,7 +64,7 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
   }
 
   void _registeredUserRefrigeratorReport(
-      Service service, int updatedAvailability) {
+      MachineService service, int updatedAvailability) {
     if (updatedAvailability == 1) {
       showDialog(
         context: context,
@@ -107,7 +109,7 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
     }
   }
 
-  void _registeredUserAvailabilityReport(Service service) {
+  void _registeredUserAvailabilityReport(MachineService service) {
     String alertText = "";
     if (service.Availability == 0) {
       alertText = "השירות יוצג כפעיל";
@@ -133,7 +135,7 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
                     } else {
                       updatedAvailability = 0;
                     }
-                    if (service.ServiceType == "מקרר") {
+                    if (service.Subtype == "מקרר") {
                       Navigator.of(context).pop();
                       setState(() {
                         _registeredUserRefrigeratorReport(
@@ -225,6 +227,7 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
   }
 
   void _showPress() {
+    //widget.model.addService();
     FocusScope.of(context).requestFocus(new FocusNode());
     _title = Container(
       margin: EdgeInsets.fromLTRB(0, 120, 10, 0),
@@ -349,7 +352,6 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
                   color: _buttonColor,
                   shape: RoundedRectangleBorder(
                       borderRadius: new BorderRadius.circular(8.0)),
-                  //color: Theme.of(context).accentColor,
                   child: Text(
                     "הצג",
                     style: TextStyle(color: Colors.white),
@@ -367,21 +369,26 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
   }
 
   Map<String, Icon> mapServicesToIcons() {
-    Map<String, Icon> serviceTypeToIcon = new Map<String, Icon>();
-    serviceTypeToIcon["מקרר"] = Icon(Icons.kitchen);
-    serviceTypeToIcon["מכונת קפה"] = Icon(MdiIcons.coffeeMaker);
-    serviceTypeToIcon["מיקרוגל חלבי"] = Icon(MdiIcons.microwave);
-    serviceTypeToIcon["מיקרוגל בשרי"] = Icon(MdiIcons.microwave);
-    serviceTypeToIcon["מים חמים"] = Icon(MdiIcons.kettleSteam);
-    serviceTypeToIcon["מכונת חטיפים"] = Icon(
-      MdiIcons.cookie,
-    );
-    serviceTypeToIcon["מכונת שתייה"] = Icon(MdiIcons.bottleSodaClassicOutline);
-    serviceTypeToIcon["מכונת צילום והדפסה"] = Icon(MdiIcons.printer);
-    return serviceTypeToIcon;
+    Map<String, Icon> servicesToIcons = new Map<String, Icon>();
+    servicesToIcons["חדר רווחה"] = Icon(ServicesIcons.armchair);
+    servicesToIcons["חדר הנקה"] =
+        Icon(MaterialCommunityIcons.baby_bottle_outline);
+    servicesToIcons["מקרר"] = Icon(Icons.kitchen);
+    servicesToIcons["מכונת קפה"] = Icon(MdiIcons.coffeeMaker);
+    servicesToIcons["מיקרוגל חלבי"] = Icon(MdiIcons.microwave);
+    servicesToIcons["מיקרוגל בשרי"] = Icon(MdiIcons.microwave);
+    servicesToIcons["מים חמים"] = Icon(MdiIcons.kettleSteam);
+    servicesToIcons["מכונת חטיפים"] = Icon(MdiIcons.cookie);
+    servicesToIcons["מכונת שתייה"] = Icon(MdiIcons.bottleSodaClassicOutline);
+    servicesToIcons["מכונת צילום והדפסה"] = Icon(MdiIcons.printer);
+    servicesToIcons["פינות ישיבה ושולחנות"] = Icon(MaterialCommunityIcons.sofa);
+    servicesToIcons["נדנדה"] = Icon(ServicesIcons.swing);
+    servicesToIcons["מטבחון"] = Icon(MaterialCommunityIcons.water_pump);
+    servicesToIcons["משטחי החתלה"] = Icon(MdiIcons.humanBabyChangingTable);
+    return servicesToIcons;
   }
 
-  Widget _milkUI(Service service) {
+  Widget _milkUI(MachineService service) {
     RefrigeratorService refrigerator = service;
     Widget milkInfo;
     Widget milkText;
@@ -476,7 +483,7 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
     );
   }
 
-  Widget _availabilityUI(Service service) {
+  Widget _availabilityUI(MachineService service) {
     Widget availabilityInfo;
     Widget availabilityIcon;
     Widget availabilityText;
@@ -548,6 +555,43 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
     );
   }
 
+  List<Widget> expansionTileContent(Service service) {
+    if (service.Type == "self-service-facilities") {
+      Widget milkInfo;
+      if (service.Subtype == "מקרר") {
+        milkInfo = _milkUI(service);
+      } else {
+        milkInfo = Row();
+      }
+      return <Widget>[
+        _availabilityUI(service),
+        milkInfo,
+      ];
+    } else if (service.Type == "welfare-rooms") {
+      WelfareRoomService welfareRoom = service;
+      return [
+        Container(
+            padding: EdgeInsets.fromLTRB(230, 0, 0, 0),
+            child: Text("החדר מכיל:")),
+        ...welfareRoom.Contains.map((containedService) {
+          return Container(
+            padding: EdgeInsets.fromLTRB(0, 5, 22, 0),
+            child: Row(children: [
+              mapServicesToIcons()[containedService],
+              Text(
+                containedService,
+                style: TextStyle(
+                  fontSize: 14,
+                ),
+              )
+            ]),
+          );
+        }).toList()
+      ];
+    } else
+      return <Widget>[];
+  }
+
   Widget _showServices(String buildingNumber, List<Service> services) {
     List<Service> servicesInBuilding = [];
     for (int i = 0; i < services.length; i++) {
@@ -565,15 +609,10 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
     }
     return Column(
         children: servicesInBuilding.map((service) {
-      Widget milkInfo;
-      if (service.ServiceType == "מקרר") {
-        milkInfo = _milkUI(service);
-      } else {
-        milkInfo = Row();
-      }
       String serviceLocation = service.Location;
       serviceLocation = serviceLocation.replaceAll("קומה -1", "קומה 1-");
-      Map<String, Icon> serviceTypeToIcon = mapServicesToIcons();
+      Map<String, Icon> servicesToIcons = mapServicesToIcons();
+
       return new Container(
         color: Color.fromRGBO(179, 238, 255, 0.5),
         margin: EdgeInsets.all(7),
@@ -584,9 +623,9 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
               children: <Widget>[
                 Row(
                   children: <Widget>[
-                    serviceTypeToIcon[service.serviceType],
+                    servicesToIcons[service.Subtype],
                     Text(
-                      service.ServiceType,
+                      service.Subtype,
                       style: TextStyle(fontSize: 16),
                     ),
                   ],
@@ -607,10 +646,7 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
             ),
           ),
           backgroundColor: Color.fromRGBO(179, 238, 255, 0.5),
-          children: <Widget>[
-            _availabilityUI(service),
-            milkInfo,
-          ],
+          children: expansionTileContent(service),
         ),
       );
     }).toList());
