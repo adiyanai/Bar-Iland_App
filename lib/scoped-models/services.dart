@@ -9,175 +9,169 @@ import '../models/service.dart';
 import '../models/user.dart';
 
 class ConnectedServicesModel extends Model {
-  List<String> buildingNumbers = [];
+  List<String> areas = [];
   List<Service> services = [];
-  bool _isLoading = false;
+  bool _isServicesLoading = false;
   //int _selServiceId;
   //User _authenticatedUser;
 }
 
 class ServicesModel extends ConnectedServicesModel {
-  List<String> get BuildingNumbers {
-    return List.from(buildingNumbers);
+  List<String> get Areas {
+    return List.from(areas);
   }
 
   Future<Null> fetchServices() {
-    _isLoading = true;
+    _isServicesLoading = true;
     notifyListeners();
     return http
         .get('https://bar-iland-app.firebaseio.com/services.json')
         .then<Null>((http.Response response) {
       final List<Service> fetchedServiceList = [];
-      Map<String, dynamic> buildingsServices = json.decode(response.body);
-      buildingsServices.forEach((String buildingNumber, dynamic buildingData) {
-        if (!buildingNumbers.contains(buildingNumber)) {
-          buildingNumbers.add(buildingNumber);
-        }
-        buildingData.forEach((String type, dynamic servicesData) {
+      Map<String, dynamic> servicesData = json.decode(response.body);
+      servicesData.forEach((String serviceType, dynamic servicesTypeData) {
+        if (int.tryParse(serviceType) == null) {
           Service service;
-          servicesData.forEach((String id, dynamic serviceData) {
-            if (type == "self-service-facilities") {
+          servicesTypeData.forEach((String id, dynamic serviceData) {
+            if (!areas.contains(serviceData['area'])) {
+              areas.add(serviceData['area']);
+            }
+
+            if (serviceType == "machines") {
               if (serviceData['subtype'] == "מקרר") {
                 service = RefrigeratorService(
                   id: id,
-                  type: type,
+                  type: serviceType,
                   subtype: serviceData['subtype'],
-                  buildingNumber: buildingNumber,
-                  location: serviceData['location'],
+                  area: serviceData['area'],
+                  isInArea: serviceData['isInArea'],
+                  specificLocation: serviceData['specificLocation'],
                   availability: serviceData['availability'],
-                  availabilityReportDate:
-                      serviceData['availability-report-date'],
+                  availabilityReportDate: serviceData['availabilityReportDate'],
                   milk: serviceData['milk'],
-                  milkReportDate: serviceData['milk-report-date'],
-                  milkReportTime: serviceData['milk-report-time'],
+                  milkReportDate: serviceData['milkReportDate'],
+                  milkReportTime: serviceData['milkReportTime'],
                 );
               } else {
                 service = MachineService(
                   id: id,
-                  type: type,
+                  type: serviceType,
                   subtype: serviceData['subtype'],
-                  buildingNumber: buildingNumber,
-                  location: serviceData['location'],
+                  area: serviceData['area'],
+                  isInArea: serviceData['isInArea'],
+                  specificLocation: serviceData['specificLocation'],
                   availability: serviceData['availability'],
-                  availabilityReportDate:
-                      serviceData['availability-report-date'],
+                  availabilityReportDate: serviceData['availabilityReportDate'],
                 );
               }
               fetchedServiceList.add(service);
-            } else if (type == "welfare-rooms") {
+            } else if (serviceType == "welfare") {
               List<String> contained = [];
               (serviceData['contains']).forEach((service) {
                 contained.add(service);
               });
               service = WelfareRoomService(
                   id: id,
-                  type: type,
+                  type: serviceType,
                   subtype: serviceData['subtype'],
-                  buildingNumber: buildingNumber,
-                  location: serviceData['location'],
+                  area: serviceData['area'],
+                  isInArea: serviceData['isInArea'],
+                  specificLocation: serviceData['specificLocation'],
                   contains: contained);
+              fetchedServiceList.add(service);
+            } else if (serviceType == "businesses") {
+              service = BusinessService(
+                  id: id,
+                  type: serviceType,
+                  subtype: serviceData['subtype'],
+                  area: serviceData['area'],
+                  isInArea: serviceData['isInArea'],
+                  specificLocation: serviceData['specificLocation'],
+                  name: serviceData['name'],
+                  phoneNumber: serviceData['phoneNumber'],
+                  activityTime: serviceData['activityTime'],
+                  generalInfo: serviceData['generalInfo']);
+              fetchedServiceList.add(service);
+            } else if (serviceType == "academicServices") {
+              service = AcademicService(
+                id: id,
+                type: serviceType,
+                subtype: serviceData['subtype'],
+                area: serviceData['area'],
+                isInArea: serviceData['isInArea'],
+                specificLocation: serviceData['specificLocation'],
+                name: serviceData['name'],
+                phoneNumber: serviceData['phoneNumber'],
+                activityTime: serviceData['activityTime'],
+                mail: serviceData['mail'],
+                website: serviceData['website'],
+              );
               fetchedServiceList.add(service);
             }
           });
-        });
+        }
       });
+
       fetchedServiceList.sort((service1, service2) {
-        int result = service1.Location.compareTo(service2.Location);
+        int result =
+            service1.SpecificLocation.compareTo(service2.SpecificLocation);
         if (result != 0) {
           return result;
         } else {
           return service1.Subtype.compareTo(service2.Subtype);
         }
       });
+
       services = fetchedServiceList;
-      _isLoading = false;
+      _isServicesLoading = false;
       notifyListeners();
     });
   }
 
-  /*Future<bool> addService(
-      {int availability = 1,
-      String location = "קומה 1-, חדר רווחה",
-      String serviceType = "מיקרוגל בשרי"}) async {
-    _isLoading = true;
-    notifyListeners();
-    final Map<String, dynamic> serviceData = {
-      'availability': availability,
-      'location': location,
-      'subtype': serviceType,
-    };
-
-    final http.Response response = await http.post(
-        'https://bar-iland-app.firebaseio.com/services/211/self-service-facilities.json',
-        body: json.encode(serviceData));
-    if (response.statusCode != 200 && response.statusCode != 201) {
-      _isLoading = false;
-      notifyListeners();
-      return false;
-    }
-    //final Map<String, dynamic> responseData = json.decode(response.body);
-
-    _isLoading = false;
-    notifyListeners();
-    return true;
-  }*/
-  
-  /*
-  Future<bool> addService({
-    String location = "חדר 320",
-    String subtype = "חדר הנקה",
+  Future<bool> addAcademicService({
+    String subtype = "ספריה",
+    String name = "ספרית אגודת הסטודנטים",
+    String activityTime = "ימים א'-ה': 10:00 עד 14:00",
+    String phoneNumber = "03-5343666",
+    String mail = "pniyot@bis.org.il",
+    String website = "http://www.bis.org.il/",
+    String area = "בניין 107",
+    bool isInArea = true,
+    String specificLocation = "קומה 1",
   }) async {
-    _isLoading = true;
+    _isServicesLoading = true;
     notifyListeners();
     final Map<String, dynamic> serviceData = {
-      'location': location,
       'subtype': subtype,
+      'name': name,
+      'activityTime': activityTime,
+      'phoneNumber': phoneNumber,
+      'mail': mail,
+      'website': website,
+      'area': area,
+      'isInArea': isInArea,
+      'specificLocation': specificLocation,
     };
 
     final http.Response response = await http.post(
-        'https://bar-iland-app.firebaseio.com/services/211/welfare-rooms.json',
+        'https://bar-iland-app.firebaseio.com/services/academicServices.json',
         body: json.encode(serviceData));
     if (response.statusCode != 200 && response.statusCode != 201) {
-      _isLoading = false;
+      _isServicesLoading = false;
       notifyListeners();
       return false;
     }
-    _isLoading = false;
-    notifyListeners();
-    return true;
-  }
-*/
-
-Future<bool> addService({
-    String location = "חדר 320",
-    String subtype = "חדר הנקה",
-  }) async {
-    _isLoading = true;
-    notifyListeners();
-    final Map<String, dynamic> serviceData = {
-      'location': location,
-      'subtype': subtype,
-    };
-
-    final http.Response response = await http.post(
-        'https://bar-iland-app.firebaseio.com/services/211/welfare-rooms.json',
-        body: json.encode(serviceData));
-    if (response.statusCode != 200 && response.statusCode != 201) {
-      _isLoading = false;
-      notifyListeners();
-      return false;
-    }
-    _isLoading = false;
+    _isServicesLoading = false;
     notifyListeners();
     return true;
   }
 
   Future<bool> refrigeratorReport(
-      String _selectedBuildingNumber,
+      String _selectedArea,
       RefrigeratorService refrigerator,
-      int updatedAvailability,
-      int milkAvailability) {
-    _isLoading = true;
+      bool updatedAvailability,
+      bool milkAvailability) {
+    _isServicesLoading = true;
     DateTime today = new DateTime.now();
     String currentDate =
         "${today.day.toString()}/${today.month.toString().padLeft(2, '0')}/${today.year.toString().padLeft(2, '0')}";
@@ -185,25 +179,27 @@ Future<bool> addService({
         "${today.hour.toString()}:${today.minute.toString().padLeft(2, '0')}";
     Map<String, dynamic> updatedData = {
       'subtype': refrigerator.Subtype,
-      'location': refrigerator.Location,
+      'area': _selectedArea,
+      'isInArea': refrigerator.IsInArea,
+      'specificLocation': refrigerator.SpecificLocation,
       'availability': updatedAvailability,
-      'availability-report-date': currentDate,
+      'availabilityReportDate': currentDate,
       'milk': milkAvailability,
-      'milk-report-date': currentDate,
-      'milk-report-time': currentTime
+      'milkReportDate': currentDate,
+      'milkReportTime': currentTime
     };
     return http
         .put(
-            'https://bar-iland-app.firebaseio.com/services/${_selectedBuildingNumber}/self-service-facilities/${refrigerator.Id}.json',
+            'https://bar-iland-app.firebaseio.com/services/machines/${refrigerator.Id}.json',
             body: json.encode(updatedData))
         .then((http.Response response) {
       final Map<String, dynamic> responseData = json.decode(response.body);
       refrigerator.Availability = updatedAvailability;
       refrigerator.AvailabilityReportDate =
-          responseData['availability-report-date'];
+          responseData['availabilityReportDate'];
       refrigerator.Milk = milkAvailability;
-      refrigerator.MilkReportDate = responseData['milk-report-date'];
-      refrigerator.MilkReportTime = responseData['milk-report-time'];
+      refrigerator.MilkReportDate = responseData['milkReportDate'];
+      refrigerator.MilkReportTime = responseData['milkReportTime'];
       for (int i = 0; i < services.length; i++) {
         if (services[i].Id == refrigerator.Id) {
           services[i] = refrigerator;
@@ -211,38 +207,41 @@ Future<bool> addService({
           break;
         }
       }
-      _isLoading = false;
+      _isServicesLoading = false;
       return true;
     });
   }
 
-  Future<bool> availabiltyReport(String _selectedBuildingNumber,
-      Service service, int updatedAvailability) {
-    _isLoading = true;
+  Future<bool> availabiltyReport(String _selectedArea,
+      Service service, bool updatedAvailability) {
+    _isServicesLoading = true;
     notifyListeners();
     DateTime today = new DateTime.now();
     String currentDate =
         "${today.day.toString()}/${today.month.toString().padLeft(2, '0')}/${today.year.toString().padLeft(2, '0')}";
     Map<String, dynamic> updatedData = {
-      'availability': updatedAvailability,
+      'area': service.Area,
+      'isInArea': service.IsInArea,
+      'specificLocation': service.SpecificLocation,
       'subtype': service.Subtype,
-      'location': service.Location,
-      'availability-report-date': currentDate
+      'availability': updatedAvailability,
+      'availabilityReportDate': currentDate
     };
     return http
         .put(
-            'https://bar-iland-app.firebaseio.com/services/${_selectedBuildingNumber}/self-service-facilities/${service.Id}.json',
+            'https://bar-iland-app.firebaseio.com/services/machines/${service.Id}.json',
             body: json.encode(updatedData))
         .then((http.Response response) {
       final Map<String, dynamic> responseData = json.decode(response.body);
 
       final Service updatedService = MachineService(
           id: service.Id,
-          type: "self-service-facilities",
+          type: "machines",
           subtype: responseData['subtype'],
-          buildingNumber: _selectedBuildingNumber,
+          area: _selectedArea,
+          isInArea: responseData['isInArea'],
+          specificLocation: responseData['specificLocation'],
           availability: updatedAvailability,
-          location: responseData['location'],
           availabilityReportDate: currentDate);
 
       for (int i = 0; i < services.length; i++) {
@@ -252,7 +251,7 @@ Future<bool> addService({
           break;
         }
       }
-      _isLoading = false;
+      _isServicesLoading = false;
       notifyListeners();
       return true;
     });
@@ -260,7 +259,7 @@ Future<bool> addService({
 }
 
 class UtilityModel extends ConnectedServicesModel {
-  bool get isLoading {
-    return _isLoading;
+  bool get isServicesLoading {
+    return _isServicesLoading;
   }
 }

@@ -1,5 +1,6 @@
 import 'package:bar_iland_app/scoped-models/main.dart';
 import 'package:flutter/material.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import './pages/services_by_building.dart';
 import './pages/services_by_type.dart';
 
@@ -15,24 +16,25 @@ class ServiceManager extends StatelessWidget {
       child: Directionality(
         textDirection: TextDirection.rtl,
         child: Scaffold(
+          resizeToAvoidBottomInset: false,
           appBar: AppBar(
             centerTitle: true,
-            title: Center(child: Text('שירותים באוניברסיטה')),
+            title: Center(child: Text('שירותי האוניברסיטה')),
             bottom: TabBar(
               tabs: <Widget>[
                 Tab(
-                  icon: Icon(Icons.list),
+                  icon: Icon(MdiIcons.formatListBulletedType),
                   text: 'לפי סוג שירות',
                 ),
                 Tab(
-                  icon: Icon(Icons.business),
-                  text: 'לפי בניין',
+                  icon: Icon(Icons.location_on),
+                  text: 'לפי מיקום',
                 ),
               ],
             ),
           ),
           body: TabBarView(
-            children: <Widget>[ServiceByType(model), ServiceByBuilding(model)],
+            children: <Widget>[ServiceByType(model), ServicesByArea(model)],
           ),
         ),
       ),

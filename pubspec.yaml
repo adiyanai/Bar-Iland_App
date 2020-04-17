@@ -71,6 +71,7 @@ flutter:
     - assets/background.jpg
     - assets/available_milk.png
     - assets/unavailable_milk.png
+    - assets/Bar_Ilan_Mini_Map.jpg
     - assets/Bar_Ilan_Map.jpg
     #  - images/a_dot_ham.jpeg
 
