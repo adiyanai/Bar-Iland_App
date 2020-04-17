@@ -49,6 +49,12 @@ class _EventsCalendarState extends State<EventsCalendar> {
     });
   }
 
+  Widget _buildBuildingTextField() {}
+
+  Widget _buildEventTypeTextField() {}
+
+  Widget _buildEventDescriptionTextField() {}
+
   void _registeredUserAddEvent() {
     showDialog(
       context: context,
@@ -67,18 +73,17 @@ class _EventsCalendarState extends State<EventsCalendar> {
                   if (_eventController.text.isEmpty) return;
                   setState(() {
                     widget._model.addEvent(_calendarController.selectedDay,
-                        'סוג אירוע', _eventController.text);
+                        'בניין 507', 'סוג אירוע', _eventController.text);
                     final Event newEvent = Event(
                         id: widget._model.selectedEventId,
                         date: _calendarController.selectedDay,
+                        location: 'בניין 507',
                         eventType: 'סוג אירוע',
                         eventDescription: _eventController.text);
                     if (_events[_calendarController.selectedDay] != null) {
                       _events[_calendarController.selectedDay].add(newEvent);
                     } else {
-                      _events[_calendarController.selectedDay] = [
-                        newEvent
-                      ];
+                      _events[_calendarController.selectedDay] = [newEvent];
                     }
                     _eventController.clear();
                     Navigator.pop(context);
@@ -121,59 +126,100 @@ class _EventsCalendarState extends State<EventsCalendar> {
       textDirection: TextDirection.rtl,
       child: Scaffold(
         appBar: AppBar(
-          title: Row(children: [
-            Text(
-              'לוח אירועים',
-            ),
-            SizedBox(
-              width: 87,
-            ),
-            Image.asset(
-              'assets/Bar_Iland_line.png',
-              height: 35,
-            ),
-          ]),
-        ),
-        body: SingleChildScrollView(
-          child: Column(
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              TableCalendar(
-                events: _events,
-                calendarController: _calendarController,
-                locale: 'he',
-                availableGestures: AvailableGestures.horizontalSwipe,
-                calendarStyle: CalendarStyle(
-                  weekendStyle: TextStyle(
-                    color: Colors.black,
-                  ),
-                  outsideWeekendStyle: TextStyle(
-                    color: Colors.black38,
-                  ),
-                  todayColor: Colors.green,
-                  selectedColor: Colors.blue,
-                ),
-                headerStyle: HeaderStyle(
-                  formatButtonVisible: false,
-                  centerHeaderTitle: true,
-                  titleTextStyle: TextStyle(fontSize: 20),
-                ),
-                weekendDays: [DateTime.friday, DateTime.saturday],
-                daysOfWeekStyle: DaysOfWeekStyle(
-                  weekendStyle: TextStyle(
-                    color: Colors.black,
-                  ),
-                ),
-                onDaySelected: (DateTime date, List<dynamic> events) {
-                  setState(() {
-                    _selectedEvents = events;
-                  });
-                },
+              Text(
+                'לוח אירועים',
               ),
-              ..._selectedEvents.map((event) => ListTile(
-                    title: Text(event.EventDescription),
-                  )),
+              Image.asset(
+                'assets/Bar_Iland_line.png',
+                height: 35,
+              ),
             ],
           ),
+        ),
+        body: Stack(
+          children: <Widget>[
+            Container(
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage('assets/people_party.png'),
+                  fit: BoxFit.cover,
+                  colorFilter: ColorFilter.mode(
+                    Colors.black.withOpacity(0.7),
+                    BlendMode.dstATop,
+                  ),
+                ),
+              ),
+            ),
+            SingleChildScrollView(
+              child: Column(
+                children: [
+                  TableCalendar(
+                    events: _events,
+                    calendarController: _calendarController,
+                    locale: 'he',
+                    availableGestures: AvailableGestures.horizontalSwipe,
+                    calendarStyle: CalendarStyle(
+                      weekendStyle: TextStyle(
+                        color: Colors.black,
+                      ),
+                      outsideWeekendStyle: TextStyle(
+                        color: Colors.black38,
+                      ),
+                      todayColor: Colors.green,
+                      selectedColor: Colors.blue,
+                    ),
+                    headerStyle: HeaderStyle(
+                      formatButtonVisible: false,
+                      centerHeaderTitle: true,
+                      titleTextStyle: TextStyle(fontSize: 20),
+                    ),
+                    weekendDays: [DateTime.friday, DateTime.saturday],
+                    daysOfWeekStyle: DaysOfWeekStyle(
+                      weekendStyle: TextStyle(
+                        color: Colors.black,
+                      ),
+                      weekdayStyle: TextStyle(
+                        color: Colors.black54,
+                      ),
+                    ),
+                    onDaySelected: (DateTime date, List<dynamic> events) {
+                      setState(() {
+                        _selectedEvents = events;
+                      });
+                    },
+                  ),
+                  SizedBox(
+                    height: 15,
+                  ),
+                  ..._selectedEvents.map(
+                    (event) => Column(
+                      children: <Widget>[
+                        Container(
+                          margin:
+                              EdgeInsets.symmetric(vertical: 2, horizontal: 5),
+                          decoration: BoxDecoration(
+                            color: Colors.white38,
+                            border: Border.all(
+                              color: Colors.black26,
+                              width: 0.5,
+                            ),
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: ListTile(
+                            leading: const Icon(Icons.cake),
+                            title: Text(event.EventDescription),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
         floatingActionButton: FloatingActionButton(
           child: Icon(Icons.add),
