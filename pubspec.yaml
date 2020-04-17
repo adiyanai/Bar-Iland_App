@@ -72,6 +72,7 @@ flutter:
     - assets/available_milk.png
     - assets/unavailable_milk.png
     - assets/Bar_Ilan_Map.jpg
+    - assets/people_party.png
     #  - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
