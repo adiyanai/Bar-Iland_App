@@ -4,15 +4,17 @@ class Service {
   final String id;
   final String type;
   final String subtype;
-  final String buildingNumber;
-  final String location;
+  final String area;
+  final bool isInArea;
+  final String specificLocation;
 
   Service(
       {@required this.id,
       @required this.type,
       @required this.subtype,
-      @required this.buildingNumber,
-      @required this.location});
+      @required this.area,
+      @required this.isInArea,
+      @required this.specificLocation});
 
   String get Id {
     return id;
@@ -26,39 +28,45 @@ class Service {
     return subtype;
   }
 
-  String get BuildingNumber {
-    return buildingNumber;
+  String get Area {
+    return area;
   }
 
-  String get Location {
-    return location;
+  bool get IsInArea {
+    return isInArea;
+  }
+
+  String get SpecificLocation {
+    return specificLocation;
   }
 }
 
 class MachineService extends Service {
-  int availability;
+  bool availability;
   String availabilityReportDate;
 
   MachineService(
       {@required String id,
       @required String type,
       @required String subtype,
-      @required String buildingNumber,
-      @required String location,
+      @required String area,
+      @required bool isInArea,
+      @required String specificLocation,
       @required this.availability,
       @required this.availabilityReportDate})
       : super(
             id: id,
             type: type,
             subtype: subtype,
-            buildingNumber: buildingNumber,
-            location: location);
+            area: area,
+            isInArea: isInArea,
+            specificLocation: specificLocation);
 
-  int get Availability {
+  bool get Availability {
     return availability;
   }
 
-  void set Availability(int updatedAvailability) {
+  void set Availability(bool updatedAvailability) {
     availability = updatedAvailability;
   }
 
@@ -72,16 +80,17 @@ class MachineService extends Service {
 }
 
 class RefrigeratorService extends MachineService {
-  int milk;
+  bool milk;
   String milkReportDate;
   String milkReportTime;
   RefrigeratorService(
       {@required String id,
       @required String type,
       @required String subtype,
-      @required String buildingNumber,
-      @required String location,
-      @required int availability,
+      @required String area,
+      @required bool isInArea,
+      @required String specificLocation,
+      @required bool availability,
       @required String availabilityReportDate,
       @required this.milk,
       @required this.milkReportDate,
@@ -90,16 +99,17 @@ class RefrigeratorService extends MachineService {
             id: id,
             type: type,
             subtype: subtype,
-            buildingNumber: buildingNumber,
-            location: location,
+            area: area,
+            isInArea: isInArea,
+            specificLocation: specificLocation,
             availability: availability,
             availabilityReportDate: availabilityReportDate);
 
-  int get Milk {
+  bool get Milk {
     return milk;
   }
 
-  void set Milk(int updatedMilk) {
+  void set Milk(bool updatedMilk) {
     milk = updatedMilk;
   }
 
@@ -127,17 +137,109 @@ class WelfareRoomService extends Service {
       {@required String id,
       @required String type,
       @required String subtype,
-      @required String buildingNumber,
-      @required String location,
+      @required String area,
+      @required bool isInArea,
+      @required String specificLocation,
       @required this.contains})
       : super(
             id: id,
             type: type,
             subtype: subtype,
-            buildingNumber: buildingNumber,
-            location: location);
+            area: area,
+            isInArea: isInArea,
+            specificLocation: specificLocation);
 
   List<String> get Contains {
     return contains;
+  }
+}
+
+class BusinessService extends Service {
+  String name = "–––";
+  String activityTime = "–––";
+  String phoneNumber = "–––";
+  String generalInfo = "–––";
+
+  BusinessService(
+      {@required String id,
+      @required String type,
+      @required String subtype,
+      @required String area,
+      @required bool isInArea,
+      @required String specificLocation,
+      @required this.name,
+      this.activityTime,
+      this.phoneNumber,
+      this.generalInfo})
+      : super(
+            id: id,
+            type: type,
+            subtype: subtype,
+            area: area,
+            isInArea: isInArea,
+            specificLocation: specificLocation);
+
+  String get Name {
+    return name;
+  }
+
+  String get ActivityTime {
+    return activityTime;
+  }
+
+  String get PhoneNumber {
+    return phoneNumber;
+  }
+
+  String get GeneralInfo {
+    return generalInfo;
+  }
+}
+
+class AcademicService extends Service {
+  String name = "–––";
+  String activityTime = "–––";
+  String phoneNumber = "–––";
+  String mail = "–––";
+  String website = "–––";
+
+  AcademicService(
+      {@required String id,
+      @required String type,
+      @required String subtype,
+      @required String area,
+      @required bool isInArea,
+      @required String specificLocation,
+      @required this.name,
+      this.activityTime,
+      this.phoneNumber,
+      this.mail,
+      this.website})
+      : super(
+            id: id,
+            type: type,
+            subtype: subtype,
+            area: area,
+            isInArea: isInArea,
+            specificLocation: specificLocation);
+
+  String get Name {
+    return name;
+  }
+
+  String get ActivityTime {
+    return activityTime;
+  }
+
+  String get PhoneNumber {
+    return phoneNumber;
+  }
+
+  String get Mail {
+    return mail;
+  }
+
+  String get Website {
+    return website;
   }
 }

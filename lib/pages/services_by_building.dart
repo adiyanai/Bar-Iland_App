@@ -11,21 +11,21 @@ import 'package:scoped_model/scoped_model.dart';
 import '../models/service.dart';
 import '../scoped-models/main.dart';
 
-class ServiceByBuilding extends StatefulWidget {
+class ServicesByArea extends StatefulWidget {
   final MainModel model;
-  ServiceByBuilding(this.model);
+  ServicesByArea(this.model);
 
   @override
   State<StatefulWidget> createState() {
-    return _ServiceByBuildingState();
+    return _ServicesByAreaState();
   }
 }
 
-class _ServiceByBuildingState extends State<ServiceByBuilding> {
+class _ServicesByAreaState extends State<ServicesByArea> {
   AutoCompleteTextField<String> _textField;
   GlobalKey<AutoCompleteTextFieldState<String>> _key = new GlobalKey();
   final FocusNode _focusNode = FocusNode();
-  String _selectedBuildingNumber = "";
+  String _selectedArea = "";
   bool _isNotPressable = true;
   bool _isOkPressed = false;
   Color _buttonColor = Colors.grey;
@@ -64,8 +64,8 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
   }
 
   void _registeredUserRefrigeratorReport(
-      MachineService service, int updatedAvailability) {
-    if (updatedAvailability == 1) {
+      MachineService service, bool updatedAvailability) {
+    if (updatedAvailability == true) {
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -80,8 +80,8 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
                   onPressed: () {
                     setState(() {
                       RefrigeratorService refrigeratorReport = service;
-                      widget.model.refrigeratorReport(_selectedBuildingNumber,
-                          refrigeratorReport, updatedAvailability, 1);
+                      widget.model.refrigeratorReport(_selectedArea,
+                          refrigeratorReport, updatedAvailability, true);
                       Navigator.of(context).pop();
                     });
                   },
@@ -90,8 +90,8 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
                   child: Text('לא'),
                   onPressed: () {
                     setState(() {
-                      widget.model.refrigeratorReport(_selectedBuildingNumber,
-                          service, updatedAvailability, 0);
+                      widget.model.refrigeratorReport(
+                          _selectedArea, service, updatedAvailability, false);
                       Navigator.of(context).pop();
                     });
                   },
@@ -104,14 +104,14 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
     } else {
       setState(() {
         widget.model.refrigeratorReport(
-            _selectedBuildingNumber, service, updatedAvailability, 0);
+            _selectedArea, service, updatedAvailability, false);
       });
     }
   }
 
   void _registeredUserAvailabilityReport(MachineService service) {
     String alertText = "";
-    if (service.Availability == 0) {
+    if (service.Availability == false) {
       alertText = "השירות יוצג כפעיל";
     } else {
       alertText = "השירות יוצג כלא פעיל";
@@ -120,7 +120,7 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
       showDialog(
         context: context,
         builder: (BuildContext context) {
-          int updatedAvailability;
+          bool updatedAvailability;
           return Directionality(
             textDirection: TextDirection.rtl,
             child: AlertDialog(
@@ -130,10 +130,10 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
                 FlatButton(
                   child: Text('אישור'),
                   onPressed: () {
-                    if (service.Availability == 0) {
-                      updatedAvailability = 1;
+                    if (service.Availability == false) {
+                      updatedAvailability = true;
                     } else {
-                      updatedAvailability = 0;
+                      updatedAvailability = false;
                     }
                     if (service.Subtype == "מקרר") {
                       Navigator.of(context).pop();
@@ -143,8 +143,8 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
                       });
                     } else {
                       setState(() {
-                        widget.model.availabiltyReport(_selectedBuildingNumber,
-                            service, updatedAvailability);
+                        widget.model.availabiltyReport(
+                            _selectedArea, service, updatedAvailability);
                         Navigator.of(context).pop();
                       });
                     }
@@ -187,9 +187,9 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
   }
 
   void _registeredUserMilkReport(
-      RefrigeratorService refrigerator, int updatedMilkAvailability) {
+      RefrigeratorService refrigerator, bool updatedMilkAvailability) {
     String alertText = "";
-    if (updatedMilkAvailability == 0) {
+    if (updatedMilkAvailability == FractionalOffsetTween) {
       alertText = "החלב במקרר יוצג כלא זמין";
     } else {
       alertText = "החלב במקרר יוצג כזמין";
@@ -207,8 +207,8 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
                 child: Text('אישור'),
                 onPressed: () {
                   setState(() {
-                    widget.model.refrigeratorReport(_selectedBuildingNumber,
-                        refrigerator, 1, updatedMilkAvailability);
+                    widget.model.refrigeratorReport(_selectedArea, refrigerator,
+                        true, updatedMilkAvailability);
                     Navigator.of(context).pop();
                   });
                 },
@@ -227,20 +227,23 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
   }
 
   void _showPress() {
-    //widget.model.addService();
+    //widget.model.addAcademicService();
     FocusScope.of(context).requestFocus(new FocusNode());
     _title = Container(
-      margin: EdgeInsets.fromLTRB(0, 120, 10, 0),
+      width: 600,
+      color: Color.fromRGBO(200, 230, 230, 0.7),
+      padding: EdgeInsets.fromLTRB(0, 0, 15, 0),
+      margin: EdgeInsets.fromLTRB(0, 110, 0, 0),
       child: Text(
-        "השירותים בבניין " + _selectedBuildingNumber + ":",
+        "השירותים באזור " + _selectedArea + ":",
         style: TextStyle(
-            color: Colors.blue, fontSize: 20, fontWeight: FontWeight.bold),
+            color: Colors.black, fontSize: 22, fontWeight: FontWeight.bold),
       ),
     );
     _isOkPressed = true;
     _textField.textField.controller.text = "";
     _buttonColor = Colors.grey;
-    if (_selectedBuildingNumber != null) {
+    if (_selectedArea != null) {
       _addingButton = Container(
         padding: EdgeInsets.fromLTRB(0, 430, 270, 0),
         child: RawMaterialButton(
@@ -262,45 +265,45 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
 
   Widget _buildAutoCompleteTextField() {
     return Container(
-      width: 70,
+      width: 240,
       child: _textField = AutoCompleteTextField<String>(
-        inputFormatters: [
-          WhitelistingTextInputFormatter.digitsOnly,
-          LengthLimitingTextInputFormatter(4)
-        ],
         key: _key,
-        keyboardType: TextInputType.number,
         clearOnSubmit: false,
         focusNode: _focusNode,
-        suggestions: widget.model.buildingNumbers,
-        style: TextStyle(color: Colors.black, fontSize: 20.0),
+        suggestions: widget.model.Areas,
+        suggestionsAmount: 12,
+        style: TextStyle(color: Colors.black, fontSize: 18.0),
         decoration: InputDecoration(
           contentPadding: EdgeInsets.fromLTRB(0, 0, 10, 0),
+          hintText: 'חיפוש מיקום באוניברסיטה',
         ),
-        itemFilter: (buildingNumber, query) {
-          return buildingNumber.startsWith(query) &&
-              buildingNumber.length > query.length;
+        itemFilter: (area, query) {
+          return area.contains(query) || query == "";
         },
-        itemSorter: (buildingNumber1, buildingNumber2) {
-          return int.parse(buildingNumber1)
-              .compareTo(int.parse(buildingNumber2));
+        itemSorter: (area1, area2) {
+          int result = area1.length.compareTo(area2.length);
+          if (result != 0) {
+            return result;
+          } else {
+            return area1.compareTo(area2);
+          }
         },
-        itemSubmitted: (buildingNumber) {
+        itemSubmitted: (area) {
           setState(() {
             FocusScope.of(context).requestFocus(new FocusNode());
             _isOkPressed = false;
             _title = Container();
-            _selectedBuildingNumber = buildingNumber;
-            _textField.textField.controller.text = _selectedBuildingNumber;
+            _selectedArea = area;
+            _textField.textField.controller.text = _selectedArea;
             _isNotPressable = false;
             _buttonColor = Colors.blue;
           });
         },
-        textChanged: (buildingNumber) {
+        textChanged: (area) {
           _isOkPressed = false;
           _title = Container();
-          _selectedBuildingNumber = buildingNumber;
-          if (widget.model.buildingNumbers.contains(_selectedBuildingNumber)) {
+          _selectedArea = area;
+          if (widget.model.Areas.contains(_selectedArea)) {
             setState(() {
               _isNotPressable = false;
               _buttonColor = Colors.blue;
@@ -312,14 +315,14 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
             });
           }
         },
-        itemBuilder: (context, buildingNumber) {
+        itemBuilder: (context, area) {
           // UI for the autocomplete row
           return Center(
             child: Container(
-              padding: const EdgeInsets.only(bottom: 8.0),
+              padding: const EdgeInsets.only(bottom: 5.0),
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text('$buildingNumber'),
+                padding: const EdgeInsets.all(5.0),
+                child: Text('$area'),
               ),
             ),
           );
@@ -328,34 +331,41 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
     );
   }
 
-  Widget _buildingSearch() {
+  Widget _locationSearch() {
     return Container(
-      decoration: BoxDecoration(),
-      height: 80,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.all(Radius.circular(50.0)),
+        color: Color.fromRGBO(255, 255, 255, 0.9),
+      ),
+      height: 50,
+      width: 350,
       margin: const EdgeInsets.all(20.0),
-      padding: const EdgeInsets.all(1.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
+          /*
           Text(
             'מספר בניין:',
             style: TextStyle(fontSize: 20),
           ),
+          */
           _buildAutoCompleteTextField(),
           Container(
-            margin: EdgeInsets.fromLTRB(0, 10, 15, 0),
-            width: 60,
+            width: 45,
+            height: 45,
             child: IgnorePointer(
               ignoring: _isNotPressable,
               child: RaisedButton(
                   color: _buttonColor,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: new BorderRadius.circular(8.0)),
-                  child: Text(
-                    "הצג",
-                    style: TextStyle(color: Colors.white),
-                  ),
+                  shape: CircleBorder(),
+                  child: Container(
+                      padding: EdgeInsets.only(left: 20),
+                      child: Icon(
+                        MaterialIcons.search,
+                        size: 30,
+                        color: Colors.white,
+                      )),
                   onPressed: () {
                     setState(() {
                       _showPress();
@@ -368,24 +378,40 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
     );
   }
 
-  Map<String, Icon> mapServicesToIcons() {
-    Map<String, Icon> servicesToIcons = new Map<String, Icon>();
-    servicesToIcons["חדר רווחה"] = Icon(ServicesIcons.armchair);
-    servicesToIcons["חדר הנקה"] =
-        Icon(MaterialCommunityIcons.baby_bottle_outline);
-    servicesToIcons["מקרר"] = Icon(Icons.kitchen);
-    servicesToIcons["מכונת קפה"] = Icon(MdiIcons.coffeeMaker);
-    servicesToIcons["מיקרוגל חלבי"] = Icon(MdiIcons.microwave);
-    servicesToIcons["מיקרוגל בשרי"] = Icon(MdiIcons.microwave);
-    servicesToIcons["מים חמים"] = Icon(MdiIcons.kettleSteam);
-    servicesToIcons["מכונת חטיפים"] = Icon(MdiIcons.cookie);
-    servicesToIcons["מכונת שתייה"] = Icon(MdiIcons.bottleSodaClassicOutline);
-    servicesToIcons["מכונת צילום והדפסה"] = Icon(MdiIcons.printer);
-    servicesToIcons["פינות ישיבה ושולחנות"] = Icon(MaterialCommunityIcons.sofa);
-    servicesToIcons["נדנדה"] = Icon(ServicesIcons.swing);
-    servicesToIcons["מטבחון"] = Icon(MaterialCommunityIcons.water_pump);
-    servicesToIcons["משטחי החתלה"] = Icon(MdiIcons.humanBabyChangingTable);
-    return servicesToIcons;
+  Map<String, Icon> mapToIcons() {
+    Map<String, Icon> servicesIcons = {
+      "חדר רווחה": Icon(ServicesIcons.armchair, size: 20),
+      "חדר הנקה": Icon(MaterialCommunityIcons.baby_bottle_outline),
+      "מקרר": Icon(Icons.kitchen),
+      "מכונת קפה": Icon(MdiIcons.coffeeMaker),
+      "מיקרוגל חלבי": Icon(MdiIcons.microwave),
+      "מיקרוגל בשרי": Icon(MdiIcons.microwave),
+      "מים חמים": Icon(MdiIcons.kettleSteam),
+      "מכונת חטיפים": Icon(MdiIcons.cookie),
+      "מכונת שתייה": Icon(MdiIcons.bottleSodaClassicOutline),
+      "מכונת צילום והדפסה": Icon(MdiIcons.printer),
+      "פינות ישיבה ושולחנות": Icon(MaterialCommunityIcons.sofa),
+      "נדנדה": Icon(ServicesIcons.swing),
+      "מטבחון": Icon(MaterialCommunityIcons.water_pump),
+      "משטחי החתלה": Icon(MdiIcons.humanBabyChangingTable),
+      "בית קפה": Icon(MaterialCommunityIcons.coffee),
+      "מסעדה": Icon(MaterialIcons.restaurant),
+      "בנק": Icon(MaterialCommunityIcons.bank),
+      "דואר": Icon(MaterialCommunityIcons.mailbox),
+      "ציוד משרדי וכלי כתיבה": Icon(MaterialCommunityIcons.pencil),
+      "סופר": Icon(MaterialCommunityIcons.cart),
+      "חנות בגדים": Icon(MaterialCommunityIcons.shopping),
+      "סנדלריה": Icon(MdiIcons.tools),
+      "סוכנות נסיעות": Icon(MdiIcons.airplane),
+      "ספריה": Icon(MdiIcons.library),
+      "מזכירות": Icon(MdiIcons.officeBuilding),
+      "שעות פעילות": Icon(MaterialCommunityIcons.clock_outline),
+      "טלפון": Icon(MdiIcons.phone),
+      "מידע נוסף": Icon(MaterialCommunityIcons.information_outline),
+      "מייל": Icon(MaterialCommunityIcons.email_box),
+      "אתר": Icon(MaterialCommunityIcons.web),
+    };
+    return servicesIcons;
   }
 
   Widget _milkUI(MachineService service) {
@@ -395,10 +421,10 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
     Widget milkIcon;
     Widget milkReportButton;
     Widget milkReportText;
-    if (refrigerator.Availability == 0) {
+    if (refrigerator.Availability == false) {
       return Row();
     }
-    if (refrigerator.Milk == 1) {
+    if (refrigerator.Milk == true) {
       milkText = Text(
         "יש חלב במקרר",
         style: TextStyle(
@@ -441,11 +467,11 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
             child: milkReportText,
             onPressed: () {
               setState(() {
-                int updatedMilkAvailability;
-                if (refrigerator.Milk == 1) {
-                  updatedMilkAvailability = 0;
+                bool updatedMilkAvailability;
+                if (refrigerator.Milk == true) {
+                  updatedMilkAvailability = false;
                 } else {
-                  updatedMilkAvailability = 1;
+                  updatedMilkAvailability = true;
                 }
                 _connectionMode == ConnectionMode.RegisteredUser
                     ? _registeredUserMilkReport(
@@ -489,7 +515,7 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
     Widget availabilityText;
     Widget availabilityReportButton;
     Widget availabilityReportText;
-    if (service.Availability == 0) {
+    if (service.Availability == false) {
       availabilityIcon = IconTheme(
         data: new IconThemeData(color: Colors.red),
         child: new Icon(Icons.cancel),
@@ -556,7 +582,7 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
   }
 
   List<Widget> expansionTileContent(Service service) {
-    if (service.Type == "self-service-facilities") {
+    if (service.Type == "machines") {
       Widget milkInfo;
       if (service.Subtype == "מקרר") {
         milkInfo = _milkUI(service);
@@ -567,17 +593,14 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
         _availabilityUI(service),
         milkInfo,
       ];
-    } else if (service.Type == "welfare-rooms") {
+    } else if (service.Type == "welfare") {
       WelfareRoomService welfareRoom = service;
       return [
-        Container(
-            padding: EdgeInsets.fromLTRB(230, 0, 0, 0),
-            child: Text("החדר מכיל:")),
         ...welfareRoom.Contains.map((containedService) {
           return Container(
-            padding: EdgeInsets.fromLTRB(0, 5, 22, 0),
+            padding: EdgeInsets.fromLTRB(0, 5, 18, 0),
             child: Row(children: [
-              mapServicesToIcons()[containedService],
+              mapToIcons()[containedService],
               Text(
                 containedService,
                 style: TextStyle(
@@ -588,34 +611,84 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
           );
         }).toList()
       ];
-    } else
-      return <Widget>[];
+    } else if (service.Type == "businesses") {
+      BusinessService business = service;
+      Map<String, String> businessInfo = {
+        "שעות פעילות": business.ActivityTime,
+        "טלפון": business.PhoneNumber,
+        "מידע נוסף": business.GeneralInfo
+      };
+      return (businessInfo.keys).map((infoType) {
+        return Container(
+          width: 320,
+          padding: EdgeInsets.fromLTRB(40, 0, 0, 0),
+          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            mapToIcons()[infoType],
+            Expanded(child: Text(businessInfo[infoType]))
+          ]),
+        );
+      }).toList();
+    } else if (service.Type == "academicServices") {
+      AcademicService academicService = service;
+      Map<String, String> academicServiceInfo = {
+        "שעות פעילות": academicService.ActivityTime,
+        "טלפון": academicService.PhoneNumber,
+        "מייל": academicService.Mail,
+        "אתר": academicService.Website,
+      };
+      return (academicServiceInfo.keys).map((infoType) {
+        return Container(
+          width: 315,
+          padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
+          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            mapToIcons()[infoType],
+            Expanded(child: Text(academicServiceInfo[infoType]))
+          ]),
+        );
+      }).toList();
+    }
+    return <Widget>[];
   }
 
-  Widget _showServices(String buildingNumber, List<Service> services) {
-    List<Service> servicesInBuilding = [];
+  Widget _showServices(String area, List<Service> services) {
+    List<Service> servicesInArea = [];
     for (int i = 0; i < services.length; i++) {
-      if (services[i].BuildingNumber == buildingNumber) {
-        servicesInBuilding.add(services[i]);
+      if (services[i].Area == area) {
+        servicesInArea.add(services[i]);
       }
     }
     if (!_isOkPressed) {
       return Column();
     }
-    if (servicesInBuilding.length == 0) {
+    if (servicesInArea.length == 0) {
       return Center(
-        child: Text('לא נמצאו שירותים בבניין ' + buildingNumber.toString()),
+        child: Text('לא נמצאו שירותים בבניין ' + area.toString()),
       );
     }
     return Column(
-        children: servicesInBuilding.map((service) {
-      String serviceLocation = service.Location;
+        children: servicesInArea.map((service) {
+      String serviceLocation = service.Area;
+      if (service.SpecificLocation != "") {
+        serviceLocation += ", " + service.SpecificLocation;
+      }
       serviceLocation = serviceLocation.replaceAll("קומה -1", "קומה 1-");
-      Map<String, Icon> servicesToIcons = mapServicesToIcons();
-
+      Map<String, Icon> servicesToIcons = mapToIcons();
+      String serviceTitle;
+      if (service.Type == "businesses") {
+        BusinessService business = service;
+        serviceTitle = business.Name;
+      } else if (service.Type == "academicServices") {
+        AcademicService academicService = service;
+        serviceTitle = academicService.Name;
+      } else {
+        serviceTitle = service.Subtype;
+      }
       return new Container(
-        color: Color.fromRGBO(179, 238, 255, 0.5),
-        margin: EdgeInsets.all(7),
+        padding: EdgeInsets.only(top: 10),
+        decoration: BoxDecoration(
+          border: Border.all(color: Color.fromRGBO(220, 250, 250, 0.9)),
+          color: Color.fromRGBO(200, 230, 230, 0.7),
+        ),
         child: ExpansionTile(
           title: Container(
             child: Column(
@@ -625,8 +698,9 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
                   children: <Widget>[
                     servicesToIcons[service.Subtype],
                     Text(
-                      service.Subtype,
-                      style: TextStyle(fontSize: 16),
+                      serviceTitle,
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
@@ -634,7 +708,7 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
                   children: <Widget>[
                     Icon(
                       Icons.location_on,
-                      size: 22,
+                      size: 20,
                     ),
                     Text(
                       serviceLocation,
@@ -645,7 +719,7 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
               ],
             ),
           ),
-          backgroundColor: Color.fromRGBO(179, 238, 255, 0.5),
+          backgroundColor: Color.fromRGBO(200, 240, 255, 0.8),
           children: expansionTileContent(service),
         ),
       );
@@ -653,24 +727,33 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
   }
 
   Widget _buildPage(List<Service> services) {
-    FocusScope.of(context).autofocus(_focusNode);
+    //FocusScope.of(context).autofocus(_focusNode);
     return Stack(
       children: <Widget>[
-        _title,
         Container(
-          padding: EdgeInsets.fromLTRB(0, 150, 0, 0),
-          height: 430,
+          decoration: new BoxDecoration(
+            image: new DecorationImage(
+              image: new AssetImage("assets/Bar_Ilan_Mini_Map.jpg"),
+              fit: BoxFit.fill,
+              colorFilter: ColorFilter.mode(
+                  Colors.white.withOpacity(0.9), BlendMode.softLight),
+            ),
+          ),
+          padding: EdgeInsets.fromLTRB(0, 140, 0, 0),
+          height: 600,
           child: ListView(
             children: <Widget>[
               _displayedServices = _showServices(
-                _selectedBuildingNumber,
+                _selectedArea,
                 services,
               )
             ],
           ),
         ),
+        _title,
+
         //_addingButton,
-        _buildingSearch(),
+        _locationSearch(),
       ],
     );
   }
@@ -680,9 +763,9 @@ class _ServiceByBuildingState extends State<ServiceByBuilding> {
     return ScopedModelDescendant<MainModel>(
       builder: (BuildContext context, Widget child, MainModel model) {
         Widget content;
-        if (!model.isLoading) {
+        if (!model.isServicesLoading) {
           content = _buildPage(model.services);
-        } else if (model.isLoading) {
+        } else if (model.isServicesLoading) {
           content = Center(child: CircularProgressIndicator());
         }
         return RefreshIndicator(
