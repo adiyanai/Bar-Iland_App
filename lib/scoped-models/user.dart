@@ -11,7 +11,7 @@ import '../models/connection.dart';
 class UserModel extends Model {
   final API_KEY = 'AIzaSyBePDkpa3WV4UVazs9tRi0WnicXHsj2Ui0';
   User _authenticatedUser;
-  bool _isLoading = false;
+  bool _isUserLoading = false;
   Timer _authTimer;
   ConnectionMode _connectionMode = ConnectionMode.GuestUser;
   PublishSubject<bool> _userSubject = PublishSubject();
@@ -28,8 +28,8 @@ class UserModel extends Model {
     return _userSubject;
   }
 
-  bool get isLoading {
-    return _isLoading;
+  bool get isUserLoading {
+    return _isUserLoading;
   }
 
   User get user {
@@ -38,7 +38,7 @@ class UserModel extends Model {
 
   Future<Map<String, dynamic>> authenticate(String email, String password,
       [AuthMode mode = AuthMode.Login]) async {
-    _isLoading = true;
+    _isUserLoading = true;
     notifyListeners();
     final Map<String, dynamic> authData = {
       'email': email,
@@ -87,7 +87,7 @@ class UserModel extends Model {
     } else if (responseData['error']['message'] == 'EMAIL_EXISTS') {
       message = 'דוא"ל זה כבר קיים!';
     }
-    _isLoading = false;
+    _isUserLoading = false;
     notifyListeners();
     return {'success': !hasError, 'message': message};
   }
@@ -130,7 +130,7 @@ class UserModel extends Model {
   }
 
   Future<Map<String, dynamic>> resetPassword(String email) async {
-    _isLoading = true;
+    _isUserLoading = true;
     notifyListeners();
     final Map<String, dynamic> resetData = {
       'requestType': 'PASSWORD_RESET',
@@ -153,7 +153,7 @@ class UserModel extends Model {
     else if (responseData['error']['message'] == 'EMAIL_NOT_FOUND') {
       message = 'דוא"ל לא קיים';
     }
-    _isLoading = false;
+    _isUserLoading = false;
     notifyListeners();
     return {'success': !hasError, 'message': message};
   }

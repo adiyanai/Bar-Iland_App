@@ -112,7 +112,7 @@ class _AutoPageState extends State<AuthPage> {
       children: <Widget>[
         ScopedModelDescendant<MainModel>(
           builder: (BuildContext context, Widget child, MainModel model) {
-            return model.isLoading
+            return model.isUserLoading
                 ? CircularProgressIndicator()
                 : RaisedButton(
                     color: Theme.of(context).primaryColor,

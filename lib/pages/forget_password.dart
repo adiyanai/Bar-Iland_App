@@ -116,7 +116,7 @@ class _ForgetPasswordState extends State<ForgetPassword> {
                   ScopedModelDescendant<MainModel>(
                     builder:
                         (BuildContext context, Widget child, MainModel model) {
-                      return model.isLoading
+                      return model.isUserLoading
                           ? Center(child: CircularProgressIndicator())
                           : Center(
                               child: RaisedButton(
