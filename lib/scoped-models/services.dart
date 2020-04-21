@@ -1,19 +1,16 @@
 import 'dart:convert';
 import 'dart:async';
-import 'dart:io';
 
 import 'package:scoped_model/scoped_model.dart';
 import 'package:http/http.dart' as http;
 
 import '../models/service.dart';
-import '../models/user.dart';
 
 class ConnectedServicesModel extends Model {
   List<String> areas = [];
   List<Service> services = [];
   bool _isServicesLoading = false;
   //int _selServiceId;
-  //User _authenticatedUser;
 }
 
 class ServicesModel extends ConnectedServicesModel {
@@ -70,7 +67,7 @@ class ServicesModel extends ConnectedServicesModel {
               (serviceData['contains']).forEach((service) {
                 contained.add(service);
               });
-              service = WelfareRoomService(
+              service = WelfareService(
                   id: id,
                   type: serviceType,
                   subtype: serviceData['subtype'],
@@ -107,6 +104,42 @@ class ServicesModel extends ConnectedServicesModel {
                 website: serviceData['website'],
               );
               fetchedServiceList.add(service);
+            } else if (serviceType == "prayerServices") {
+              String winterPrayers = "";
+              (serviceData['winterPrayers']).forEach((time) {
+                if (time != "") {
+                  winterPrayers += (time + "\n");
+                }
+              });
+              String summerPrayers = "";
+              (serviceData['summerPrayers']).forEach((time) {
+                if (time != "") {
+                  summerPrayers += (time + "\n");
+                }
+              });
+              service = PrayerService(
+                id: id,
+                type: serviceType,
+                subtype: serviceData['subtype'],
+                area: serviceData['area'],
+                isInArea: serviceData['isInArea'],
+                specificLocation: serviceData['specificLocation'],
+                winterPrayers: winterPrayers,
+                summerPrayers: summerPrayers,
+                womanSection: serviceData['womanSection'],
+              );
+              fetchedServiceList.add(service);
+            } else if (serviceType == "computersLabs") {
+              service = ComputersLabService(
+                id: id,
+                type: serviceType,
+                subtype: serviceData['subtype'],
+                area: serviceData['area'],
+                isInArea: serviceData['isInArea'],
+                specificLocation: serviceData['specificLocation'],
+                activityTime: serviceData['activityTime'],
+              );
+              fetchedServiceList.add(service);
             }
           });
         }
@@ -121,11 +154,46 @@ class ServicesModel extends ConnectedServicesModel {
           return service1.Subtype.compareTo(service2.Subtype);
         }
       });
-
       services = fetchedServiceList;
       _isServicesLoading = false;
       notifyListeners();
     });
+  }
+
+  Future<bool> addMachineService({
+    String subtype =  "מכשיר החייאה (דפיברילטור)",
+    String area = "בניין 206",
+    bool isInArea = true,
+    String specificLocation = "קומת כניסה, מסדרון דרומי, בכניסה לקוביה",
+    bool availability = true,
+  }) async {
+    _isServicesLoading = true;
+    notifyListeners();
+    DateTime today = new DateTime.now();
+    String currentDate =
+        "${today.day.toString()}/${today.month.toString().padLeft(2, '0')}/${today.year.toString().padLeft(2, '0')}";
+    
+    //String currentTime = "${today.hour.toString()}:${today.minute.toString().padLeft(2, '0')}";
+
+    final Map<String, dynamic> serviceData = {
+      'subtype': subtype,
+      'area': area,
+      'isInArea': isInArea,
+      'specificLocation': specificLocation,
+      'availability': availability,
+      'availabilityReportDate': currentDate
+    };
+    final http.Response response = await http.post(
+        'https://bar-iland-app.firebaseio.com/services/machines.json',
+        body: json.encode(serviceData));
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      _isServicesLoading = false;
+      notifyListeners();
+      return false;
+    }
+    _isServicesLoading = false;
+    notifyListeners();
+    return true;
   }
 
   Future<bool> addAcademicService({
@@ -155,6 +223,84 @@ class ServicesModel extends ConnectedServicesModel {
 
     final http.Response response = await http.post(
         'https://bar-iland-app.firebaseio.com/services/academicServices.json',
+        body: json.encode(serviceData));
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      _isServicesLoading = false;
+      notifyListeners();
+      return false;
+    }
+    _isServicesLoading = false;
+    notifyListeners();
+    return true;
+  }
+
+  Future<bool> addPrayerService({
+    String subtype = "מנייני שחרית",
+    String area = "בניין 304",
+    bool isInArea = true,
+    String womanSection = "עזרת הנשים פתוחה",
+    String specificLocation = "בית כנסת שלייפר",
+  }) async {
+    _isServicesLoading = true;
+
+    List<String> winterPrayers = [];
+    winterPrayers.add("7:00 (ימי שני וחמישי בשעה 6:50)");
+    //winterPrayers.add("19:35");
+
+    List<String> summerPrayers = [];
+
+    //summerPrayers.add("");
+    winterPrayers.add("7:00 (ימי שני וחמישי בשעה 6:50)");
+    /*
+    summerPrayers.add("13:35");
+    summerPrayers.add("14:30");
+    summerPrayers.add("15:35");
+    summerPrayers.add("17:35");
+    */
+
+    notifyListeners();
+    final Map<String, dynamic> serviceData = {
+      'subtype': subtype,
+      'area': area,
+      'isInArea': isInArea,
+      'specificLocation': specificLocation,
+      'winterPrayers': winterPrayers,
+      'summerPrayers': summerPrayers,
+      'womanSection': womanSection,
+    };
+
+    final http.Response response = await http.post(
+        'https://bar-iland-app.firebaseio.com/services/prayerServices.json',
+        body: json.encode(serviceData));
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      _isServicesLoading = false;
+      notifyListeners();
+      return false;
+    }
+    _isServicesLoading = false;
+    notifyListeners();
+    return true;
+  }
+
+  Future<bool> addComputerLabsService({
+    String subtype = "מעבדת מחשבים",
+    String activityTime = "ימים א'-ה', 19:45-08:00",
+    String area = "בניין 211",
+    bool isInArea = true,
+    String specificLocation = "קומת קרקע, כמ\"ט 20",
+  }) async {
+    _isServicesLoading = true;
+    notifyListeners();
+    final Map<String, dynamic> serviceData = {
+      'subtype': subtype,
+      'activityTime': activityTime,
+      'area': area,
+      'isInArea': isInArea,
+      'specificLocation': specificLocation,
+    };
+
+    final http.Response response = await http.post(
+        'https://bar-iland-app.firebaseio.com/services/computersLabs.json',
         body: json.encode(serviceData));
     if (response.statusCode != 200 && response.statusCode != 201) {
       _isServicesLoading = false;
@@ -212,8 +358,8 @@ class ServicesModel extends ConnectedServicesModel {
     });
   }
 
-  Future<bool> availabiltyReport(String _selectedArea,
-      Service service, bool updatedAvailability) {
+  Future<bool> availabiltyReport(
+      String _selectedArea, Service service, bool updatedAvailability) {
     _isServicesLoading = true;
     notifyListeners();
     DateTime today = new DateTime.now();

@@ -1,7 +1,6 @@
 import 'package:autocomplete_textfield/autocomplete_textfield.dart';
 import 'package:bar_iland_app/models/connection.dart';
 import 'package:bar_iland_app/services_icons.dart';
-import 'package:flutter/services.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
@@ -227,7 +226,7 @@ class _ServicesByAreaState extends State<ServicesByArea> {
   }
 
   void _showPress() {
-    //widget.model.addAcademicService();
+    //widget.model.addMachineService();
     FocusScope.of(context).requestFocus(new FocusNode());
     _title = Container(
       width: 600,
@@ -405,11 +404,23 @@ class _ServicesByAreaState extends State<ServicesByArea> {
       "סוכנות נסיעות": Icon(MdiIcons.airplane),
       "ספריה": Icon(MdiIcons.library),
       "מזכירות": Icon(MdiIcons.officeBuilding),
+      "מנייני ערבית": Icon(MaterialCommunityIcons.book_open_page_variant),
       "שעות פעילות": Icon(MaterialCommunityIcons.clock_outline),
       "טלפון": Icon(MdiIcons.phone),
       "מידע נוסף": Icon(MaterialCommunityIcons.information_outline),
       "מייל": Icon(MaterialCommunityIcons.email_box),
       "אתר": Icon(MaterialCommunityIcons.web),
+      "מנייני שחרית": Icon(MaterialCommunityIcons.book_open_page_variant),
+      "מנייני מנחה": Icon(MaterialCommunityIcons.book_open_page_variant),
+      "זמני תפילות שעון קיץ":
+          Icon(MaterialCommunityIcons.clock_outline, size: 0),
+      "זמני תפילות שעון חורף":
+          Icon(MaterialCommunityIcons.clock_outline, size: 0),
+      "שעון קיץ": Icon(MaterialCommunityIcons.clock_outline),
+      "שעון חורף": Icon(MaterialCommunityIcons.clock_outline),
+      "עזרת נשים": Icon(FontAwesome.female, size: 18),
+      "מעבדת מחשבים": Icon(Icons.computer),
+      "מכשיר החייאה (דפיברילטור)": Icon(MdiIcons.medicalBag),
     };
     return servicesIcons;
   }
@@ -581,76 +592,169 @@ class _ServicesByAreaState extends State<ServicesByArea> {
     );
   }
 
+  List<Widget> machinesContent(Service service) {
+    Widget milkInfo;
+    if (service.Subtype == "מקרר") {
+      milkInfo = _milkUI(service);
+    } else {
+      milkInfo = Row();
+    }
+    return <Widget>[
+      _availabilityUI(service),
+      milkInfo,
+    ];
+  }
+
+  List<Widget> welfareContent(Service service) {
+    WelfareService welfareRoom = service;
+    return [
+      ...welfareRoom.Contains.map((containedService) {
+        return Container(
+          padding: EdgeInsets.fromLTRB(0, 5, 18, 0),
+          child: Row(children: [
+            mapToIcons()[containedService],
+            Text(
+              containedService,
+              style: TextStyle(
+                fontSize: 14,
+              ),
+            )
+          ]),
+        );
+      }).toList()
+    ];
+  }
+
+  List<Widget> businessesContent(Service service) {
+    BusinessService business = service;
+    Map<String, String> businessInfo = Map<String, String>();
+    if (business.ActivityTime != "" ) {
+      businessInfo["שעות פעילות"] = business.ActivityTime;
+    }
+    if (business.PhoneNumber != "") {
+      businessInfo["טלפון"] = business.PhoneNumber;
+    }
+    if (business.GeneralInfo != "") {
+      businessInfo["מידע נוסף"] = business.GeneralInfo;
+    }
+    return (businessInfo.keys).map((infoType) {
+      return Container(
+        width: 320,
+        padding: EdgeInsets.fromLTRB(40, 0, 0, 0),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          mapToIcons()[infoType],
+          Expanded(child: Text(businessInfo[infoType]))
+        ]),
+      );
+    }).toList();
+  }
+
+  List<Widget> academicServicesContent(Service service) {
+    AcademicService academicService = service;
+    Map<String, String> academicServiceInfo = {
+      "שעות פעילות": academicService.ActivityTime,
+      "טלפון": academicService.PhoneNumber,
+      "מייל": academicService.Mail,
+      "אתר": academicService.Website,
+    };
+    return (academicServiceInfo.keys).map((infoType) {
+      return Container(
+        width: 320,
+        padding: EdgeInsets.fromLTRB(40, 0, 0, 0),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          mapToIcons()[infoType],
+          Expanded(child: Text(academicServiceInfo[infoType]))
+        ]),
+      );
+    }).toList();
+  }
+
+  List<Widget> prayerServicesContent(Service service) {
+    PrayerService prayerService = service;
+    Map<String, Container> prayerServiceInfo = Map<String, Container>();
+    String clock;
+    if (prayerService.WinterPrayers != "") {
+      clock = "שעון חורף";
+      prayerServiceInfo[clock] = Container(child: Text(
+        "שעון חורף",
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 16,
+          decoration: TextDecoration.underline,
+        )),
+      );
+      prayerServiceInfo["זמני תפילות שעון חורף"] =
+          Container(padding: EdgeInsets.only(right: 20), child: Text(prayerService.WinterPrayers));
+    }
+    if (prayerService.SummerPrayers != "") {
+      clock = "שעון קיץ";
+      prayerServiceInfo[clock] = Container(child: Text(
+        "שעון קיץ",
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 16,
+          decoration: TextDecoration.underline,
+        ),
+      ));
+      prayerServiceInfo["זמני תפילות שעון קיץ"] =
+          Container(padding: EdgeInsets.only(right: 20), child: Text(prayerService.SummerPrayers));
+    }
+    if (prayerService.WomanSection != "") {
+      prayerServiceInfo["עזרת נשים"] = Container(child: Text(prayerService.WomanSection));
+    }
+    return [
+      Container(
+        child: Column(
+            children: (prayerServiceInfo.keys).map((info) {
+          return Container(
+            padding: EdgeInsets.only(right: 15),
+            child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [mapToIcons()[info], prayerServiceInfo[info]]),
+          );
+        }).toList()),
+      )
+    ];
+  }
+
+ List<Widget> computersLabsContent(service) {
+  ComputersLabService computersLab = service;
+  Map<String, String> computersLabInfo = Map<String, String>();
+  computersLabInfo["שעות פעילות"] = computersLab.ActivityTime;
+       return [
+      Container(
+        child: Column(
+            children: (computersLabInfo.keys).map((info) {
+          return Container(
+            padding: EdgeInsets.only(right: 15),
+            child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [mapToIcons()[info], Text(computersLabInfo[info])]),
+          );
+        }).toList()),
+      )
+    ];
+ }
+
   List<Widget> expansionTileContent(Service service) {
     if (service.Type == "machines") {
-      Widget milkInfo;
-      if (service.Subtype == "מקרר") {
-        milkInfo = _milkUI(service);
-      } else {
-        milkInfo = Row();
-      }
-      return <Widget>[
-        _availabilityUI(service),
-        milkInfo,
-      ];
+      return machinesContent(service);
     } else if (service.Type == "welfare") {
-      WelfareRoomService welfareRoom = service;
-      return [
-        ...welfareRoom.Contains.map((containedService) {
-          return Container(
-            padding: EdgeInsets.fromLTRB(0, 5, 18, 0),
-            child: Row(children: [
-              mapToIcons()[containedService],
-              Text(
-                containedService,
-                style: TextStyle(
-                  fontSize: 14,
-                ),
-              )
-            ]),
-          );
-        }).toList()
-      ];
+      return welfareContent(service);
     } else if (service.Type == "businesses") {
-      BusinessService business = service;
-      Map<String, String> businessInfo = {
-        "שעות פעילות": business.ActivityTime,
-        "טלפון": business.PhoneNumber,
-        "מידע נוסף": business.GeneralInfo
-      };
-      return (businessInfo.keys).map((infoType) {
-        return Container(
-          width: 320,
-          padding: EdgeInsets.fromLTRB(40, 0, 0, 0),
-          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            mapToIcons()[infoType],
-            Expanded(child: Text(businessInfo[infoType]))
-          ]),
-        );
-      }).toList();
+      return businessesContent(service);
     } else if (service.Type == "academicServices") {
-      AcademicService academicService = service;
-      Map<String, String> academicServiceInfo = {
-        "שעות פעילות": academicService.ActivityTime,
-        "טלפון": academicService.PhoneNumber,
-        "מייל": academicService.Mail,
-        "אתר": academicService.Website,
-      };
-      return (academicServiceInfo.keys).map((infoType) {
-        return Container(
-          width: 315,
-          padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
-          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            mapToIcons()[infoType],
-            Expanded(child: Text(academicServiceInfo[infoType]))
-          ]),
-        );
-      }).toList();
+      return academicServicesContent(service);
+    } else if (service.Type == "prayerServices") {
+      return prayerServicesContent(service);
+    } else if (service.Type == "computersLabs") {
+      return computersLabsContent(service);
     }
     return <Widget>[];
   }
 
   Widget _showServices(String area, List<Service> services) {
+    //widget.model.addAcademicService();
     List<Service> servicesInArea = [];
     for (int i = 0; i < services.length; i++) {
       if (services[i].Area == area) {
@@ -660,9 +764,10 @@ class _ServicesByAreaState extends State<ServicesByArea> {
     if (!_isOkPressed) {
       return Column();
     }
+    //TODO: UI
     if (servicesInArea.length == 0) {
       return Center(
-        child: Text('לא נמצאו שירותים בבניין ' + area.toString()),
+        child: Text('לא נמצאו שירותים באזור ' + area.toString()),
       );
     }
     return Column(

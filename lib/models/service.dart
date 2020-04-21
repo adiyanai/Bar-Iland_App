@@ -130,10 +130,10 @@ class RefrigeratorService extends MachineService {
   }
 }
 
-class WelfareRoomService extends Service {
+class WelfareService extends Service {
   @required
   List<String> contains;
-  WelfareRoomService(
+  WelfareService(
       {@required String id,
       @required String type,
       @required String subtype,
@@ -155,10 +155,10 @@ class WelfareRoomService extends Service {
 }
 
 class BusinessService extends Service {
-  String name = "–––";
-  String activityTime = "–––";
-  String phoneNumber = "–––";
-  String generalInfo = "–––";
+  String name = "";
+  String activityTime = "";
+  String phoneNumber = "";
+  String generalInfo = "";
 
   BusinessService(
       {@required String id,
@@ -197,11 +197,11 @@ class BusinessService extends Service {
 }
 
 class AcademicService extends Service {
-  String name = "–––";
-  String activityTime = "–––";
-  String phoneNumber = "–––";
-  String mail = "–––";
-  String website = "–––";
+  String name = "";
+  String activityTime = "";
+  String phoneNumber = "";
+  String mail = "";
+  String website = "";
 
   AcademicService(
       {@required String id,
@@ -241,5 +241,64 @@ class AcademicService extends Service {
 
   String get Website {
     return website;
+  }
+}
+
+class PrayerService extends Service {
+  String winterPrayers;
+  String summerPrayers;
+  String womanSection;
+
+  PrayerService({
+    @required String id,
+    @required String type,
+    @required String subtype,
+    @required String area,
+    @required bool isInArea,
+    @required String specificLocation,
+    @required this.winterPrayers,
+    @required this.summerPrayers,
+    @required this.womanSection,
+  }) : super(
+            id: id,
+            type: type,
+            subtype: subtype,
+            area: area,
+            isInArea: isInArea,
+            specificLocation: specificLocation);
+
+  String get WinterPrayers {
+    return winterPrayers;
+  }
+
+  String get SummerPrayers {
+    return summerPrayers;
+  }
+
+  String get WomanSection {
+    return womanSection;
+  }
+}
+
+class ComputersLabService extends Service {
+  String activityTime = "";
+  ComputersLabService(
+      {@required String id,
+      @required String type,
+      @required String subtype,
+      @required String area,
+      @required bool isInArea,
+      @required String specificLocation,
+      @required this.activityTime})
+      : super(
+            id: id,
+            type: type,
+            subtype: subtype,
+            area: area,
+            isInArea: isInArea,
+            specificLocation: specificLocation);
+
+  String get ActivityTime {
+    return activityTime;
   }
 }
