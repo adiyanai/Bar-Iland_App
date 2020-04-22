@@ -49,7 +49,7 @@ class _AutoPageState extends State<AuthPage> {
     }
   }
 
-  DecorationImage _buildBackgroungImage() {
+  DecorationImage _buildBackgroundImage() {
     return DecorationImage(
       image: AssetImage('assets/background.jpg'),
       fit: BoxFit.cover,
@@ -62,7 +62,6 @@ class _AutoPageState extends State<AuthPage> {
 
   Widget _buildEmailTextField() {
     return TextFormField(
-
       decoration: InputDecoration(
         labelText: 'דוא"ל',
         suffixIcon: Icon(Icons.email),
@@ -163,7 +162,7 @@ class _AutoPageState extends State<AuthPage> {
         ),
         body: Container(
           decoration: BoxDecoration(
-            image: _buildBackgroungImage(),
+            image: _buildBackgroundImage(),
           ),
           padding: EdgeInsets.all(10.0),
           child: GestureDetector(

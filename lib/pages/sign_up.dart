@@ -48,7 +48,7 @@ class _SignUpState extends State<SignUp> {
     }
   }
 
-  DecorationImage _buildBackgroungImage() {
+  DecorationImage _buildBackgroundImage() {
     return DecorationImage(
       image: AssetImage('assets/background.jpg'),
       fit: BoxFit.cover,
@@ -134,7 +134,7 @@ class _SignUpState extends State<SignUp> {
         ),
         body: Container(
           decoration: BoxDecoration(
-            image: _buildBackgroungImage(),
+            image: _buildBackgroundImage(),
           ),
           padding: EdgeInsets.all(10.0),
           child: GestureDetector(

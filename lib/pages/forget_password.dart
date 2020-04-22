@@ -47,7 +47,7 @@ class _ForgetPasswordState extends State<ForgetPassword> {
     }
   }
 
-  DecorationImage _buildBackgroungImage() {
+  DecorationImage _buildBackgroundImage() {
     return DecorationImage(
       image: AssetImage('assets/background.jpg'),
       fit: BoxFit.cover,
@@ -93,7 +93,7 @@ class _ForgetPasswordState extends State<ForgetPassword> {
         ),
         body: Container(
           decoration: BoxDecoration(
-            image: _buildBackgroungImage(),
+            image: _buildBackgroundImage(),
           ),
           padding: EdgeInsets.all(10.0),
           child: GestureDetector(
