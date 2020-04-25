@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../models/service.dart';
 import '../scoped-models/main.dart';
@@ -230,13 +231,14 @@ class _ServicesByAreaState extends State<ServicesByArea> {
     FocusScope.of(context).requestFocus(new FocusNode());
     _title = Container(
       width: 600,
-      color: Color.fromRGBO(200, 230, 230, 0.7),
+      height: 50,
+      color: Color.fromRGBO(200, 230, 230, 1),
       padding: EdgeInsets.fromLTRB(0, 0, 15, 0),
-      margin: EdgeInsets.fromLTRB(0, 110, 0, 0),
+      margin: EdgeInsets.fromLTRB(0, 100, 0, 0),
       child: Text(
         "השירותים באזור " + _selectedArea + ":",
         style: TextStyle(
-            color: Colors.black, fontSize: 22, fontWeight: FontWeight.bold),
+            color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),
       ),
     );
     _isOkPressed = true;
@@ -269,7 +271,9 @@ class _ServicesByAreaState extends State<ServicesByArea> {
         key: _key,
         clearOnSubmit: false,
         focusNode: _focusNode,
-        suggestions: widget.model.Areas,
+        suggestions: (widget.model.Locations).map((location) {
+          return location.Number + " - " + location.Name;
+        }).toList(),
         suggestionsAmount: 12,
         style: TextStyle(color: Colors.black, fontSize: 18.0),
         decoration: InputDecoration(
@@ -277,7 +281,15 @@ class _ServicesByAreaState extends State<ServicesByArea> {
           hintText: 'חיפוש מיקום באוניברסיטה',
         ),
         itemFilter: (area, query) {
-          return area.contains(query) || query == "";
+          List<String> splitArea = area.split(" ");
+          for (int i = 0; i < splitArea.length; i++) {
+            if (area.startsWith(query) ||
+                (splitArea[i] != "-" && splitArea[i].startsWith(query)) ||
+                query == "") {
+              return true;
+            }
+          }
+          return false;
         },
         itemSorter: (area1, area2) {
           int result = area1.length.compareTo(area2.length);
@@ -289,7 +301,7 @@ class _ServicesByAreaState extends State<ServicesByArea> {
         },
         itemSubmitted: (area) {
           setState(() {
-            FocusScope.of(context).requestFocus(new FocusNode());
+            //FocusScope.of(context).requestFocus(new FocusNode());
             _isOkPressed = false;
             _title = Container();
             _selectedArea = area;
@@ -625,25 +637,67 @@ class _ServicesByAreaState extends State<ServicesByArea> {
     ];
   }
 
+  _launchURL(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
+  _launchCaller(String phoneNumber) async {
+    String url = "tel:$phoneNumber";
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
+  _launchMail(String mail) async {
+    String url = "mailto:$mail";
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
   List<Widget> businessesContent(Service service) {
     BusinessService business = service;
-    Map<String, String> businessInfo = Map<String, String>();
-    if (business.ActivityTime != "" ) {
-      businessInfo["שעות פעילות"] = business.ActivityTime;
+    Map<String, Widget> businessInfo = Map<String, Widget>();
+    if (business.ActivityTime != "") {
+      businessInfo["שעות פעילות"] = Container(
+          padding: EdgeInsets.fromLTRB(0, 0, 0, 20),
+          child: Text(business.ActivityTime));
     }
     if (business.PhoneNumber != "") {
-      businessInfo["טלפון"] = business.PhoneNumber;
+      businessInfo["טלפון"] = Container(
+        padding: EdgeInsets.fromLTRB(0, 0, 0, 20),
+        child: GestureDetector(
+          onTap: () {
+            _launchCaller(business.PhoneNumber);
+          },
+          child: Text(
+            business.PhoneNumber,
+            style: TextStyle(
+                color: Colors.blue, decoration: TextDecoration.underline),
+          ),
+        ),
+      );
     }
     if (business.GeneralInfo != "") {
-      businessInfo["מידע נוסף"] = business.GeneralInfo;
+      businessInfo["מידע נוסף"] = Container(
+          padding: EdgeInsets.fromLTRB(0, 0, 0, 20),
+          child: Text(business.GeneralInfo));
     }
     return (businessInfo.keys).map((infoType) {
       return Container(
         width: 320,
-        padding: EdgeInsets.fromLTRB(40, 0, 0, 0),
+        padding: EdgeInsets.fromLTRB(40, 5, 0, 0),
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
           mapToIcons()[infoType],
-          Expanded(child: Text(businessInfo[infoType]))
+          Expanded(child: businessInfo[infoType])
         ]),
       );
     }).toList();
@@ -651,19 +705,57 @@ class _ServicesByAreaState extends State<ServicesByArea> {
 
   List<Widget> academicServicesContent(Service service) {
     AcademicService academicService = service;
-    Map<String, String> academicServiceInfo = {
-      "שעות פעילות": academicService.ActivityTime,
-      "טלפון": academicService.PhoneNumber,
-      "מייל": academicService.Mail,
-      "אתר": academicService.Website,
+    Map<String, Widget> academicServiceInfo = {
+      "שעות פעילות": Container(
+          padding: EdgeInsets.fromLTRB(0, 0, 0, 20),
+          child: Text(academicService.ActivityTime)),
+      "טלפון": Container(
+        padding: EdgeInsets.fromLTRB(0, 0, 0, 20),
+        child: GestureDetector(
+          onTap: () {
+            _launchCaller(academicService.PhoneNumber);
+          },
+          child: Text(
+            academicService.PhoneNumber,
+            style: TextStyle(
+                color: Colors.blue, decoration: TextDecoration.underline),
+          ),
+        ),
+      ),
+      "מייל": Container(
+        padding: EdgeInsets.fromLTRB(0, 0, 0, 20),
+        child: GestureDetector(
+          onTap: () {
+            _launchMail(academicService.Mail);
+          },
+          child: Text(
+            academicService.Mail,
+            style: TextStyle(
+                color: Colors.blue, decoration: TextDecoration.underline),
+          ),
+        ),
+      ),
+      "אתר": Container(
+        padding: EdgeInsets.fromLTRB(0, 0, 0, 20),
+        child: GestureDetector(
+          onTap: () {
+            _launchURL(academicService.Website);
+          },
+          child: Text(
+            academicService.Website,
+            style: TextStyle(
+                color: Colors.blue, decoration: TextDecoration.underline),
+          ),
+        ),
+      ),
     };
     return (academicServiceInfo.keys).map((infoType) {
       return Container(
         width: 320,
-        padding: EdgeInsets.fromLTRB(40, 0, 0, 0),
+        padding: EdgeInsets.fromLTRB(40, 5, 0, 0),
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
           mapToIcons()[infoType],
-          Expanded(child: Text(academicServiceInfo[infoType]))
+          Expanded(child: academicServiceInfo[infoType])
         ]),
       );
     }).toList();
@@ -675,20 +767,22 @@ class _ServicesByAreaState extends State<ServicesByArea> {
     String clock;
     if (prayerService.WinterPrayers != "") {
       clock = "שעון חורף";
-      prayerServiceInfo[clock] = Container(child: Text(
-        "שעון חורף",
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: 16,
-          decoration: TextDecoration.underline,
-        )),
+      prayerServiceInfo[clock] = Container(
+        child: Text("שעון חורף",
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+              decoration: TextDecoration.underline,
+            )),
       );
-      prayerServiceInfo["זמני תפילות שעון חורף"] =
-          Container(padding: EdgeInsets.only(right: 20), child: Text(prayerService.WinterPrayers));
+      prayerServiceInfo["זמני תפילות שעון חורף"] = Container(
+          padding: EdgeInsets.only(right: 20),
+          child: Text(prayerService.WinterPrayers));
     }
     if (prayerService.SummerPrayers != "") {
       clock = "שעון קיץ";
-      prayerServiceInfo[clock] = Container(child: Text(
+      prayerServiceInfo[clock] = Container(
+          child: Text(
         "שעון קיץ",
         style: TextStyle(
           fontWeight: FontWeight.bold,
@@ -696,11 +790,13 @@ class _ServicesByAreaState extends State<ServicesByArea> {
           decoration: TextDecoration.underline,
         ),
       ));
-      prayerServiceInfo["זמני תפילות שעון קיץ"] =
-          Container(padding: EdgeInsets.only(right: 20), child: Text(prayerService.SummerPrayers));
+      prayerServiceInfo["זמני תפילות שעון קיץ"] = Container(
+          padding: EdgeInsets.only(right: 20),
+          child: Text(prayerService.SummerPrayers));
     }
     if (prayerService.WomanSection != "") {
-      prayerServiceInfo["עזרת נשים"] = Container(child: Text(prayerService.WomanSection));
+      prayerServiceInfo["עזרת נשים"] =
+          Container(child: Text(prayerService.WomanSection));
     }
     return [
       Container(
@@ -717,11 +813,11 @@ class _ServicesByAreaState extends State<ServicesByArea> {
     ];
   }
 
- List<Widget> computersLabsContent(service) {
-  ComputersLabService computersLab = service;
-  Map<String, String> computersLabInfo = Map<String, String>();
-  computersLabInfo["שעות פעילות"] = computersLab.ActivityTime;
-       return [
+  List<Widget> computersLabsContent(service) {
+    ComputersLabService computersLab = service;
+    Map<String, String> computersLabInfo = Map<String, String>();
+    computersLabInfo["שעות פעילות"] = computersLab.ActivityTime;
+    return [
       Container(
         child: Column(
             children: (computersLabInfo.keys).map((info) {
@@ -734,7 +830,7 @@ class _ServicesByAreaState extends State<ServicesByArea> {
         }).toList()),
       )
     ];
- }
+  }
 
   List<Widget> expansionTileContent(Service service) {
     if (service.Type == "machines") {
@@ -757,78 +853,91 @@ class _ServicesByAreaState extends State<ServicesByArea> {
     //widget.model.addAcademicService();
     List<Service> servicesInArea = [];
     for (int i = 0; i < services.length; i++) {
-      if (services[i].Area == area) {
+      if (area.contains(services[i].Area)) {
         servicesInArea.add(services[i]);
       }
     }
     if (!_isOkPressed) {
       return Column();
     }
-    //TODO: UI
     if (servicesInArea.length == 0) {
       return Center(
-        child: Text('לא נמצאו שירותים באזור ' + area.toString()),
+        child: Container(
+          width: 600,
+          height: 100,
+          color: Color.fromRGBO(200, 230, 230, 0.7),
+          margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
+          padding: EdgeInsets.all(20),
+          child: Text('לא נמצאו שירותים באזור זה',
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 16,
+              )),
+        ),
       );
     }
-    return Column(
-        children: servicesInArea.map((service) {
-      String serviceLocation = service.Area;
-      if (service.SpecificLocation != "") {
-        serviceLocation += ", " + service.SpecificLocation;
-      }
-      serviceLocation = serviceLocation.replaceAll("קומה -1", "קומה 1-");
-      Map<String, Icon> servicesToIcons = mapToIcons();
-      String serviceTitle;
-      if (service.Type == "businesses") {
-        BusinessService business = service;
-        serviceTitle = business.Name;
-      } else if (service.Type == "academicServices") {
-        AcademicService academicService = service;
-        serviceTitle = academicService.Name;
-      } else {
-        serviceTitle = service.Subtype;
-      }
-      return new Container(
-        padding: EdgeInsets.only(top: 10),
-        decoration: BoxDecoration(
-          border: Border.all(color: Color.fromRGBO(220, 250, 250, 0.9)),
-          color: Color.fromRGBO(200, 230, 230, 0.7),
-        ),
-        child: ExpansionTile(
-          title: Container(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    servicesToIcons[service.Subtype],
-                    Text(
-                      serviceTitle,
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: <Widget>[
-                    Icon(
-                      Icons.location_on,
-                      size: 20,
-                    ),
-                    Text(
-                      serviceLocation,
-                      style: TextStyle(fontSize: 16),
-                    )
-                  ],
-                )
-              ],
-            ),
+    return Container(
+      margin: EdgeInsets.fromLTRB(0, 10, 0, 20),
+      child: Column(
+          children: servicesInArea.map((service) {
+        String serviceLocation = service.Area;
+        if (service.SpecificLocation != "") {
+          serviceLocation += ", " + service.SpecificLocation;
+        }
+        serviceLocation = serviceLocation.replaceAll("קומה -1", "קומה 1-");
+        Map<String, Icon> servicesToIcons = mapToIcons();
+        String serviceTitle;
+        if (service.Type == "businesses") {
+          BusinessService business = service;
+          serviceTitle = business.Name;
+        } else if (service.Type == "academicServices") {
+          AcademicService academicService = service;
+          serviceTitle = academicService.Name;
+        } else {
+          serviceTitle = service.Subtype;
+        }
+        return new Container(
+          padding: EdgeInsets.only(top: 10),
+          decoration: BoxDecoration(
+            border: Border.all(color: Color.fromRGBO(220, 250, 250, 0.9)),
+            color: Color.fromRGBO(200, 230, 230, 0.7),
           ),
-          backgroundColor: Color.fromRGBO(200, 240, 255, 0.8),
-          children: expansionTileContent(service),
-        ),
-      );
-    }).toList());
+          child: ExpansionTile(
+            title: Container(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Row(
+                    children: <Widget>[
+                      servicesToIcons[service.Subtype],
+                      Text(
+                        serviceTitle,
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: <Widget>[
+                      Icon(
+                        Icons.location_on,
+                        size: 20,
+                      ),
+                      Text(
+                        serviceLocation,
+                        style: TextStyle(fontSize: 16),
+                      )
+                    ],
+                  )
+                ],
+              ),
+            ),
+            backgroundColor: Color.fromRGBO(200, 240, 255, 0.8),
+            children: expansionTileContent(service),
+          ),
+        );
+      }).toList()),
+    );
   }
 
   Widget _buildPage(List<Service> services) {

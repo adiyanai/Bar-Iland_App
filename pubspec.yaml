@@ -38,6 +38,7 @@ dependencies:
   draggable_scrollbar: ^0.0.4
   tuple: ^1.0.3
   flutter_vector_icons: ^0.2.1
+  url_launcher: ^5.4.5
 
 
 
