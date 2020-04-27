@@ -1,12 +1,14 @@
 import 'dart:convert';
 import 'dart:async';
 
+import 'package:bar_iland_app/models/location.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:http/http.dart' as http;
 
 import '../models/service.dart';
 
 class ConnectedServicesModel extends Model {
+  List<Location> locations = [];
   List<String> areas = [];
   List<Service> services = [];
   bool _isServicesLoading = false;
@@ -16,6 +18,38 @@ class ConnectedServicesModel extends Model {
 class ServicesModel extends ConnectedServicesModel {
   List<String> get Areas {
     return List.from(areas);
+  }
+
+  List<Location> get Locations {
+    return locations;
+  }
+
+  Future<Null> fetchServicesLocations() {
+    _isServicesLoading = true;
+    notifyListeners();
+    return http
+        .get('https://bar-iland-app.firebaseio.com/locations.json')
+        .then<Null>((http.Response response) {
+      final List<Location> fetchedLocations = [];
+      Map<String, dynamic> locationsTypeData = json.decode(response.body);
+      locationsTypeData
+          .forEach((String locationType, dynamic locationsTypeData) {
+        if (locationType != "squares") {
+          Location location;
+          locationsTypeData.forEach((String id, dynamic locationData) {
+            location = Location(
+                id: id,
+                type: locationType,
+                name: locationData['name'],
+                number: locationData['number']);
+            fetchedLocations.add(location);
+          });
+        }
+      });
+      locations = fetchedLocations;
+      _isServicesLoading = false;
+      notifyListeners();
+    });
   }
 
   Future<Null> fetchServices() {
@@ -33,7 +67,6 @@ class ServicesModel extends ConnectedServicesModel {
             if (!areas.contains(serviceData['area'])) {
               areas.add(serviceData['area']);
             }
-
             if (serviceType == "machines") {
               if (serviceData['subtype'] == "מקרר") {
                 service = RefrigeratorService(
@@ -161,7 +194,7 @@ class ServicesModel extends ConnectedServicesModel {
   }
 
   Future<bool> addMachineService({
-    String subtype =  "מכשיר החייאה (דפיברילטור)",
+    String subtype = "מכשיר החייאה (דפיברילטור)",
     String area = "בניין 206",
     bool isInArea = true,
     String specificLocation = "קומת כניסה, מסדרון דרומי, בכניסה לקוביה",
@@ -172,7 +205,7 @@ class ServicesModel extends ConnectedServicesModel {
     DateTime today = new DateTime.now();
     String currentDate =
         "${today.day.toString()}/${today.month.toString().padLeft(2, '0')}/${today.year.toString().padLeft(2, '0')}";
-    
+
     //String currentTime = "${today.hour.toString()}:${today.minute.toString().padLeft(2, '0')}";
 
     final Map<String, dynamic> serviceData = {

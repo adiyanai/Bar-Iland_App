@@ -1,7 +1,7 @@
 import 'package:bar_iland_app/scoped-models/main.dart';
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import './pages/services_by_building.dart';
+import './pages/services_by_area.dart';
 import './pages/services_by_type.dart';
 
 class ServiceManager extends StatelessWidget {
@@ -10,6 +10,7 @@ class ServiceManager extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    model.fetchServicesLocations();
     model.fetchServices();
     return DefaultTabController(
       length: 2,
