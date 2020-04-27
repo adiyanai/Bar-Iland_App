@@ -100,12 +100,12 @@ class AddEventState extends State<AddEvent> {
     double _screenHeight = MediaQuery.of(context).size.height;
     return SingleChildScrollView(
       child: Container(
-        height: _screenHeight - _appBar.preferredSize.height - 44,
+        height: _screenHeight - _appBar.preferredSize.height,
         child: Stack(
           fit: StackFit.expand,
           children: <Widget>[
             Positioned.fill(
-              bottom: -(_screenHeight / 1.3),
+              top: 550,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
