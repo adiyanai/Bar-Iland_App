@@ -31,14 +31,26 @@ class _ServicesByAreaState extends State<ServicesByArea> {
   Color _buttonColor = Colors.grey;
   Future<List<Service>> _servicesList;
   Widget _displayedServices = Column();
+  ListView _listView;
   Widget _addingButton = Container();
   Widget _title = Container();
   ConnectionMode _connectionMode;
+  ScrollController _scrollController;
+  int selectedServiceIndex = 0;
+
+  bool isTileExpanded(int tileIndex) {
+    if (widget.model.SelectedServiceIndex == tileIndex) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 
   @override
   void initState() {
     super.initState();
     _connectionMode = widget.model.connectionMode;
+    //_scrollController.addListener(_ScrollPosition);
   }
 
   void _guestUserAvailabilityReport() {
@@ -63,8 +75,8 @@ class _ServicesByAreaState extends State<ServicesByArea> {
         });
   }
 
-  void _registeredUserRefrigeratorReport(
-      MachineService service, bool updatedAvailability) {
+  void _registeredUserRefrigeratorReport(MachineService service,
+      bool updatedAvailability, currExpansionTileIndex) {
     if (updatedAvailability == true) {
       showDialog(
         context: context,
@@ -82,6 +94,8 @@ class _ServicesByAreaState extends State<ServicesByArea> {
                       RefrigeratorService refrigeratorReport = service;
                       widget.model.refrigeratorReport(_selectedArea,
                           refrigeratorReport, updatedAvailability, true);
+                      widget.model.SelectedServiceIndex =
+                          currExpansionTileIndex;
                       Navigator.of(context).pop();
                     });
                   },
@@ -92,6 +106,8 @@ class _ServicesByAreaState extends State<ServicesByArea> {
                     setState(() {
                       widget.model.refrigeratorReport(
                           _selectedArea, service, updatedAvailability, false);
+                      widget.model.SelectedServiceIndex =
+                          currExpansionTileIndex;
                       Navigator.of(context).pop();
                     });
                   },
@@ -109,7 +125,8 @@ class _ServicesByAreaState extends State<ServicesByArea> {
     }
   }
 
-  void _registeredUserAvailabilityReport(MachineService service) {
+  void _registeredUserAvailabilityReport(
+      MachineService service, int currExpansionTileIndex) {
     String alertText = "";
     if (service.Availability == false) {
       alertText = "השירות יוצג כפעיל";
@@ -138,13 +155,14 @@ class _ServicesByAreaState extends State<ServicesByArea> {
                     if (service.Subtype == "מקרר") {
                       Navigator.of(context).pop();
                       setState(() {
-                        _registeredUserRefrigeratorReport(
-                            service, updatedAvailability);
+                        _registeredUserRefrigeratorReport(service,
+                            updatedAvailability, currExpansionTileIndex);
                       });
                     } else {
                       setState(() {
                         widget.model.availabiltyReport(
                             _selectedArea, service, updatedAvailability);
+                        widget.model.SelectedServiceIndex = currExpansionTileIndex;
                         Navigator.of(context).pop();
                       });
                     }
@@ -186,10 +204,10 @@ class _ServicesByAreaState extends State<ServicesByArea> {
         });
   }
 
-  void _registeredUserMilkReport(
-      RefrigeratorService refrigerator, bool updatedMilkAvailability) {
+  void _registeredUserMilkReport(RefrigeratorService refrigerator,
+      bool updatedMilkAvailability, int currExpansionTileIndex) {
     String alertText = "";
-    if (updatedMilkAvailability == FractionalOffsetTween) {
+    if (updatedMilkAvailability == false) {
       alertText = "החלב במקרר יוצג כלא זמין";
     } else {
       alertText = "החלב במקרר יוצג כזמין";
@@ -209,6 +227,7 @@ class _ServicesByAreaState extends State<ServicesByArea> {
                   setState(() {
                     widget.model.refrigeratorReport(_selectedArea, refrigerator,
                         true, updatedMilkAvailability);
+                    widget.model.SelectedServiceIndex = currExpansionTileIndex;
                     Navigator.of(context).pop();
                   });
                 },
@@ -227,7 +246,7 @@ class _ServicesByAreaState extends State<ServicesByArea> {
   }
 
   void _showPress() {
-    //widget.model.addMachineService();
+    //widget.model.addSecurityService();
     FocusScope.of(context).requestFocus(new FocusNode());
     _title = Container(
       width: 600,
@@ -314,6 +333,7 @@ class _ServicesByAreaState extends State<ServicesByArea> {
           _isOkPressed = false;
           _title = Container();
           _selectedArea = area;
+          widget.model.SelectedServiceIndex = 0;
           if (widget.model.Areas.contains(_selectedArea)) {
             setState(() {
               _isNotPressable = false;
@@ -433,11 +453,12 @@ class _ServicesByAreaState extends State<ServicesByArea> {
       "עזרת נשים": Icon(FontAwesome.female, size: 18),
       "מעבדת מחשבים": Icon(Icons.computer),
       "מכשיר החייאה (דפיברילטור)": Icon(MdiIcons.medicalBag),
+      "שירותי אבטחה": Icon(MaterialCommunityIcons.security),
     };
     return servicesIcons;
   }
 
-  Widget _milkUI(MachineService service) {
+  Widget _milkUI(MachineService service, int currExpansionTileIndex) {
     RefrigeratorService refrigerator = service;
     Widget milkInfo;
     Widget milkText;
@@ -497,8 +518,8 @@ class _ServicesByAreaState extends State<ServicesByArea> {
                   updatedMilkAvailability = true;
                 }
                 _connectionMode == ConnectionMode.RegisteredUser
-                    ? _registeredUserMilkReport(
-                        refrigerator, updatedMilkAvailability)
+                    ? _registeredUserMilkReport(refrigerator,
+                        updatedMilkAvailability, currExpansionTileIndex)
                     : _guestUserMilkReport();
               });
             },
@@ -532,7 +553,7 @@ class _ServicesByAreaState extends State<ServicesByArea> {
     );
   }
 
-  Widget _availabilityUI(MachineService service) {
+  Widget _availabilityUI(MachineService service, int currExpansionTileIndex) {
     Widget availabilityInfo;
     Widget availabilityIcon;
     Widget availabilityText;
@@ -572,7 +593,8 @@ class _ServicesByAreaState extends State<ServicesByArea> {
             onPressed: () {
               setState(() {
                 _connectionMode == ConnectionMode.RegisteredUser
-                    ? _registeredUserAvailabilityReport(service)
+                    ? _registeredUserAvailabilityReport(
+                        service, currExpansionTileIndex)
                     : _guestUserAvailabilityReport();
               });
             },
@@ -604,15 +626,15 @@ class _ServicesByAreaState extends State<ServicesByArea> {
     );
   }
 
-  List<Widget> machinesContent(Service service) {
+  List<Widget> machinesContent(Service service, int currExpansionTileIndex) {
     Widget milkInfo;
     if (service.Subtype == "מקרר") {
-      milkInfo = _milkUI(service);
+      milkInfo = _milkUI(service, currExpansionTileIndex);
     } else {
       milkInfo = Row();
     }
     return <Widget>[
-      _availabilityUI(service),
+      _availabilityUI(service, currExpansionTileIndex),
       milkInfo,
     ];
   }
@@ -832,9 +854,37 @@ class _ServicesByAreaState extends State<ServicesByArea> {
     ];
   }
 
-  List<Widget> expansionTileContent(Service service) {
+  List<Widget> securityServicesContent(service) {
+    SecurityService securityService = service;
+    Map<String, String> securityServiceInfo = Map<String, String>();
+    securityServiceInfo["שעות פעילות"] = "ימי חול: " +
+        securityService.WeekdaysActivityTime +
+        "\n" +
+        "ימי שישי וערבי חג: " +
+        securityService.FridaysActivityTime +
+        "\n" +
+        "שבתות: " +
+        securityService.SaturdaysActivityTime;
+    return [
+      Container(
+        child: Column(
+            children: (securityServiceInfo.keys).map((info) {
+          return Container(
+            padding: EdgeInsets.only(right: 15),
+            child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              mapToIcons()[info],
+              Text(securityServiceInfo[info])
+            ]),
+          );
+        }).toList()),
+      )
+    ];
+  }
+
+  List<Widget> expansionTileContent(
+      Service service, int currExpansionTileIndex) {
     if (service.Type == "machines") {
-      return machinesContent(service);
+      return machinesContent(service, currExpansionTileIndex);
     } else if (service.Type == "welfare") {
       return welfareContent(service);
     } else if (service.Type == "businesses") {
@@ -845,7 +895,10 @@ class _ServicesByAreaState extends State<ServicesByArea> {
       return prayerServicesContent(service);
     } else if (service.Type == "computersLabs") {
       return computersLabsContent(service);
+    } else if (service.Type == "securityServices") {
+      return securityServicesContent(service);
     }
+
     return <Widget>[];
   }
 
@@ -876,10 +929,13 @@ class _ServicesByAreaState extends State<ServicesByArea> {
         ),
       );
     }
+    int expansionTileIndex = 0;
     return Container(
       margin: EdgeInsets.fromLTRB(0, 10, 0, 20),
       child: Column(
           children: servicesInArea.map((service) {
+        expansionTileIndex += 1;
+        int currExpansionTileIndex = expansionTileIndex;
         String serviceLocation = service.Area;
         if (service.SpecificLocation != "") {
           serviceLocation += ", " + service.SpecificLocation;
@@ -903,6 +959,21 @@ class _ServicesByAreaState extends State<ServicesByArea> {
             color: Color.fromRGBO(200, 230, 230, 0.7),
           ),
           child: ExpansionTile(
+            initiallyExpanded: isTileExpanded(currExpansionTileIndex),
+            onExpansionChanged: (expanded) {
+              if (expanded &&
+                  servicesInArea.length > 4 &&
+                  currExpansionTileIndex == servicesInArea.length) {
+                _scrollController
+                    .jumpTo(_scrollController.position.maxScrollExtent + 430);
+              } else if (expanded) {
+                widget.model.SelectedServiceIndex = currExpansionTileIndex;
+                _scrollController.animateTo(
+                    (widget.model.SelectedServiceIndex - 1) * 35.0,
+                    duration: Duration(milliseconds: 500),
+                    curve: Curves.ease);
+              }
+            },
             title: Container(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -933,7 +1004,7 @@ class _ServicesByAreaState extends State<ServicesByArea> {
               ),
             ),
             backgroundColor: Color.fromRGBO(200, 240, 255, 0.8),
-            children: expansionTileContent(service),
+            children: expansionTileContent(service, currExpansionTileIndex),
           ),
         );
       }).toList()),
@@ -942,30 +1013,29 @@ class _ServicesByAreaState extends State<ServicesByArea> {
 
   Widget _buildPage(List<Service> services) {
     //FocusScope.of(context).autofocus(_focusNode);
+    _scrollController = ScrollController(
+        initialScrollOffset: (widget.model.SelectedServiceIndex - 1) * 35.0);
+    _listView = ListView(controller: _scrollController, children: <Widget>[
+      _displayedServices = _showServices(
+        _selectedArea,
+        services,
+      )
+    ]);
     return Stack(
       children: <Widget>[
         Container(
-          decoration: new BoxDecoration(
-            image: new DecorationImage(
-              image: new AssetImage("assets/Bar_Ilan_Mini_Map.jpg"),
-              fit: BoxFit.fill,
-              colorFilter: ColorFilter.mode(
-                  Colors.white.withOpacity(0.9), BlendMode.softLight),
+            decoration: new BoxDecoration(
+              image: new DecorationImage(
+                image: new AssetImage("assets/Bar_Ilan_Mini_Map.jpg"),
+                fit: BoxFit.fill,
+                colorFilter: ColorFilter.mode(
+                    Colors.white.withOpacity(0.9), BlendMode.softLight),
+              ),
             ),
-          ),
-          padding: EdgeInsets.fromLTRB(0, 140, 0, 0),
-          height: 600,
-          child: ListView(
-            children: <Widget>[
-              _displayedServices = _showServices(
-                _selectedArea,
-                services,
-              )
-            ],
-          ),
-        ),
+            padding: EdgeInsets.fromLTRB(0, 140, 0, 0),
+            height: 600,
+            child: _listView),
         _title,
-
         //_addingButton,
         _locationSearch(),
       ],
@@ -982,10 +1052,7 @@ class _ServicesByAreaState extends State<ServicesByArea> {
         } else if (model.isServicesLoading) {
           content = Center(child: CircularProgressIndicator());
         }
-        return RefreshIndicator(
-          onRefresh: model.fetchServices,
-          child: content,
-        );
+        return content;
       },
     );
   }

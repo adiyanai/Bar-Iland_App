@@ -302,3 +302,39 @@ class ComputersLabService extends Service {
     return activityTime;
   }
 }
+
+class SecurityService extends Service {
+  String weekdaysActivityTime = "";
+  String fridaysActivityTime = "";
+  String saturdaysActivityTime = "";
+
+  SecurityService(
+      {@required String id,
+      @required String type,
+      @required String subtype,
+      @required String area,
+      @required bool isInArea,
+      @required String specificLocation,
+      @required this.weekdaysActivityTime,
+      @required this.fridaysActivityTime,
+      @required this.saturdaysActivityTime})
+      : super(
+            id: id,
+            type: type,
+            subtype: subtype,
+            area: area,
+            isInArea: isInArea,
+            specificLocation: specificLocation);
+
+  String get WeekdaysActivityTime {
+    return weekdaysActivityTime;
+  }
+
+  String get FridaysActivityTime {
+    return fridaysActivityTime;
+  }
+
+  String get SaturdaysActivityTime {
+    return saturdaysActivityTime;
+  }
+}

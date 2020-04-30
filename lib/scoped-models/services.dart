@@ -12,7 +12,7 @@ class ConnectedServicesModel extends Model {
   List<String> areas = [];
   List<Service> services = [];
   bool _isServicesLoading = false;
-  //int _selServiceId;
+  int _selectedServiceIndex = 0;
 }
 
 class ServicesModel extends ConnectedServicesModel {
@@ -22,6 +22,14 @@ class ServicesModel extends ConnectedServicesModel {
 
   List<Location> get Locations {
     return locations;
+  }
+
+  int get SelectedServiceIndex {
+     return _selectedServiceIndex;
+  }
+
+  void set SelectedServiceIndex(selectedServiceIndex) {
+    _selectedServiceIndex = selectedServiceIndex;
   }
 
   Future<Null> fetchServicesLocations() {
@@ -173,6 +181,20 @@ class ServicesModel extends ConnectedServicesModel {
                 activityTime: serviceData['activityTime'],
               );
               fetchedServiceList.add(service);
+            } else if  (serviceType == "securityServices") {
+              service = SecurityService(
+                id: id,
+                type: serviceType,
+                subtype: serviceData['subtype'],
+                area: serviceData['area'],
+                isInArea: serviceData['isInArea'],
+                specificLocation: serviceData['specificLocation'],
+                weekdaysActivityTime: serviceData['weekdaysActivityTime'],
+                fridaysActivityTime: serviceData['fridaysActivityTime'],
+                saturdaysActivityTime: serviceData['saturdaysActivityTime'],
+              );
+              fetchedServiceList.add(service);
+
             }
           });
         }
@@ -358,7 +380,7 @@ class ServicesModel extends ConnectedServicesModel {
         "${today.hour.toString()}:${today.minute.toString().padLeft(2, '0')}";
     Map<String, dynamic> updatedData = {
       'subtype': refrigerator.Subtype,
-      'area': _selectedArea,
+      'area': refrigerator.Area,
       'isInArea': refrigerator.IsInArea,
       'specificLocation': refrigerator.SpecificLocation,
       'availability': updatedAvailability,
@@ -417,7 +439,7 @@ class ServicesModel extends ConnectedServicesModel {
           id: service.Id,
           type: "machines",
           subtype: responseData['subtype'],
-          area: _selectedArea,
+          area: responseData['area'],
           isInArea: responseData['isInArea'],
           specificLocation: responseData['specificLocation'],
           availability: updatedAvailability,
@@ -434,6 +456,41 @@ class ServicesModel extends ConnectedServicesModel {
       notifyListeners();
       return true;
     });
+  }
+
+
+  Future<bool> addSecurityService({
+    String subtype = "שירותי אבטחה",
+    String weekdaysActivityTime = "24 שעות",
+    String fridaysActivityTime = "24 שעות",
+    String saturdaysActivityTime = "24 שעות",
+    String area = "שער 1",
+    bool isInArea = true,
+    String specificLocation = "",
+  }) async {
+    _isServicesLoading = true;
+    notifyListeners();
+    final Map<String, dynamic> serviceData = {
+      'subtype': subtype,
+      'weekdaysActivityTime': weekdaysActivityTime,
+      'fridaysActivityTime': fridaysActivityTime,
+      'saturdaysActivityTime': saturdaysActivityTime,
+      'area': area,
+      'isInArea': isInArea,
+      'specificLocation': specificLocation,
+    };
+
+    final http.Response response = await http.post(
+        'https://bar-iland-app.firebaseio.com/services/securityServices.json',
+        body: json.encode(serviceData));
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      _isServicesLoading = false;
+      notifyListeners();
+      return false;
+    }
+    _isServicesLoading = false;
+    notifyListeners();
+    return true;
   }
 }
 
