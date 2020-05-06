@@ -26,6 +26,7 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2
   material_design_icons_flutter: ^4.0.5045
+  eva_icons_flutter: ^2.0.0
   scoped_model: ^1.0.1
   http: ^0.12.0+4
   firebase_database: ^3.1.3
@@ -75,6 +76,7 @@ flutter:
     - assets/Bar_Ilan_Mini_Map.jpg
     - assets/Bar_Ilan_Map.jpg
     - assets/people_party.png
+    - assets/services_by_type_background.png
     #  - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

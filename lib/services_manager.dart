@@ -1,8 +1,7 @@
 import 'package:bar_iland_app/scoped-models/main.dart';
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import './pages/services_by_area.dart';
-import './pages/services_by_type.dart';
+import './pages/services.dart';
 
 class ServiceManager extends StatelessWidget {
   final MainModel model;
@@ -35,7 +34,7 @@ class ServiceManager extends StatelessWidget {
             ),
           ),
           body: TabBarView(
-            children: <Widget>[ServiceByType(model), ServicesByArea(model)],
+            children: <Widget>[Services(model, "servicesByType"), Services(model, "servicesByArea")],
           ),
         ),
       ),
