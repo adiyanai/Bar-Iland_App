@@ -183,13 +183,13 @@ class EventsModel extends Model {
       locationsData.forEach((String locationType, dynamic locationTypeData) {
         if (locationType == 'amphitheaters') {
           locationTypeData.forEach((String id, dynamic locationData) {
-            location = locationData['number'] + '-' + locationData['name'];
+            location = locationData['number'] + ' - ' + locationData['name'];
             _eventsLocations.add(location);
           });
         } else if (locationType == 'buildings') {
           locationTypeData.forEach((String id, dynamic locationData) {
             if (locationData['name'] != 'מעונות') {
-              location = locationData['number'] + '-' + locationData['name'];
+              location = locationData['number'] + ' - ' + locationData['name'];
               _eventsLocations.add(location);
             }
           });
@@ -200,7 +200,7 @@ class EventsModel extends Model {
         } else if (locationType == 'structures') {
           locationTypeData.forEach((String id, dynamic locationData) {
             if (locationData['name'] != 'בנק מזרחי-טפחות') {
-              location = locationData['number'] + '-' + locationData['name'];
+              location = locationData['number'] + ' - ' + locationData['name'];
               _eventsLocations.add(location);
             }
           });
