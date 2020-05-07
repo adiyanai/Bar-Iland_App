@@ -112,8 +112,9 @@ class AddEventState extends State<AddEvent> {
                   RaisedButton(
                     child: Text(
                       'ביטול',
-                      style: TextStyle(fontSize: 12.0),
+                      //style: TextStyle(color: Colors.white ,fontSize: 18, fontWeight: FontWeight.bold),
                     ),
+                    //color: Colors.indigo[400],
                     onPressed: () {
                       Navigator.pushReplacementNamed(
                           context, '/eventsCalendar');
@@ -122,7 +123,7 @@ class AddEventState extends State<AddEvent> {
                   RaisedButton(
                     child: Text(
                       'אישור',
-                      style: TextStyle(fontSize: 12.0),
+                      //style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     color: (_canSubmit[0] && _canSubmit[1] && _canSubmit[2])
                         ? Colors.blue
@@ -236,7 +237,8 @@ class AddEventState extends State<AddEvent> {
                           child: IconButton(
                             padding: EdgeInsets.all(5),
                             icon: Icon(
-                              Icons.alarm,
+                              /*Icons.alarm,*/
+                              Icons.access_time,
                               color: Colors.white,
                             ),
                             onPressed: () => _selectTime(context),
