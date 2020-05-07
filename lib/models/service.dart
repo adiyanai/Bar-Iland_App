@@ -247,7 +247,6 @@ class AcademicService extends Service {
 class PrayerService extends Service {
   String winterPrayers;
   String summerPrayers;
-  String womanSection;
 
   PrayerService({
     @required String id,
@@ -258,7 +257,6 @@ class PrayerService extends Service {
     @required String specificLocation,
     @required this.winterPrayers,
     @required this.summerPrayers,
-    @required this.womanSection,
   }) : super(
             id: id,
             type: type,
@@ -274,14 +272,12 @@ class PrayerService extends Service {
   String get SummerPrayers {
     return summerPrayers;
   }
-
-  String get WomanSection {
-    return womanSection;
-  }
 }
 
 class ComputersLabService extends Service {
   String activityTime = "";
+  String phoneNumber = "";
+  String mail = "";
   ComputersLabService(
       {@required String id,
       @required String type,
@@ -289,7 +285,9 @@ class ComputersLabService extends Service {
       @required String area,
       @required bool isInArea,
       @required String specificLocation,
-      @required this.activityTime})
+      @required this.activityTime,
+      @required this.phoneNumber,
+      @required this.mail})
       : super(
             id: id,
             type: type,
@@ -300,5 +298,61 @@ class ComputersLabService extends Service {
 
   String get ActivityTime {
     return activityTime;
+  }
+
+  String get PhoneNumber {
+    return phoneNumber;
+  }
+
+    String get Mail {
+    return mail;
+  }
+}
+
+class SecurityService extends Service {
+  String weekdaysActivityTime = "";
+  String fridaysActivityTime = "";
+  String saturdaysActivityTime = "";
+  String phoneNumber = "";
+  String emergencyPhoneNumber = "";
+
+  SecurityService(
+      {@required String id,
+      @required String type,
+      @required String subtype,
+      @required String area,
+      @required bool isInArea,
+      @required String specificLocation,
+      @required this.weekdaysActivityTime,
+      @required this.fridaysActivityTime,
+      @required this.saturdaysActivityTime,
+      @required this.phoneNumber,
+      @required this.emergencyPhoneNumber,})
+      : super(
+            id: id,
+            type: type,
+            subtype: subtype,
+            area: area,
+            isInArea: isInArea,
+            specificLocation: specificLocation);
+
+  String get WeekdaysActivityTime {
+    return weekdaysActivityTime;
+  }
+
+  String get FridaysActivityTime {
+    return fridaysActivityTime;
+  }
+
+  String get SaturdaysActivityTime {
+    return saturdaysActivityTime;
+  }
+
+  String get PhoneNumber {
+    return phoneNumber;
+  }
+
+  String get EmergencyPhoneNumber {
+    return emergencyPhoneNumber;
   }
 }

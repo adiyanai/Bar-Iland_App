@@ -123,7 +123,7 @@ class HomePage extends StatelessWidget {
                                   children: <Widget>[
                                     Icon(Icons.business), // icon
                                     Text(
-                                      'שירותים באוניברסיטה',
+                                      'שירותי האוניברסיטה',
                                       style: TextStyle(fontSize: 13),
                                       textAlign: TextAlign.center,
                                     ) // text

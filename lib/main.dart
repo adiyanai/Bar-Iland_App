@@ -1,3 +1,4 @@
+import 'package:bar_iland_app/pages/important_links.dart';
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -9,6 +10,9 @@ import './pages/forget_password.dart';
 import './services_manager.dart';
 import './pages/events_calendar.dart';
 import './pages/CampusMap.dart';
+import './pages/important_links.dart';
+
+
 void main() {
   initializeDateFormatting().then((_) => runApp(MyApp()));
 }
@@ -49,7 +53,8 @@ class _MyAppState extends State<MyApp> {
           '/forgetPassword': (BuildContext context) => ForgetPassword(),
           '/service_manager': (BuildContext context) => ServiceManager(model),
           '/eventsCalendar': (BuildContext context) => EventsCalendar(model),
-          '/campusMap': (BuildContext context) => CampusMap()
+          '/campusMap': (BuildContext context) => CampusMap(),
+          '/importantLinks': (BuildContext context) => ImportantLinks(model)
         },
       ),
     );
