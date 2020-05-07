@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../models/connection.dart';
@@ -20,6 +21,7 @@ class _EventsCalendarState extends State<EventsCalendar> {
   Map<DateTime, List<dynamic>> _events;
   List<dynamic> _selectedEvents;
   ConnectionMode _connectionMode;
+  AppBar _appBar;
 
   @override
   void initState() {
@@ -143,14 +145,62 @@ class _EventsCalendarState extends State<EventsCalendar> {
             borderRadius: BorderRadius.circular(15),
           ),
           child: ListTile(
-            leading: const Icon(
-              Icons.music_note,
+            trailing: Icon(Icons.near_me),
+            title: Row(
+              children: <Widget>[
+                Text(
+                  event.EventType,
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.blue[700],
+                  ),
+                ),
+                /*Flexible(
+                  child: Text(
+                    event.EventDescription == ''
+                        ? ''
+                        : ' - ' + event.EventDescription,
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: /*Colors.indigo[600]*/ Colors.black54,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 2,
+                  ),
+                ),*/
+              ],
             ),
-            title: Text(
-              event.Time,
-            ),
-            subtitle: Text(
-              event.EventType,
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                event.EventDescription == ''
+                    ? Container()
+                    : Text(
+                        event.EventDescription,
+                        style: TextStyle(
+                          fontSize: 15,
+                          color: /*Colors.indigo[600]*/ Colors.black,
+                          /*backgroundColor: Colors.indigo[200]*/
+                        ),
+                      ),
+                SizedBox(
+                  height: 4,
+                ),
+                Row(
+                  children: <Widget>[
+                    Icon(
+                      Icons.access_time,
+                      size: 15,
+                      color: Colors.black54,
+                    ),
+                    SizedBox(width: 3),
+                    Text(
+                      event.Time,
+                      /*style: TextStyle(color: Colors.black,),*/
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
         ),
@@ -191,10 +241,12 @@ class _EventsCalendarState extends State<EventsCalendar> {
 
   @override
   Widget build(BuildContext context) {
+    double _screenHeight = MediaQuery.of(context).size.height;
+    var padding = MediaQuery.of(context).padding;
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        appBar: AppBar(
+        appBar: _appBar = AppBar(
           title: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -225,8 +277,19 @@ class _EventsCalendarState extends State<EventsCalendar> {
                     height: 15,
                   ),
                   // events look
-                  ..._selectedEvents.map(
-                    (event) => _buildEventLook(event),
+                  Container(
+                    height: _screenHeight -
+                        _appBar.preferredSize.height -
+                        (_screenHeight / 1.9) -
+                        padding.top -
+                        padding.bottom -
+                        50,
+                    child: ListView.builder(
+                      itemCount: _selectedEvents.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return _buildEventLook(_selectedEvents[index]);
+                      },
+                    ),
                   ),
                 ],
               ),
@@ -235,7 +298,9 @@ class _EventsCalendarState extends State<EventsCalendar> {
         ),
         // 'add-event' button
         floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.add),
+          child: Icon(
+            Icons.add,
+          ),
           onPressed: _connectionMode == ConnectionMode.RegisteredUser
               ? _registeredUserAddEvent
               : _guestUserAddEvent,
