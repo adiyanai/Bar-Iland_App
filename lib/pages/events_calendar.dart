@@ -55,7 +55,7 @@ class _EventsCalendarState extends State<EventsCalendar> {
       "הופעה": Icon(MdiIcons.microphoneVariant),
       "TimeOut": Icon(MdiIcons.cookie),
       "מדרשה": Icon(MaterialCommunityIcons.book_open_page_variant),
-      "הפססקר": Icon(MaterialCommunityIcons.file_question),
+      "הפססקר": Icon(MaterialCommunityIcons.file_document_edit_outline),
       "קפה ומאפה": Icon(MaterialCommunityIcons.coffee),
       "קבלת שבת": Icon(MaterialCommunityIcons.candle),
       "Live בקמפוס": Icon(MaterialCommunityIcons.microphone),
