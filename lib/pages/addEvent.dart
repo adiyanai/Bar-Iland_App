@@ -7,8 +7,9 @@ import '../scoped-models/main.dart';
 class AddEvent extends StatefulWidget {
   final MainModel _model;
   final DateTime _selectedDay;
+  final Map<String, Icon> _eventTypesToIcons;
 
-  AddEvent(this._model, this._selectedDay);
+  AddEvent(this._model, this._selectedDay, this._eventTypesToIcons);
 
   @override
   State<StatefulWidget> createState() {
@@ -25,6 +26,33 @@ class AddEventState extends State<AddEvent> {
   String _timeText = '';
   List<bool> _canSubmit = [false, false, false];
   AppBar _appBar;
+  List<String> _eventTypes;
+  List<String> _eventLocations;
+
+  @override
+  void initState() {
+    super.initState();
+    initEventType();
+    initEventsLocations();
+  }
+
+  void initEventType() async {
+    if (widget._model.EventTypes.isEmpty) {
+      await widget._model.fetchEventTypes();
+    }
+    setState(() {
+      _eventTypes = widget._model.EventTypes;
+    });
+  }
+
+  void initEventsLocations() async {
+    if (widget._model.EventsLocations.isEmpty) {
+      await widget._model.fetchEventsLocations();
+    }
+    setState(() {
+      _eventLocations = widget._model.EventsLocations;
+    });
+  }
 
   DecorationImage _buildBackgroundImage() {
     return DecorationImage(
@@ -39,17 +67,23 @@ class AddEventState extends State<AddEvent> {
 
   List<DropdownMenuItem<String>> _buildDropdownMenuItemsEventType() {
     List<DropdownMenuItem<String>> items = List();
-    for (String eventType in widget._model.EventTypeList) {
+    for (String eventType in _eventTypes) {
       items.add(
         DropdownMenuItem(
           value: eventType,
           child: Container(
             alignment: Alignment.center,
-            child: Text(
-              eventType,
-              style: TextStyle(
-                color: Colors.black54,
-              ),
+            child: Row(
+              children: <Widget>[
+                widget._eventTypesToIcons[eventType],
+                SizedBox(width: 4,),
+                Text(
+                  eventType,
+                  style: TextStyle(
+                    color: Colors.black54,
+                  ),
+                ),
+              ],
             ),
           ),
         ),
@@ -60,7 +94,7 @@ class AddEventState extends State<AddEvent> {
 
   List<DropdownMenuItem<String>> _buildDropdownMenuItemsEventLocations() {
     List<DropdownMenuItem<String>> items = List();
-    for (String location in widget._model.EventsLocations) {
+    for (String location in _eventLocations) {
       items.add(
         DropdownMenuItem(
           value: location,
@@ -317,7 +351,7 @@ class AddEventState extends State<AddEvent> {
                         style: TextStyle(fontSize: 20),
                       ),
                       Container(
-                        width: 140,
+                        width: 180,
                         child: SearchableDropdown.single(
                           keyboardType: TextInputType.text,
                           iconSize: 24,
@@ -384,7 +418,12 @@ class AddEventState extends State<AddEvent> {
                 onTap: () {
                   FocusScope.of(context).requestFocus(FocusNode());
                 },
-                child: _buildPage(),
+                child: widget._model.isEventTypeLoading ||
+                        widget._model.isEventsLocationsLoading
+                    ? Center(
+                        child: CircularProgressIndicator(),
+                      )
+                    : _buildPage(),
               ),
             );
           },
