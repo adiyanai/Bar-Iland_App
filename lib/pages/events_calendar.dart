@@ -5,6 +5,8 @@ import '../models/connection.dart';
 import '../scoped-models/main.dart';
 import '../models/event.dart';
 import './addEvent.dart';
+import 'package:flutter_vector_icons/flutter_vector_icons.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class EventsCalendar extends StatefulWidget {
   final MainModel _model;
@@ -21,6 +23,7 @@ class _EventsCalendarState extends State<EventsCalendar> {
   Map<DateTime, List<dynamic>> _events;
   List<dynamic> _selectedEvents;
   ConnectionMode _connectionMode;
+  Map<String, Icon> _eventTypesToIcons;
   AppBar _appBar;
 
   @override
@@ -29,6 +32,7 @@ class _EventsCalendarState extends State<EventsCalendar> {
     _connectionMode = widget._model.connectionMode;
     _calendarController = CalendarController();
     _selectedEvents = [];
+    _eventTypesToIcons = _mapEventTypesToIcons();
     _events = {};
     initEvents();
   }
@@ -39,6 +43,26 @@ class _EventsCalendarState extends State<EventsCalendar> {
       final List<Event> eventsData = widget._model.allEvents;
       _events = fromListToMapEvents(eventsData);
     });
+  }
+
+  Map<String, Icon> _mapEventTypesToIcons() {
+    Map<String, Icon> eventsToIcons = {
+      "סטנדאפ": Icon(IconData(0xe24e, fontFamily: 'MaterialIcons')),
+      "הרצאה": Icon(Icons.school),
+      "ספורט": Icon(MdiIcons.basketball),
+      "הפאב החברתי": Icon(MaterialCommunityIcons.beer),
+      "שבת בקמפוס": Icon(MaterialCommunityIcons.candle),
+      "הופעה": Icon(MdiIcons.microphoneVariant),
+      "TimeOut": Icon(MdiIcons.cookie),
+      "מדרשה": Icon(MaterialCommunityIcons.book_open_page_variant),
+      "הפססקר": Icon(MaterialCommunityIcons.file_question),
+      "קפה ומאפה": Icon(MaterialCommunityIcons.coffee),
+      "קבלת שבת": Icon(MaterialCommunityIcons.candle),
+      "Live בקמפוס": Icon(MaterialCommunityIcons.microphone),
+      "אחר": Icon(MaterialCommunityIcons.dots_horizontal),
+      "מסיבה": Icon(MdiIcons.balloon),
+    };
+    return eventsToIcons;
   }
 
   Map<DateTime, List<dynamic>> fromListToMapEvents(List<Event> eventsData) {
@@ -145,14 +169,18 @@ class _EventsCalendarState extends State<EventsCalendar> {
             borderRadius: BorderRadius.circular(15),
           ),
           child: ListTile(
-            trailing: Icon(Icons.near_me),
+            leading: _eventTypesToIcons[event.EventType],
+            trailing: Icon(
+              Icons.near_me,
+              color: Colors.blue[700],
+            ),
             title: Row(
               children: <Widget>[
                 Text(
                   event.EventType,
                   style: TextStyle(
                     fontSize: 18,
-                    color: Colors.blue[700],
+                    color: Colors.deepPurple[700],
                   ),
                 ),
                 /*Flexible(
@@ -212,8 +240,8 @@ class _EventsCalendarState extends State<EventsCalendar> {
     Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-            builder: (BuildContext context) =>
-                AddEvent(widget._model, _calendarController.selectedDay)));
+            builder: (BuildContext context) => AddEvent(widget._model,
+                _calendarController.selectedDay, _eventTypesToIcons)));
   }
 
   void _guestUserAddEvent() {
@@ -241,8 +269,8 @@ class _EventsCalendarState extends State<EventsCalendar> {
 
   @override
   Widget build(BuildContext context) {
-    double _screenHeight = MediaQuery.of(context).size.height;
-    var padding = MediaQuery.of(context).padding;
+    //double _screenHeight = MediaQuery.of(context).size.height;
+    //var padding = MediaQuery.of(context).padding;
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
@@ -268,7 +296,8 @@ class _EventsCalendarState extends State<EventsCalendar> {
               child: Column(
                 children: [
                   // calendar
-                  widget._model.isEventsLoading
+                  widget._model.isEventsLoading ||
+                          widget._model.isAddEventLoading
                       ? Center(
                           child: CircularProgressIndicator(),
                         )
@@ -278,12 +307,7 @@ class _EventsCalendarState extends State<EventsCalendar> {
                   ),
                   // events look
                   Container(
-                    height: _screenHeight -
-                        _appBar.preferredSize.height -
-                        (_screenHeight / 1.9) -
-                        padding.top -
-                        padding.bottom -
-                        50,
+                    height: 160,
                     child: ListView.builder(
                       itemCount: _selectedEvents.length,
                       itemBuilder: (BuildContext context, int index) {
