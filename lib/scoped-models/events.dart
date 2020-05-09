@@ -6,9 +6,12 @@ import '../models/event.dart';
 class EventsModel extends Model {
   final databaseURL = 'https://bar-iland-app.firebaseio.com/events';
   List<Event> _events = [];
-  List<String> _eventTypeList = [];
+  List<String> _eventTypes = [];
   List<String> _eventsLocations = [];
   bool _isEventsLoading = false;
+  bool _isEventTypeLoading = false;
+  bool _isEventsLocationsLoading = false;
+  bool _isAddEventLoading = false;
   String _selEventId;
 
   List<Event> get allEvents {
@@ -17,6 +20,18 @@ class EventsModel extends Model {
 
   bool get isEventsLoading {
     return _isEventsLoading;
+  }
+
+  bool get isEventTypeLoading {
+    return _isEventTypeLoading;
+  }
+
+  bool get isEventsLocationsLoading {
+    return _isEventsLocationsLoading;
+  }
+
+  bool get isAddEventLoading {
+    return _isAddEventLoading;
   }
 
   int get selectedEventIndex {
@@ -33,29 +48,22 @@ class EventsModel extends Model {
     if (selectedEventId == null) {
       return null;
     }
-
     return _events.firstWhere((Event event) {
       return event.id == _selEventId;
     });
   }
 
-  List<String> get EventTypeList {
-    if (_eventTypeList.isEmpty) {
-      fetchEventTypeList();
-    }
-    return _eventTypeList;
+  List<String> get EventTypes {
+    return _eventTypes;
   }
 
   List<String> get EventsLocations {
-    if (_eventsLocations.isEmpty) {
-      fetchEventsLocations();
-    }
     return _eventsLocations;
   }
 
   Future<bool> addEvent(DateTime date, String time, String location,
       String eventType, String eventDescription) async {
-    _isEventsLoading = true;
+    _isAddEventLoading = true;
     notifyListeners();
     final Map<String, dynamic> eventData = {
       'date': date.toString(),
@@ -70,11 +78,11 @@ class EventsModel extends Model {
           .post(databaseURL + '/eventsData.json', body: json.encode(eventData));
 
       if (response.statusCode != 200 && response.statusCode != 201) {
-        _isEventsLoading = false;
+        _isAddEventLoading = false;
         notifyListeners();
         return false;
       }
-
+      print('end send event');
       final Map<String, dynamic> responseData = json.decode(response.body);
       final Event newEvent = Event(
           id: responseData['name'],
@@ -84,12 +92,14 @@ class EventsModel extends Model {
           eventType: eventType,
           eventDescription: eventDescription);
       _events.add(newEvent);
+      print('add event to list');
       _selEventId = responseData['name'];
-      _isEventsLoading = false;
+      _isAddEventLoading = false;
+      print('isEventsLoading is false');
       notifyListeners();
       return true;
     } catch (error) {
-      _isEventsLoading = false;
+      _isAddEventLoading = false;
       notifyListeners();
       return false;
     }
@@ -148,70 +158,75 @@ class EventsModel extends Model {
     });
   }
 
-  Future<Null> fetchEventTypeList() {
-    _isEventsLoading = true;
+  Future<Null> fetchEventTypes() {
+    _isEventTypeLoading = true;
     notifyListeners();
     return http
         .get(databaseURL + '/eventTypes.json')
         .then<Null>((http.Response response) {
+      final List<String> fetchedEventTypeList = [];
       final Map<String, dynamic> eventTypesData = json.decode(response.body);
       if (eventTypesData == null) {
-        _isEventsLoading = false;
+        _isEventTypeLoading = false;
         notifyListeners();
         return;
       }
       eventTypesData.forEach((String eventTypeId, dynamic eventTypeData) {
-        _eventTypeList.add(eventTypeData['eventType']);
+        fetchedEventTypeList.add(eventTypeData['eventType']);
       });
-      _isEventsLoading = false;
+      _eventTypes = fetchedEventTypeList;
+      _eventTypes.add('אחר');
+      _isEventTypeLoading = false;
       notifyListeners();
       //_selEventId = null;
     }).catchError((error) {
-      _isEventsLoading = false;
+      _isEventTypeLoading = false;
       notifyListeners();
       return;
     });
   }
 
   Future<Null> fetchEventsLocations() {
-    _isEventsLoading = true;
+    _isEventsLocationsLoading = true;
     String locationsURL = 'https://bar-iland-app.firebaseio.com/locations.json';
     notifyListeners();
     return http.get(locationsURL).then<Null>((http.Response response) {
+      final List<String> fetchedEventsLocations = [];
       final Map<String, dynamic> locationsData = json.decode(response.body);
       String location;
       locationsData.forEach((String locationType, dynamic locationTypeData) {
         if (locationType == 'amphitheaters') {
           locationTypeData.forEach((String id, dynamic locationData) {
             location = locationData['number'] + ' - ' + locationData['name'];
-            _eventsLocations.add(location);
+            fetchedEventsLocations.add(location);
           });
         } else if (locationType == 'buildings') {
           locationTypeData.forEach((String id, dynamic locationData) {
             if (locationData['name'] != 'מעונות') {
               location = locationData['number'] + ' - ' + locationData['name'];
-              _eventsLocations.add(location);
+              fetchedEventsLocations.add(location);
             }
           });
         } else if (locationType == 'squares') {
           locationTypeData.forEach((String id, dynamic locationData) {
-            _eventsLocations.add(locationData['name']);
+            fetchedEventsLocations.add(locationData['name']);
           });
         } else if (locationType == 'structures') {
           locationTypeData.forEach((String id, dynamic locationData) {
             if (locationData['name'] != 'בנק מזרחי-טפחות') {
               location = locationData['number'] + ' - ' + locationData['name'];
-              _eventsLocations.add(location);
+              fetchedEventsLocations.add(location);
             }
           });
         }
       });
+      _eventsLocations = fetchedEventsLocations;
       _eventsLocations.add('אחר');
-      _isEventsLoading = false;
+      _isEventsLocationsLoading = false;
       notifyListeners();
       //_selEventId = null;
     }).catchError((error) {
-      _isEventsLoading = false;
+      _isEventsLocationsLoading = false;
       notifyListeners();
       return;
     });
