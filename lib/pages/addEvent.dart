@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:searchable_dropdown/searchable_dropdown.dart';
@@ -132,9 +133,10 @@ class AddEventState extends State<AddEvent> {
 
   Widget _buildPage() {
     double _screenHeight = MediaQuery.of(context).size.height;
+    var _padding = MediaQuery.of(context).padding;
     return SingleChildScrollView(
       child: Container(
-        height: _screenHeight - _appBar.preferredSize.height,
+        height: _screenHeight - _appBar.preferredSize.height - _padding.bottom - _padding.top,
         child: Stack(
           fit: StackFit.expand,
           children: <Widget>[
@@ -219,6 +221,7 @@ class AddEventState extends State<AddEvent> {
                         key: _textFieldKey,
                         keyboardType: TextInputType.multiline,
                         maxLines: 3,
+                        maxLength: 65,
                         decoration: InputDecoration(
                           hintText: 'הקלד כאן...',
                           border: OutlineInputBorder(
@@ -308,13 +311,13 @@ class AddEventState extends State<AddEvent> {
                         style: TextStyle(fontSize: 20),
                       ),
                       Container(
-                        width: 220,
+                        width: 290,
                         child: SearchableDropdown.single(
                           keyboardType: TextInputType.text,
                           iconSize: 24,
                           dialogBox: false,
                           menuConstraints:
-                              BoxConstraints.tight(Size.fromHeight(110)),
+                              BoxConstraints.tight(Size.fromHeight(200)),
                           items: _buildDropdownMenuItemsEventLocations(),
                           value: _selectedLocation,
                           closeButton: SizedBox.shrink(),
@@ -357,7 +360,7 @@ class AddEventState extends State<AddEvent> {
                           iconSize: 24,
                           dialogBox: false,
                           menuConstraints:
-                              BoxConstraints.tight(Size.fromHeight(110)),
+                              BoxConstraints.tight(Size.fromHeight(200)),
                           items: _buildDropdownMenuItemsEventType(),
                           value: _selectedEventType,
                           closeButton: SizedBox.shrink(),
