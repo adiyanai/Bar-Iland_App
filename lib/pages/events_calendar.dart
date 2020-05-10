@@ -58,7 +58,7 @@ class _EventsCalendarState extends State<EventsCalendar> {
       "הפססקר": Icon(MaterialCommunityIcons.file_document_edit_outline),
       "קפה ומאפה": Icon(MaterialCommunityIcons.coffee),
       "קבלת שבת": Icon(MaterialCommunityIcons.candle),
-      "Live בקמפוס": Icon(MaterialCommunityIcons.microphone),
+      "Live בקמפוס": Icon(MdiIcons.microphoneVariant),
       "אחר": Icon(MaterialCommunityIcons.dots_horizontal),
       "מסיבה": Icon(MdiIcons.balloon),
     };
@@ -183,19 +183,6 @@ class _EventsCalendarState extends State<EventsCalendar> {
                     color: Colors.deepPurple[700],
                   ),
                 ),
-                /*Flexible(
-                  child: Text(
-                    event.EventDescription == ''
-                        ? ''
-                        : ' - ' + event.EventDescription,
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: /*Colors.indigo[600]*/ Colors.black54,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 2,
-                  ),
-                ),*/
               ],
             ),
             subtitle: Column(
@@ -203,16 +190,43 @@ class _EventsCalendarState extends State<EventsCalendar> {
               children: <Widget>[
                 event.EventDescription == ''
                     ? Container()
-                    : Text(
-                        event.EventDescription,
-                        style: TextStyle(
-                          fontSize: 15,
-                          color: /*Colors.indigo[600]*/ Colors.black,
-                          /*backgroundColor: Colors.indigo[200]*/
-                        ),
+                    : Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Icon(
+                            Icons.info,
+                            size: 15,
+                            color: Colors.black,
+                          ),
+                          SizedBox(width: 3),
+                          Container(
+                            width: 230,
+                            child: Text(
+                              event.EventDescription,
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: /*Colors.indigo[600]*/ Colors.black,
+                                /*backgroundColor: Colors.indigo[200]*/
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                 SizedBox(
                   height: 4,
+                ),
+                Row(
+                  children: <Widget>[
+                    Icon(
+                      Icons.location_on,
+                      size: 15,
+                      color: Colors.black54,
+                    ),
+                    SizedBox(width: 3),
+                    Text(
+                      event.Location,
+                    ),
+                  ],
                 ),
                 Row(
                   children: <Widget>[
@@ -224,7 +238,6 @@ class _EventsCalendarState extends State<EventsCalendar> {
                     SizedBox(width: 3),
                     Text(
                       event.Time,
-                      /*style: TextStyle(color: Colors.black,),*/
                     ),
                   ],
                 ),
