@@ -133,10 +133,9 @@ class AddEventState extends State<AddEvent> {
 
   Widget _buildPage() {
     double _screenHeight = MediaQuery.of(context).size.height;
-    var _padding = MediaQuery.of(context).padding;
     return SingleChildScrollView(
       child: Container(
-        height: _screenHeight - _appBar.preferredSize.height - _padding.bottom - _padding.top,
+        height: _screenHeight - _appBar.preferredSize.height,
         child: Stack(
           fit: StackFit.expand,
           children: <Widget>[
