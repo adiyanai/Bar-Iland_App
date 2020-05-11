@@ -192,7 +192,7 @@ class _EventsCalendarState extends State<EventsCalendar> {
                 event.EventDescription == ''
                     ? Container()
                     : Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Icon(
                             Icons.info,
@@ -201,7 +201,7 @@ class _EventsCalendarState extends State<EventsCalendar> {
                           ),
                           SizedBox(width: 3),
                           Container(
-                            width: _screenWidth * 0.6,
+                            width: _screenWidth * 0.55,
                             child: Text(
                               event.EventDescription,
                               style: TextStyle(
@@ -223,8 +223,11 @@ class _EventsCalendarState extends State<EventsCalendar> {
                       color: Colors.black54,
                     ),
                     SizedBox(width: 3),
-                    Text(
-                      event.Location,
+                    Container(
+                      width: _screenWidth * 0.55,
+                      child: Text(
+                        event.Location,
+                      ),
                     ),
                   ],
                 ),
