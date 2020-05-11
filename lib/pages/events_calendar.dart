@@ -48,9 +48,9 @@ class _EventsCalendarState extends State<EventsCalendar> {
   Map<String, Icon> _mapEventTypesToIcons() {
     Map<String, Icon> eventsToIcons = {
       "סטנדאפ": Icon(IconData(0xe24e, fontFamily: 'MaterialIcons')),
-      "הרצאה": Icon(Icons.school),
+      "הרצאה/כנס": Icon(Icons.school),
       "ספורט": Icon(MdiIcons.basketball),
-      "הפאב החברתי": Icon(MaterialCommunityIcons.beer),
+      "הפאב החברתי": Icon(FontAwesome5Solid.beer),
       "שבת בקמפוס": Icon(MaterialCommunityIcons.candle),
       "הופעה": Icon(MdiIcons.microphoneVariant),
       "TimeOut": Icon(MdiIcons.cookie),
@@ -156,6 +156,7 @@ class _EventsCalendarState extends State<EventsCalendar> {
   }
 
   Column _buildEventLook(dynamic event) {
+    double _screenWidth = MediaQuery.of(context).size.width;
     return Column(
       children: <Widget>[
         Container(
@@ -200,13 +201,12 @@ class _EventsCalendarState extends State<EventsCalendar> {
                           ),
                           SizedBox(width: 3),
                           Container(
-                            width: 230,
+                            width: _screenWidth * 0.6,
                             child: Text(
                               event.EventDescription,
                               style: TextStyle(
                                 fontSize: 15,
-                                color: /*Colors.indigo[600]*/ Colors.black,
-                                /*backgroundColor: Colors.indigo[200]*/
+                                color: Colors.black,
                               ),
                             ),
                           ),
