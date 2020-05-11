@@ -71,10 +71,7 @@ class HomePage extends StatelessWidget {
         child: Scaffold(
           drawer: _buildDrawer(),
           appBar: AppBar(
-            title: Image.asset(
-              'assets/Bar_Iland_line.png',
-              height: 40,
-            ),
+            title: Container(padding: EdgeInsets.only(right: 70), child: Row(children: [Text("דף הבית  "), Icon(Icons.home)])),
             centerTitle: true,
             leading: Builder(
               builder: (context) => IconButton(
@@ -126,7 +123,7 @@ class HomePage extends StatelessWidget {
                                       'שירותי האוניברסיטה',
                                       style: TextStyle(fontSize: 13),
                                       textAlign: TextAlign.center,
-                                    ) // text
+                                    ), // text
                                   ],
                                 ),
                               ),

@@ -19,7 +19,8 @@ class ServiceManager extends StatelessWidget {
           resizeToAvoidBottomInset: false,
           appBar: AppBar(
             centerTitle: true,
-            title: Center(child: Text('שירותי האוניברסיטה')),
+            title:
+                  Center(child: Text('שירותי האוניברסיטה')),
             bottom: TabBar(
               tabs: <Widget>[
                 Tab(
@@ -34,7 +35,10 @@ class ServiceManager extends StatelessWidget {
             ),
           ),
           body: TabBarView(
-            children: <Widget>[Services(model, "servicesByType"), Services(model, "servicesByArea")],
+            children: <Widget>[
+              Services(model, "לפי סוג שירות"),
+              Services(model, "לפי מיקום")
+            ],
           ),
         ),
       ),

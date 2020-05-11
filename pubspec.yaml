@@ -40,6 +40,8 @@ dependencies:
   tuple: ^1.0.3
   flutter_vector_icons: ^0.2.1
   url_launcher: ^5.4.5
+  flutter_emoji: ^2.2.1+1
+
 
 
 
@@ -77,6 +79,25 @@ flutter:
     - assets/Bar_Ilan_Map.jpg
     - assets/people_party.png
     - assets/services_by_type_background.png
+    - assets/resturants_and_coffee_shops.jpg
+    - assets/snack_machines.jpg
+    - assets/shops_and_businesses.jpg
+    - assets/secretaries_and_administration.jpg
+    - assets/libraries.jpg
+    - assets/nursing_rooms.jpg
+    - assets/welfare_rooms.jpg
+    - assets/coffee_corners.jpg
+    - assets/hot_water.jpg
+    - assets/refrigerators.jpg
+    - assets/microwaves.jpg
+    - assets/drink_machines.jpg
+    - assets/computers_labs.jpg
+    - assets/minyanim.jpg
+    - assets/gates_and_security.jpg
+    - assets/defibrillators.jpg
+    - assets/copy_and_print_services.jpg
+    - assets/faucets.jpg
+
     #  - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
