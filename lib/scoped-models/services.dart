@@ -8,7 +8,7 @@ import 'package:http/http.dart' as http;
 import '../models/service.dart';
 
 class ConnectedServicesModel extends Model {
-  String servicesBy = "";
+  String _servicesView = "";
   List<Location> locations = [];
   List<String> areas = [];
   List<Service> services = [];
@@ -17,12 +17,12 @@ class ConnectedServicesModel extends Model {
 }
 
 class ServicesModel extends ConnectedServicesModel {
-  String get ServicesBy {
-    return servicesBy;
+  String get ServicesView {
+    return _servicesView;
   }
 
-  void set ServicesBy(String by) {
-    servicesBy = by;
+  void set ServicesView(String servicesView) {
+    _servicesView = servicesView;
   }
 
   List<String> get Areas {

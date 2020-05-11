@@ -1,10 +1,11 @@
 import 'package:bar_iland_app/services_icons.dart';
 import '../models/service.dart';
 
-import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+
 
 Map<String, Icon> mapToIcons() {
   Map<String, Icon> servicesIcons = {
