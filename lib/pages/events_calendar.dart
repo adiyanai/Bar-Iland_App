@@ -201,7 +201,7 @@ class _EventsCalendarState extends State<EventsCalendar> {
                           ),
                           SizedBox(width: 3),
                           Container(
-                            width: _screenWidth * 0.6,
+                            width: _screenWidth * 0.55,
                             child: Text(
                               event.EventDescription,
                               style: TextStyle(

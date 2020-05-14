@@ -78,69 +78,55 @@ class ServicesModel extends ConnectedServicesModel {
       final List<Service> fetchedServiceList = [];
       Map<String, dynamic> servicesData = json.decode(response.body);
       servicesData.forEach((String serviceType, dynamic servicesTypeData) {
-        if (int.tryParse(serviceType) == null) {
-          Service service;
-          servicesTypeData.forEach((String id, dynamic serviceData) {
-            if (!areas.contains(serviceData['area'])) {
-              areas.add(serviceData['area']);
+        Service service;
+        servicesTypeData.forEach((String id, dynamic serviceData) {
+          if (!areas.contains(serviceData['area'])) {
+            areas.add(serviceData['area']);
+          }
+          if (serviceType == "machines") {
+            if (serviceData['subtype'] == "מקרר") {
+              service = RefrigeratorService(
+                id: id,
+                type: serviceType,
+                subtype: serviceData['subtype'],
+                area: serviceData['area'],
+                isInArea: serviceData['isInArea'],
+                specificLocation: serviceData['specificLocation'],
+                availability: serviceData['availability'],
+                availabilityReportDate: serviceData['availabilityReportDate'],
+                milk: serviceData['milk'],
+                milkReportDate: serviceData['milkReportDate'],
+                milkReportTime: serviceData['milkReportTime'],
+              );
+            } else {
+              service = MachineService(
+                id: id,
+                type: serviceType,
+                subtype: serviceData['subtype'],
+                area: serviceData['area'],
+                isInArea: serviceData['isInArea'],
+                specificLocation: serviceData['specificLocation'],
+                availability: serviceData['availability'],
+                availabilityReportDate: serviceData['availabilityReportDate'],
+              );
             }
-            if (serviceType == "machines") {
-              if (serviceData['subtype'] == "מקרר") {
-                service = RefrigeratorService(
-                  id: id,
-                  type: serviceType,
-                  subtype: serviceData['subtype'],
-                  area: serviceData['area'],
-                  isInArea: serviceData['isInArea'],
-                  specificLocation: serviceData['specificLocation'],
-                  availability: serviceData['availability'],
-                  availabilityReportDate: serviceData['availabilityReportDate'],
-                  milk: serviceData['milk'],
-                  milkReportDate: serviceData['milkReportDate'],
-                  milkReportTime: serviceData['milkReportTime'],
-                );
-              } else {
-                service = MachineService(
-                  id: id,
-                  type: serviceType,
-                  subtype: serviceData['subtype'],
-                  area: serviceData['area'],
-                  isInArea: serviceData['isInArea'],
-                  specificLocation: serviceData['specificLocation'],
-                  availability: serviceData['availability'],
-                  availabilityReportDate: serviceData['availabilityReportDate'],
-                );
-              }
-              fetchedServiceList.add(service);
-            } else if (serviceType == "welfare") {
-              List<String> contained = [];
-              (serviceData['contains']).forEach((service) {
-                contained.add(service);
-              });
-              service = WelfareService(
-                  id: id,
-                  type: serviceType,
-                  subtype: serviceData['subtype'],
-                  area: serviceData['area'],
-                  isInArea: serviceData['isInArea'],
-                  specificLocation: serviceData['specificLocation'],
-                  contains: contained);
-              fetchedServiceList.add(service);
-            } else if (serviceType == "businesses") {
-              service = BusinessService(
-                  id: id,
-                  type: serviceType,
-                  subtype: serviceData['subtype'],
-                  area: serviceData['area'],
-                  isInArea: serviceData['isInArea'],
-                  specificLocation: serviceData['specificLocation'],
-                  name: serviceData['name'],
-                  phoneNumber: serviceData['phoneNumber'],
-                  activityTime: serviceData['activityTime'],
-                  generalInfo: serviceData['generalInfo']);
-              fetchedServiceList.add(service);
-            } else if (serviceType == "academicServices") {
-              service = AcademicService(
+            fetchedServiceList.add(service);
+          } else if (serviceType == "welfare") {
+            List<String> contained = [];
+            (serviceData['contains']).forEach((service) {
+              contained.add(service);
+            });
+            service = WelfareService(
+                id: id,
+                type: serviceType,
+                subtype: serviceData['subtype'],
+                area: serviceData['area'],
+                isInArea: serviceData['isInArea'],
+                specificLocation: serviceData['specificLocation'],
+                contains: contained);
+            fetchedServiceList.add(service);
+          } else if (serviceType == "businesses") {
+            service = BusinessService(
                 id: id,
                 type: serviceType,
                 subtype: serviceData['subtype'],
@@ -150,65 +136,69 @@ class ServicesModel extends ConnectedServicesModel {
                 name: serviceData['name'],
                 phoneNumber: serviceData['phoneNumber'],
                 activityTime: serviceData['activityTime'],
-                mail: serviceData['mail'],
-                website: serviceData['website'],
-              );
-              fetchedServiceList.add(service);
-            } else if (serviceType == "prayerServices") {
-              String winterPrayers = "";
-              (serviceData['winterPrayers']).forEach((time) {
-                if (time != "") {
-                  winterPrayers += (time + "\n");
-                }
-              });
-              String summerPrayers = "";
-              (serviceData['summerPrayers']).forEach((time) {
-                if (time != "") {
-                  summerPrayers += (time + "\n");
-                }
-              });
-              service = PrayerService(
-                id: id,
-                type: serviceType,
-                subtype: serviceData['subtype'],
-                area: serviceData['area'],
-                isInArea: serviceData['isInArea'],
-                specificLocation: serviceData['specificLocation'],
-                winterPrayers: winterPrayers,
-                summerPrayers: summerPrayers,
-              );
-              fetchedServiceList.add(service);
-            } else if (serviceType == "computersLabs") {
-              service = ComputersLabService(
-                id: id,
-                type: serviceType,
-                subtype: serviceData['subtype'],
-                area: serviceData['area'],
-                isInArea: serviceData['isInArea'],
-                specificLocation: serviceData['specificLocation'],
-                activityTime: serviceData['activityTime'],
-                phoneNumber: serviceData['phoneNumber'],
-                mail: serviceData['mail'],
-              );
-              fetchedServiceList.add(service);
-            } else if (serviceType == "securityServices") {
-              service = SecurityService(
-                id: id,
-                type: serviceType,
-                subtype: serviceData['subtype'],
-                area: serviceData['area'],
-                isInArea: serviceData['isInArea'],
-                specificLocation: serviceData['specificLocation'],
-                weekdaysActivityTime: serviceData['weekdaysActivityTime'],
-                fridaysActivityTime: serviceData['fridaysActivityTime'],
-                saturdaysActivityTime: serviceData['saturdaysActivityTime'],
-                phoneNumber: serviceData['phoneNumber'],
-                emergencyPhoneNumber: serviceData['emergencyPhoneNumber'],
-              );
-              fetchedServiceList.add(service);
-            }
-          });
-        }
+                generalInfo: serviceData['generalInfo']);
+            fetchedServiceList.add(service);
+          } else if (serviceType == "academicServices") {
+            service = AcademicService(
+              id: id,
+              type: serviceType,
+              subtype: serviceData['subtype'],
+              area: serviceData['area'],
+              isInArea: serviceData['isInArea'],
+              specificLocation: serviceData['specificLocation'],
+              name: serviceData['name'],
+              phoneNumber: serviceData['phoneNumber'],
+              activityTime: serviceData['activityTime'],
+              mail: serviceData['mail'],
+              website: serviceData['website'],
+            );
+            fetchedServiceList.add(service);
+          } else if (serviceType == "prayerServices") {
+            service = PrayerService(
+              id: id,
+              type: serviceType,
+              subtype: serviceData['subtype'],
+              area: serviceData['area'],
+              isInArea: serviceData['isInArea'],
+              specificLocation: serviceData['specificLocation'],
+              shacharitPrayersWinter: serviceData['shacharitPrayersWinter'],
+              minchaPrayersWinter: serviceData['minchaPrayersWinter'],
+              arvitPrayersWinter: serviceData['arvitPrayersWinter'],
+              shacharitPrayersSummer: serviceData['shacharitPrayersSummer'],
+              minchaPrayersSummer: serviceData['minchaPrayersSummer'],
+              arvitPrayersSummer: serviceData['arvitPrayersSummer'],
+            );
+            fetchedServiceList.add(service);
+          } else if (serviceType == "computersLabs") {
+            service = ComputersLabService(
+              id: id,
+              type: serviceType,
+              subtype: serviceData['subtype'],
+              area: serviceData['area'],
+              isInArea: serviceData['isInArea'],
+              specificLocation: serviceData['specificLocation'],
+              activityTime: serviceData['activityTime'],
+              phoneNumber: serviceData['phoneNumber'],
+              mail: serviceData['mail'],
+            );
+            fetchedServiceList.add(service);
+          } else if (serviceType == "securityServices") {
+            service = SecurityService(
+              id: id,
+              type: serviceType,
+              subtype: serviceData['subtype'],
+              area: serviceData['area'],
+              isInArea: serviceData['isInArea'],
+              specificLocation: serviceData['specificLocation'],
+              weekdaysActivityTime: serviceData['weekdaysActivityTime'],
+              fridaysActivityTime: serviceData['fridaysActivityTime'],
+              saturdaysActivityTime: serviceData['saturdaysActivityTime'],
+              phoneNumber: serviceData['phoneNumber'],
+              emergencyPhoneNumber: serviceData['emergencyPhoneNumber'],
+            );
+            fetchedServiceList.add(service);
+          }
+        });
       });
 
       fetchedServiceList.sort((service1, service2) {
@@ -227,11 +217,12 @@ class ServicesModel extends ConnectedServicesModel {
   }
 
   Future<bool> addMachineService({
-    String subtype = "מכשיר החייאה (דפיברילטור)",
-    String area = "בניין 206",
+    String subtype = "מקרר",
+    String area = "מבנה 501",
     bool isInArea = true,
-    String specificLocation = "קומת כניסה, מסדרון דרומי, בכניסה לקוביה",
+    String specificLocation = "חדר 13",
     bool availability = true,
+    bool milk = true,
   }) async {
     _isServicesLoading = true;
     notifyListeners();
@@ -239,7 +230,8 @@ class ServicesModel extends ConnectedServicesModel {
     String currentDate =
         "${today.day.toString()}/${today.month.toString().padLeft(2, '0')}/${today.year.toString().padLeft(2, '0')}";
 
-    //String currentTime = "${today.hour.toString()}:${today.minute.toString().padLeft(2, '0')}";
+    String currentTime =
+        "${today.hour.toString()}:${today.minute.toString().padLeft(2, '0')}";
 
     final Map<String, dynamic> serviceData = {
       'subtype': subtype,
@@ -247,7 +239,10 @@ class ServicesModel extends ConnectedServicesModel {
       'isInArea': isInArea,
       'specificLocation': specificLocation,
       'availability': availability,
-      'availabilityReportDate': currentDate
+      'availabilityReportDate': currentDate,
+      'milk': milk,
+      'milkReportDate': currentDate,
+      'milkReportTime': currentTime
     };
     final http.Response response = await http.post(
         'https://bar-iland-app.firebaseio.com/services/machines.json',
@@ -301,27 +296,19 @@ class ServicesModel extends ConnectedServicesModel {
   }
 
   Future<bool> addPrayerService({
-    String subtype = "מנייני שחרית",
+    String subtype = "מניין",
     String area = "בניין 304",
     bool isInArea = true,
     String specificLocation = "בית כנסת שלייפר",
+    String shacharitPrayersWinter = "07:00 (ימים ב', ה' ותעניות: 06:50)\n",
+    String minchaPrayersWinter = "12:30 (מנחה קצרה)\n13:20\n14:30\n15:35\n",
+    String arvitPrayersWinter = "17:35\n19:35\n",
+    String shacharitPrayersSummer = "07:00 (ימים ב', ה' ותעניות: 06:50)\n",
+    String minchaPrayersSummer =
+        "13:20 (מנחה קצרה)\n13:35\n14:30\n15:35\n17:35",
+    String arvitPrayersSummer = "",
   }) async {
     _isServicesLoading = true;
-
-    List<String> winterPrayers = [];
-    winterPrayers.add("7:00 (ימי שני וחמישי בשעה 6:50)");
-    //winterPrayers.add("19:35");
-
-    List<String> summerPrayers = [];
-
-    //summerPrayers.add("");
-    winterPrayers.add("7:00 (ימי שני וחמישי בשעה 6:50)");
-    /*
-    summerPrayers.add("13:35");
-    summerPrayers.add("14:30");
-    summerPrayers.add("15:35");
-    summerPrayers.add("17:35");
-    */
 
     notifyListeners();
     final Map<String, dynamic> serviceData = {
@@ -329,8 +316,12 @@ class ServicesModel extends ConnectedServicesModel {
       'area': area,
       'isInArea': isInArea,
       'specificLocation': specificLocation,
-      'winterPrayers': winterPrayers,
-      'summerPrayers': summerPrayers,
+      'shacharitPrayersWinter': shacharitPrayersWinter,
+      'minchaPrayersWinter': minchaPrayersWinter,
+      'arvitPrayersWinter': arvitPrayersWinter,
+      'shacharitPrayersSummer': shacharitPrayersSummer,
+      'minchaPrayersSummer': minchaPrayersSummer,
+      'arvitPrayersSummer': arvitPrayersSummer,
     };
 
     final http.Response response = await http.post(

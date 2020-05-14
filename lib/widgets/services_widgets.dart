@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
-
 Map<String, Icon> mapToIcons() {
   Map<String, Icon> servicesIcons = {
     "חדר רווחה": Icon(ServicesIcons.armchair, size: 20),
@@ -34,14 +33,12 @@ Map<String, Icon> mapToIcons() {
     "סוכנות נסיעות": Icon(MdiIcons.airplane),
     "ספריה": Icon(MdiIcons.library),
     "מזכירות": Icon(MdiIcons.officeBuilding),
-    "מנייני ערבית": Icon(MaterialCommunityIcons.book_open_page_variant),
     "שעות פעילות": Icon(MaterialCommunityIcons.clock_outline),
     "טלפון": Icon(MdiIcons.phone),
     "מידע נוסף": Icon(MaterialCommunityIcons.information_outline),
     "מייל": Icon(MaterialCommunityIcons.email_box),
     "אתר": Icon(MaterialCommunityIcons.web),
-    "מנייני שחרית": Icon(MaterialCommunityIcons.book_open_page_variant),
-    "מנייני מנחה": Icon(MaterialCommunityIcons.book_open_page_variant),
+    "מניין": Icon(MaterialCommunityIcons.book_open_page_variant),
     "זמני תפילות שעון קיץ": Icon(MaterialCommunityIcons.clock_outline, size: 0),
     "זמני תפילות שעון חורף":
         Icon(MaterialCommunityIcons.clock_outline, size: 0),
@@ -121,24 +118,22 @@ List<Widget> businessesContent(Service service) {
 }
 
 List<Widget> welfareContent(Service service) {
-    WelfareService welfareRoom = service;
-    return [
-      ...welfareRoom.Contains.map((containedService) {
-        return Container(
-          padding: EdgeInsets.fromLTRB(0, 0, 18, 0),
-          child: Row(children: [
-            mapToIcons()[containedService],
-            Text(
-              containedService,
-              style: TextStyle(
-                fontSize: 14,
-              ),
-            )
-          ]),
-        );
-      }).toList()
-    ];
-  }
+  WelfareService welfareRoom = service;
+  return welfareRoom.Contains.map((containedService) {
+    return Container(
+      padding: EdgeInsets.fromLTRB(0, 0, 18, 0),
+      child: Row(children: [
+        mapToIcons()[containedService],
+        Text(
+          containedService,
+          style: TextStyle(
+            fontSize: 14,
+          ),
+        )
+      ]),
+    );
+  }).toList();
+}
 
 List<Widget> academicServicesContent(Service service) {
   AcademicService academicService = service;
@@ -201,36 +196,22 @@ List<Widget> academicServicesContent(Service service) {
 List<Widget> prayerServicesContent(Service service) {
   PrayerService prayerService = service;
   Map<String, Container> prayerServiceInfo = Map<String, Container>();
-  String clock;
-  if (prayerService.WinterPrayers != "") {
-    clock = "שעון חורף";
-    prayerServiceInfo[clock] = Container(
-      child: Text("שעון חורף",
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
-            decoration: TextDecoration.underline,
-          )),
-    );
-    prayerServiceInfo["זמני תפילות שעון חורף"] = Container(
-        padding: EdgeInsets.only(right: 20),
-        child: Text(prayerService.WinterPrayers));
-  }
-  if (prayerService.SummerPrayers != "") {
-    clock = "שעון קיץ";
-    prayerServiceInfo[clock] = Container(
-        child: Text(
+  prayerServiceInfo = prayersInfo(
+      prayerServiceInfo,
+      "שעון חורף",
+      "זמני תפילות שעון חורף",
+      prayerService.ShacharitPrayersWinter,
+      prayerService.MinchaPrayersWinter,
+      prayerService.ArvitPrayersWinter);
+
+  prayerServiceInfo = prayersInfo(
+      prayerServiceInfo,
       "שעון קיץ",
-      style: TextStyle(
-        fontWeight: FontWeight.bold,
-        fontSize: 16,
-        decoration: TextDecoration.underline,
-      ),
-    ));
-    prayerServiceInfo["זמני תפילות שעון קיץ"] = Container(
-        padding: EdgeInsets.only(right: 20),
-        child: Text(prayerService.SummerPrayers));
-  }
+      "זמני תפילות שעון קיץ",
+      prayerService.ShacharitPrayersSummer,
+      prayerService.MinchaPrayersSummer,
+      prayerService.ArvitPrayersSummer);
+
   return [
     Container(
       child: Column(
@@ -244,6 +225,65 @@ List<Widget> prayerServicesContent(Service service) {
       }).toList()),
     )
   ];
+}
+
+Map<String, Container> prayersInfo(
+    Map<String, Container> prayerServiceInfo,
+    String clock,
+    String prayerTimes,
+    String shacharitPrayers,
+    String minchaPrayersWinter,
+    String arvitPrayersWinter) {
+  if (shacharitPrayers != "" ||
+      minchaPrayersWinter != "" ||
+      arvitPrayersWinter != "") {
+    prayerServiceInfo[clock] = Container(
+      child: Text(
+        clock,
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 16,
+          decoration: TextDecoration.underline,
+        ),
+      ),
+    );
+    List<Text> prayersTexts = [];
+    if (shacharitPrayers != "") {
+      prayersTexts.add(
+        Text(
+          "שחרית:",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      );
+      prayersTexts.add(Text(shacharitPrayers));
+    }
+    if (minchaPrayersWinter != "") {
+      prayersTexts.add(Text(
+        "מנחה",
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+        ),
+      ));
+      prayersTexts.add(Text(minchaPrayersWinter));
+    }
+    if (arvitPrayersWinter != "") {
+      prayersTexts.add(Text(
+        "ערבית",
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+        ),
+      ));
+      prayersTexts.add(Text(arvitPrayersWinter));
+    }
+    prayerServiceInfo[prayerTimes] = Container(
+      padding: EdgeInsets.only(right: 20),
+      child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start, children: prayersTexts),
+    );
+  }
+  return prayerServiceInfo;
 }
 
 List<Widget> computersLabsContent(service) {
@@ -308,35 +348,36 @@ List<Widget> securityServicesContent(service) {
       securityService.SaturdaysActivityTime +
       "\n");
   securityServiceInfo["טלפון"] = Container(
-      width: 300,
-      padding: EdgeInsets.fromLTRB(0, 0, 0, 20),
-      child: Column(children: [
-        Row(children: [
-          GestureDetector(
-            onTap: () {
-              _launchCaller(securityService.PhoneNumber);
-            },
-            child: Text(
-              securityService.PhoneNumber,
-              style: TextStyle(
-                  color: Colors.blue, decoration: TextDecoration.underline),
-            ),
-          )
-        ]),
-        Row(children: [
-          Text("במצבי חירום: "),
-          GestureDetector(
-            onTap: () {
-              _launchCaller(securityService.EmergencyPhoneNumber);
-            },
-            child: Text(
-              securityService.EmergencyPhoneNumber,
-              style: TextStyle(
-                  color: Colors.blue, decoration: TextDecoration.underline),
-            ),
+    width: 300,
+    padding: EdgeInsets.fromLTRB(0, 0, 0, 20),
+    child: Column(children: [
+      Row(children: [
+        GestureDetector(
+          onTap: () {
+            _launchCaller(securityService.PhoneNumber);
+          },
+          child: Text(
+            securityService.PhoneNumber,
+            style: TextStyle(
+                color: Colors.blue, decoration: TextDecoration.underline),
           ),
-        ])
-      ]));
+        )
+      ]),
+      Row(children: [
+        Text("במצבי חירום: "),
+        GestureDetector(
+          onTap: () {
+            _launchCaller(securityService.EmergencyPhoneNumber);
+          },
+          child: Text(
+            securityService.EmergencyPhoneNumber,
+            style: TextStyle(
+                color: Colors.blue, decoration: TextDecoration.underline),
+          ),
+        ),
+      ])
+    ]),
+  );
   return [
     Container(
       child: Column(
