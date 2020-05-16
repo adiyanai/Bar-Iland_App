@@ -1,12 +1,15 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:location/location.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:flutter_vector_icons/flutter_vector_icons.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+
 import '../models/connection.dart';
 import '../scoped-models/main.dart';
 import '../models/event.dart';
 import './addEvent.dart';
-import 'package:flutter_vector_icons/flutter_vector_icons.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import './google_map.dart';
 
 class EventsCalendar extends StatefulWidget {
   final MainModel _model;
@@ -26,15 +29,22 @@ class _EventsCalendarState extends State<EventsCalendar> {
   Map<String, Icon> _eventTypesToIcons;
   AppBar _appBar;
 
+  // location properties
+  Location _location;
+  bool _serviceEnabled;
+  PermissionStatus _permissionGranted;
+  LocationData _locationData;
+
   @override
   void initState() {
-    super.initState();
+    _location = new Location();
     _connectionMode = widget._model.connectionMode;
     _calendarController = CalendarController();
     _selectedEvents = [];
     _eventTypesToIcons = _mapEventTypesToIcons();
     _events = {};
     initEvents();
+    super.initState();
   }
 
   void initEvents() async {
@@ -171,9 +181,38 @@ class _EventsCalendarState extends State<EventsCalendar> {
           ),
           child: ListTile(
             leading: _eventTypesToIcons[event.EventType],
-            trailing: Icon(
-              Icons.near_me,
-              color: Colors.blue[700],
+            trailing: SizedBox(
+              width: 35,
+              child: IconButton(
+                icon: Icon(
+                  Icons.near_me,
+                  color: Colors.blue[700],
+                ),
+                onPressed: () async {
+                  _serviceEnabled = await _location.serviceEnabled();
+                  if (!_serviceEnabled) {
+                    _serviceEnabled = await _location.requestService();
+                    if (!_serviceEnabled) {
+                      return;
+                    }
+                  }
+
+                  _permissionGranted = await _location.hasPermission();
+                  if (_permissionGranted == PermissionStatus.denied) {
+                    _permissionGranted = await _location.requestPermission();
+                    if (_permissionGranted != PermissionStatus.granted) {
+                      return;
+                    }
+                  }
+
+                  _locationData = await _location.getLocation();
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (BuildContext context) =>
+                              GMap(_locationData)));
+                },
+              ),
             ),
             title: Row(
               children: <Widget>[
@@ -291,17 +330,9 @@ class _EventsCalendarState extends State<EventsCalendar> {
       textDirection: TextDirection.rtl,
       child: Scaffold(
         appBar: _appBar = AppBar(
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'לוח אירועים',
-              ),
-              Image.asset(
-                'assets/Bar_Iland_line.png',
-                height: 35,
-              ),
-            ],
+          centerTitle: true,
+          title: Text(
+            'לוח אירועים',
           ),
         ),
         body: Stack(
