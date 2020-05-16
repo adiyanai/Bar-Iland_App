@@ -77,7 +77,9 @@ class AddEventState extends State<AddEvent> {
             child: Row(
               children: <Widget>[
                 widget._eventTypesToIcons[eventType],
-                SizedBox(width: 4,),
+                SizedBox(
+                  width: 4,
+                ),
                 Text(
                   eventType,
                   style: TextStyle(
@@ -396,17 +398,9 @@ class AddEventState extends State<AddEvent> {
       child: Scaffold(
         appBar: _appBar = AppBar(
           leading: Container(),
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'הוספת אירוע',
-              ),
-              Image.asset(
-                'assets/Bar_Iland_line.png',
-                height: 35,
-              ),
-            ],
+          centerTitle: true,
+          title: Text(
+            'הוספת אירוע',
           ),
         ),
         body: ScopedModelDescendant<MainModel>(
