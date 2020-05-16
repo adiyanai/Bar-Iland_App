@@ -13,12 +13,12 @@ import '../scoped-models/main.dart';
 
 class Services extends StatefulWidget {
   final MainModel model;
-  final String servicesBy;
-  Services(this.model, this.servicesBy);
+  final String servicesView;
+  Services(this.model, this.servicesView);
 
   @override
   State<StatefulWidget> createState() {
-    model.ServicesBy = servicesBy;
+    model.ServicesView = servicesView;
     return _ServicesState();
   }
 }
@@ -26,7 +26,7 @@ class Services extends StatefulWidget {
 class _ServicesState extends State<Services> {
   ConnectionMode _connectionMode;
   Future<List<Service>> _servicesList;
-  Widget _displayedServices = Column();
+  Widget _displayedServicesByArea = Column();
   ListView _servicesListView;
   Map<String, Icon> _mapServicesToIcons;
   AutoCompleteTextField<String> _textField;
@@ -52,11 +52,59 @@ class _ServicesState extends State<Services> {
     return ScopedModelDescendant<MainModel>(
       builder: (BuildContext context, Widget child, MainModel model) {
         Widget content;
-        if (!model.isServicesLoading && model.ServicesBy == "servicesByType") {
-          content = _buildServicesByTypePage();
-        } else if (!model.isServicesLoading &&
-            model.ServicesBy == "servicesByArea") {
-          content = _buildServicesByAreaPage(model.services);
+        if (!model.isServicesLoading) {
+          switch (model.ServicesView) {
+            case "לפי מיקום":
+              content = _buildServicesByAreaPage(model.services);
+              break;
+            case "לפי סוג שירות":
+              content = _buildServicesByTypePage();
+              break;
+            default:
+              content = WillPopScope(
+                onWillPop: () {
+                  model.ServicesView = "לפי סוג שירות";
+                  Navigator.pop(context, false);
+                  return Future.value(false);
+                },
+                child: Directionality(
+                  textDirection: TextDirection.rtl,
+                  child: Scaffold(
+                    appBar: AppBar(
+                      title: Container(
+                        width: MediaQuery.of(context).size.width,
+                        padding: EdgeInsets.only(left: 40),
+                        child: Center(
+                          child: Text(
+                            model.ServicesView,
+                          ),
+                        ),
+                      ),
+                    ),
+                    body: Stack(
+                      children: [
+                        Container(
+                          child: _buildSpecificServiceTypePage(
+                              model.ServicesView, model.services),
+                        ),
+                        Container(
+                          margin: EdgeInsets.fromLTRB(0, 55, 15, 0),
+                          width: 145,
+                          child: RaisedButton.icon(
+                            icon: Icon(Icons.location_on),
+                            textColor: Colors.white,
+                            color: Colors.blue,
+                            label: const Text("מיון לפי מיקום"),
+                            onPressed: () {},
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+              break;
+          }
         } else if (model.isServicesLoading) {
           content = Center(child: CircularProgressIndicator());
         }
@@ -67,27 +115,29 @@ class _ServicesState extends State<Services> {
 
   Widget serviceTypeButton(String text, Icon icon) {
     return SizedBox.fromSize(
-        size: Size(90, 90),
-        child: ClipOval(
-          child: Material(
-            color: Colors.lightBlue[200],
-            child: InkWell(
-              splashColor: Colors.cyanAccent,
-              onTap: () {
-                //Navigator.pushNamed(context, '/');
-              },
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  icon,
-                  Text(text,
-                      style: TextStyle(fontSize: 14),
-                      textAlign: TextAlign.center),
-                ],
-              ),
+      size: Size(95, 95),
+      child: ClipOval(
+        child: Material(
+          color: Colors.lightBlue[200],
+          child: InkWell(
+            splashColor: Colors.cyanAccent,
+            onTap: () {
+              widget.model.ServicesView = text;
+              Navigator.pushNamed(context, '/services');
+            },
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                icon,
+                Text(text,
+                    style: TextStyle(fontSize: 14),
+                    textAlign: TextAlign.center),
+              ],
             ),
           ),
-        ));
+        ),
+      ),
+    );
   }
 
   Widget _buildServicesByTypePage() {
@@ -111,56 +161,78 @@ class _ServicesState extends State<Services> {
           child: ListView(
             children: <Widget>[
               SizedBox(height: 35),
-              Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-                serviceTypeButton(
-                    "בתי קפה ומסעדות", _mapServicesToIcons["בית קפה"]),
-                serviceTypeButton("חנויות ועסקים", Icon(Icons.business_center)),
-                serviceTypeButton(
-                    "מזכירויות ומנהלה", Icon(MdiIcons.officeBuilding)),
-              ]),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  serviceTypeButton(
+                      "בתי קפה ומסעדות", _mapServicesToIcons["בית קפה"]),
+                  serviceTypeButton(
+                      "חנויות ועסקים", Icon(Icons.business_center)),
+                  serviceTypeButton(
+                      "מזכירויות ומנהלה", Icon(MdiIcons.officeBuilding)),
+                ],
+              ),
               SizedBox(height: 15),
               Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    serviceTypeButton("ספריות", Icon(MdiIcons.library)),
-                    serviceTypeButton("פינות הנקה",
-                        Icon(MaterialCommunityIcons.baby_bottle_outline)),
-                    serviceTypeButton("חדרי רווחה", Icon(ServicesIcons.armchair, size: 20),),
-                  ]),
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  serviceTypeButton("ספריות", Icon(MdiIcons.library)),
+                  serviceTypeButton("חדרי הנקה",
+                      Icon(MaterialCommunityIcons.baby_bottle_outline)),
+                  serviceTypeButton(
+                    "חדרי רווחה",
+                    Icon(ServicesIcons.armchair, size: 20),
+                  ),
+                ],
+              ),
               SizedBox(height: 15),
               Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    serviceTypeButton("פינות קפה", Icon(MdiIcons.coffeeMaker)),
-                    serviceTypeButton("מים חמים", Icon(MdiIcons.kettleSteam)),
-                    serviceTypeButton(
-                      "מקררים",
-                      Icon(Icons.kitchen),
-                    ),
-                  ]),
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  serviceTypeButton("פינות קפה", Icon(MdiIcons.coffeeMaker)),
+                  serviceTypeButton("מים חמים", Icon(MdiIcons.kettleSteam)),
+                  serviceTypeButton(
+                    "מקררים",
+                    Icon(Icons.kitchen),
+                  ),
+                ],
+              ),
               SizedBox(height: 15),
               Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    serviceTypeButton("מיקרוגלים", Icon(MdiIcons.microwave)),
-                    serviceTypeButton("מכונות חטיפים", Icon(MdiIcons.cookie)),
-                    serviceTypeButton(
-                        "מכונות שתייה", Icon(MdiIcons.bottleSodaClassicOutline)),
-                  ]),
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  serviceTypeButton("מיקרוגלים", Icon(MdiIcons.microwave)),
+                  serviceTypeButton("מכונות חטיפים", Icon(MdiIcons.cookie)),
+                  serviceTypeButton(
+                      "מכונות שתייה", Icon(MdiIcons.bottleSodaClassicOutline)),
+                ],
+              ),
               SizedBox(height: 15),
               Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    serviceTypeButton("מעבדות מחשבים", Icon(Icons.computer)),
-                    serviceTypeButton("מניינים",
-                        Icon(MaterialCommunityIcons.book_open_page_variant)),
-                    serviceTypeButton(
-                        "שערים ואבטחה", Icon(MaterialCommunityIcons.gate)),
-                  ]),
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  serviceTypeButton("מעבדות מחשבים", Icon(Icons.computer)),
+                  serviceTypeButton("מניינים",
+                      Icon(MaterialCommunityIcons.book_open_page_variant)),
+                  serviceTypeButton(
+                      "שערים ואבטחה", Icon(MaterialCommunityIcons.gate)),
+                ],
+              ),
+              SizedBox(height: 15),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  serviceTypeButton("מכשירי החייאה", Icon(MdiIcons.medicalBag)),
+                  serviceTypeButton(
+                      "שירותי צילום והדפסה", Icon(MdiIcons.printer)),
+                  serviceTypeButton("קולרים", Icon(MdiIcons.waterPump)),
+                ],
+              ),
               SizedBox(height: 35),
             ],
           ),
@@ -176,7 +248,7 @@ class _ServicesState extends State<Services> {
     _servicesListView = ListView(
       controller: _scrollController,
       children: <Widget>[
-        _displayedServices = _showServicesByArea(
+        _displayedServicesByArea = _showServicesByArea(
           (_selectedArea.split(" - "))[0],
           services,
         )
@@ -204,7 +276,6 @@ class _ServicesState extends State<Services> {
   }
 
   Widget _showServicesByArea(String area, List<Service> services) {
-    //widget.model.addAcademicService();
     List<Service> servicesInArea = [];
     for (int i = 0; i < services.length; i++) {
       if (area == (services[i].Area)) {
@@ -232,11 +303,15 @@ class _ServicesState extends State<Services> {
         ),
       );
     }
+    return _createServicesList(servicesInArea);
+  }
+
+  Widget _createServicesList(List<Service> servicesList) {
     int expansionTileIndex = 0;
     return Container(
       margin: EdgeInsets.fromLTRB(0, 10, 0, 20),
       child: Column(
-          children: servicesInArea.map((service) {
+          children: servicesList.map((service) {
         expansionTileIndex += 1;
         int currExpansionTileIndex = expansionTileIndex;
         String serviceLocation = service.Area;
@@ -264,8 +339,8 @@ class _ServicesState extends State<Services> {
             initiallyExpanded: _isTileExpanded(currExpansionTileIndex),
             onExpansionChanged: (expanded) {
               if (expanded &&
-                  servicesInArea.length > 4 &&
-                  currExpansionTileIndex == servicesInArea.length) {
+                  servicesList.length > 4 &&
+                  currExpansionTileIndex == servicesList.length) {
                 _scrollController
                     .jumpTo(_scrollController.position.maxScrollExtent + 150);
                 _scrollController.animateTo(
@@ -871,7 +946,7 @@ class _ServicesState extends State<Services> {
   }
 
   void _searchPress() {
-    //widget.model.addComputerLabsService();
+    //widget.model.addPrayerService();
     FocusScope.of(context).requestFocus(new FocusNode());
     _title = Container(
       width: 600,
@@ -906,5 +981,146 @@ class _ServicesState extends State<Services> {
         ),
       );
     }
+  }
+
+  Map<String, AssetImage> _mapServicesToImages() {
+    Map<String, AssetImage> servicesToImages = {
+      "בתי קפה ומסעדות": AssetImage("assets/resturants_and_coffee_shops.jpg"),
+      "חנויות ועסקים": AssetImage("assets/shops_and_businesses.jpg"),
+      "מכונות חטיפים": AssetImage("assets/snack_machines.jpg"),
+      "מזכירויות ומנהלה":
+          AssetImage("assets/secretaries_and_administration.jpg"),
+      "ספריות": AssetImage("assets/libraries.jpg"),
+      "חדרי הנקה": AssetImage("assets/nursing_rooms.jpg"),
+      "חדרי רווחה": AssetImage("assets/welfare_rooms.jpg"),
+      "פינות קפה": AssetImage("assets/coffee_corners.jpg"),
+      "מים חמים": AssetImage("assets/hot_water.jpg"),
+      "מקררים": AssetImage("assets/refrigerators.jpg"),
+      "מיקרוגלים": AssetImage("assets/microwaves.jpg"),
+      "מכונות שתייה": AssetImage("assets/drink_machines.jpg"),
+      "מעבדות מחשבים": AssetImage("assets/computers_labs.jpg"),
+      "מניינים": AssetImage("assets/minyanim.jpg"),
+      "שערים ואבטחה": AssetImage("assets/gates_and_security.jpg"),
+      "מכשירי החייאה": AssetImage("assets/defibrillators.jpg"),
+      "שירותי צילום והדפסה": AssetImage("assets/copy_and_print_services.jpg"),
+      "קולרים": AssetImage("assets/faucets.jpg"),
+    };
+    return servicesToImages;
+  }
+
+  Widget _buildSpecificServiceTypePage(
+      String serviceType, List<Service> services) {
+    Map<String, AssetImage> servicesToImages = _mapServicesToImages();
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Container(
+        padding: EdgeInsets.only(
+          top: 110,
+        ),
+        height: MediaQuery.of(context).size.height,
+        width: MediaQuery.of(context).size.width,
+        child: _showServicesByType(serviceType, services),
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: servicesToImages[serviceType],
+            fit: BoxFit.cover,
+            colorFilter: ColorFilter.mode(
+              Colors.black.withOpacity(0.55),
+              BlendMode.dstATop,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _showServicesByType(
+      String specificServiceType, List<Service> services) {
+    List<Service> servicesByType = [];
+    List<String> servicesTypes = [""];
+    if (specificServiceType == "חנויות ועסקים") {
+      for (int i = 0; i < services.length; i++) {
+        if ((services[i].Type) == "businesses" &&
+            services[i].Subtype != "בית קפה" &&
+            services[i].Subtype != "מסעדה") {
+          servicesByType.add(services[i]);
+        }
+      }
+    } else if (specificServiceType == "פינות קפה") {
+      for (int i = 0; i < services.length; i++) {
+        if (services[i].SpecificLocation.contains("פינת קפה")) {
+          servicesByType.add(services[i]);
+        }
+      }
+    } else if (specificServiceType == "חדרי רווחה") {
+      for (int i = 0; i < services.length; i++) {
+        if (services[i].Subtype == "חדר רווחה" ||
+            services[i].SpecificLocation.contains("חדר רווחה")) {
+          servicesByType.add(services[i]);
+        }
+      }
+    } else if (specificServiceType == "חדרי הנקה") {
+      for (int i = 0; i < services.length; i++) {
+        if (services[i].Subtype == "חדר הנקה" ||
+            services[i].SpecificLocation.contains("חדר הנקה")) {
+          servicesByType.add(services[i]);
+        }
+      }
+    } else {
+      switch (specificServiceType) {
+        case "בתי קפה ומסעדות":
+          servicesTypes.add("בית קפה");
+          servicesTypes.add("מסעדה");
+          break;
+        case "מזכירויות והנהלה":
+          servicesTypes.add("מזכירות");
+          break;
+        case "ספריות":
+          servicesTypes.add("ספריה");
+          break;
+        case "מים חמים":
+          servicesTypes.add("מים חמים");
+          break;
+        case "מקררים":
+          servicesTypes.add("מקרר");
+          break;
+        case "מיקרוגלים":
+          servicesTypes.add("מיקרוגל בשרי");
+          servicesTypes.add("מיקרוגל חלבי");
+          break;
+        case "מכונות חטיפים":
+          servicesTypes.add("מכונת חטיפים");
+          break;
+        case "מכונות שתייה":
+          servicesTypes.add("מכונת שתייה");
+          break;
+        case "מעבדות מחשבים":
+          servicesTypes.add("מעבדת מחשבים");
+          break;
+        case "מניינים":
+          servicesTypes.add("מניין");
+          break;
+        case "שערים ואבטחה":
+          servicesTypes.add("שירותי אבטחה");
+          break;
+        case "מכשירי החייאה":
+          servicesTypes.add("מכשיר החייאה (דפיברילטור)");
+          break;
+        case "שירותי צילום והדפסה":
+          servicesTypes.add("מכונת צילום והדפסה");
+          break;
+        case "קולרים":
+          servicesTypes.add("קולר");
+          break;
+      }
+    }
+    for (int i = 0; i < services.length; i++) {
+      servicesTypes.forEach((type) {
+        if (type == (services[i].Subtype)) {
+          servicesByType.add(services[i]);
+        }
+      });
+    }
+    return ListView(children: <Widget>[_createServicesList(servicesByType)]);
   }
 }

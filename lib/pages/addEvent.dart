@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:searchable_dropdown/searchable_dropdown.dart';
@@ -7,8 +8,9 @@ import '../scoped-models/main.dart';
 class AddEvent extends StatefulWidget {
   final MainModel _model;
   final DateTime _selectedDay;
+  final Map<String, Icon> _eventTypesToIcons;
 
-  AddEvent(this._model, this._selectedDay);
+  AddEvent(this._model, this._selectedDay, this._eventTypesToIcons);
 
   @override
   State<StatefulWidget> createState() {
@@ -25,6 +27,33 @@ class AddEventState extends State<AddEvent> {
   String _timeText = '';
   List<bool> _canSubmit = [false, false, false];
   AppBar _appBar;
+  List<String> _eventTypes;
+  List<String> _eventLocations;
+
+  @override
+  void initState() {
+    super.initState();
+    initEventType();
+    initEventsLocations();
+  }
+
+  void initEventType() async {
+    if (widget._model.EventTypes.isEmpty) {
+      await widget._model.fetchEventTypes();
+    }
+    setState(() {
+      _eventTypes = widget._model.EventTypes;
+    });
+  }
+
+  void initEventsLocations() async {
+    if (widget._model.EventsLocations.isEmpty) {
+      await widget._model.fetchEventsLocations();
+    }
+    setState(() {
+      _eventLocations = widget._model.EventsLocations;
+    });
+  }
 
   DecorationImage _buildBackgroundImage() {
     return DecorationImage(
@@ -39,17 +68,23 @@ class AddEventState extends State<AddEvent> {
 
   List<DropdownMenuItem<String>> _buildDropdownMenuItemsEventType() {
     List<DropdownMenuItem<String>> items = List();
-    for (String eventType in widget._model.EventTypeList) {
+    for (String eventType in _eventTypes) {
       items.add(
         DropdownMenuItem(
           value: eventType,
           child: Container(
             alignment: Alignment.center,
-            child: Text(
-              eventType,
-              style: TextStyle(
-                color: Colors.black54,
-              ),
+            child: Row(
+              children: <Widget>[
+                widget._eventTypesToIcons[eventType],
+                SizedBox(width: 4,),
+                Text(
+                  eventType,
+                  style: TextStyle(
+                    color: Colors.black54,
+                  ),
+                ),
+              ],
             ),
           ),
         ),
@@ -60,7 +95,7 @@ class AddEventState extends State<AddEvent> {
 
   List<DropdownMenuItem<String>> _buildDropdownMenuItemsEventLocations() {
     List<DropdownMenuItem<String>> items = List();
-    for (String location in widget._model.EventsLocations) {
+    for (String location in _eventLocations) {
       items.add(
         DropdownMenuItem(
           value: location,
@@ -112,8 +147,9 @@ class AddEventState extends State<AddEvent> {
                   RaisedButton(
                     child: Text(
                       'ביטול',
-                      style: TextStyle(fontSize: 12.0),
+                      //style: TextStyle(color: Colors.white ,fontSize: 18, fontWeight: FontWeight.bold),
                     ),
+                    //color: Colors.indigo[400],
                     onPressed: () {
                       Navigator.pushReplacementNamed(
                           context, '/eventsCalendar');
@@ -122,7 +158,7 @@ class AddEventState extends State<AddEvent> {
                   RaisedButton(
                     child: Text(
                       'אישור',
-                      style: TextStyle(fontSize: 12.0),
+                      //style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     color: (_canSubmit[0] && _canSubmit[1] && _canSubmit[2])
                         ? Colors.blue
@@ -184,6 +220,7 @@ class AddEventState extends State<AddEvent> {
                         key: _textFieldKey,
                         keyboardType: TextInputType.multiline,
                         maxLines: 3,
+                        maxLength: 65,
                         decoration: InputDecoration(
                           hintText: 'הקלד כאן...',
                           border: OutlineInputBorder(
@@ -236,7 +273,8 @@ class AddEventState extends State<AddEvent> {
                           child: IconButton(
                             padding: EdgeInsets.all(5),
                             icon: Icon(
-                              Icons.alarm,
+                              /*Icons.alarm,*/
+                              Icons.access_time,
                               color: Colors.white,
                             ),
                             onPressed: () => _selectTime(context),
@@ -272,13 +310,13 @@ class AddEventState extends State<AddEvent> {
                         style: TextStyle(fontSize: 20),
                       ),
                       Container(
-                        width: 220,
+                        width: 290,
                         child: SearchableDropdown.single(
                           keyboardType: TextInputType.text,
                           iconSize: 24,
                           dialogBox: false,
                           menuConstraints:
-                              BoxConstraints.tight(Size.fromHeight(110)),
+                              BoxConstraints.tight(Size.fromHeight(200)),
                           items: _buildDropdownMenuItemsEventLocations(),
                           value: _selectedLocation,
                           closeButton: SizedBox.shrink(),
@@ -315,13 +353,13 @@ class AddEventState extends State<AddEvent> {
                         style: TextStyle(fontSize: 20),
                       ),
                       Container(
-                        width: 140,
+                        width: 180,
                         child: SearchableDropdown.single(
                           keyboardType: TextInputType.text,
                           iconSize: 24,
                           dialogBox: false,
                           menuConstraints:
-                              BoxConstraints.tight(Size.fromHeight(110)),
+                              BoxConstraints.tight(Size.fromHeight(200)),
                           items: _buildDropdownMenuItemsEventType(),
                           value: _selectedEventType,
                           closeButton: SizedBox.shrink(),
@@ -382,7 +420,12 @@ class AddEventState extends State<AddEvent> {
                 onTap: () {
                   FocusScope.of(context).requestFocus(FocusNode());
                 },
-                child: _buildPage(),
+                child: widget._model.isEventTypeLoading ||
+                        widget._model.isEventsLocationsLoading
+                    ? Center(
+                        child: CircularProgressIndicator(),
+                      )
+                    : _buildPage(),
               ),
             );
           },

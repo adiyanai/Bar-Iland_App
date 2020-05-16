@@ -1,4 +1,5 @@
 import 'package:bar_iland_app/pages/important_links.dart';
+import 'package:bar_iland_app/pages/services.dart';
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -54,7 +55,8 @@ class _MyAppState extends State<MyApp> {
           '/service_manager': (BuildContext context) => ServiceManager(model),
           '/eventsCalendar': (BuildContext context) => EventsCalendar(model),
           '/campusMap': (BuildContext context) => CampusMap(),
-          '/importantLinks': (BuildContext context) => ImportantLinks(model)
+          '/importantLinks': (BuildContext context) => ImportantLinks(model),
+          '/services': (BuildContext context) => Services(model, model.ServicesView),
         },
       ),
     );
