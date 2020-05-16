@@ -245,9 +245,12 @@ class AcademicService extends Service {
 }
 
 class PrayerService extends Service {
-  String winterPrayers;
-  String summerPrayers;
-
+  String shacharitPrayersWinter;
+  String minchaPrayersWinter;
+  String arvitPrayersWinter;
+  String shacharitPrayersSummer;
+  String minchaPrayersSummer;
+  String arvitPrayersSummer;
   PrayerService({
     @required String id,
     @required String type,
@@ -255,8 +258,12 @@ class PrayerService extends Service {
     @required String area,
     @required bool isInArea,
     @required String specificLocation,
-    @required this.winterPrayers,
-    @required this.summerPrayers,
+    @required this.shacharitPrayersWinter,
+    @required this.minchaPrayersWinter,
+    @required this.arvitPrayersWinter,
+    @required this.shacharitPrayersSummer,
+    @required this.minchaPrayersSummer,
+    @required this.arvitPrayersSummer,
   }) : super(
             id: id,
             type: type,
@@ -265,12 +272,28 @@ class PrayerService extends Service {
             isInArea: isInArea,
             specificLocation: specificLocation);
 
-  String get WinterPrayers {
-    return winterPrayers;
+  String get ShacharitPrayersWinter {
+    return shacharitPrayersWinter;
   }
 
-  String get SummerPrayers {
-    return summerPrayers;
+  String get MinchaPrayersWinter {
+    return minchaPrayersWinter;
+  }
+
+  String get ArvitPrayersWinter {
+    return arvitPrayersWinter;
+  }
+
+  String get ShacharitPrayersSummer {
+    return shacharitPrayersSummer;
+  }
+
+  String get MinchaPrayersSummer {
+    return minchaPrayersSummer;
+  }
+
+  String get ArvitPrayersSummer {
+    return arvitPrayersSummer;
   }
 }
 
@@ -304,7 +327,7 @@ class ComputersLabService extends Service {
     return phoneNumber;
   }
 
-    String get Mail {
+  String get Mail {
     return mail;
   }
 }
@@ -316,19 +339,19 @@ class SecurityService extends Service {
   String phoneNumber = "";
   String emergencyPhoneNumber = "";
 
-  SecurityService(
-      {@required String id,
-      @required String type,
-      @required String subtype,
-      @required String area,
-      @required bool isInArea,
-      @required String specificLocation,
-      @required this.weekdaysActivityTime,
-      @required this.fridaysActivityTime,
-      @required this.saturdaysActivityTime,
-      @required this.phoneNumber,
-      @required this.emergencyPhoneNumber,})
-      : super(
+  SecurityService({
+    @required String id,
+    @required String type,
+    @required String subtype,
+    @required String area,
+    @required bool isInArea,
+    @required String specificLocation,
+    @required this.weekdaysActivityTime,
+    @required this.fridaysActivityTime,
+    @required this.saturdaysActivityTime,
+    @required this.phoneNumber,
+    @required this.emergencyPhoneNumber,
+  }) : super(
             id: id,
             type: type,
             subtype: subtype,
