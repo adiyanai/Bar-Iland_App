@@ -257,16 +257,52 @@ class ServicesModel extends ConnectedServicesModel {
     return true;
   }
 
-  Future<bool> addAcademicService({
-    String subtype = "ספריה",
-    String name = "ספרית אגודת הסטודנטים",
-    String activityTime = "ימים א'-ה': 10:00 עד 14:00",
-    String phoneNumber = "03-5343666",
-    String mail = "pniyot@bis.org.il",
-    String website = "http://www.bis.org.il/",
+  Future<bool> addBusinessService({
+    String subtype = "ציוד משרדי וכלי כתיבה",
+    String name = "האקדמון",
+    String activityTime = "ימים א'-ה': 17:00-08:00, יום ו': 12:00-08:00",
+    String phoneNumber = "08-9147788",
+    String generalInfo = "",
     String area = "בניין 107",
     bool isInArea = true,
-    String specificLocation = "קומה 1",
+    String specificLocation = "",
+  }) async {
+    _isServicesLoading = true;
+    notifyListeners();
+    final Map<String, dynamic> serviceData = {
+      'subtype': subtype,
+      'name': name,
+      'activityTime': activityTime,
+      'phoneNumber': phoneNumber,
+      'area': area,
+      'isInArea': isInArea,
+      'specificLocation': specificLocation,
+      'generalInfo': generalInfo,
+    };
+
+    final http.Response response = await http.post(
+        'https://bar-iland-app.firebaseio.com/services/businesses.json',
+        body: json.encode(serviceData));
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      _isServicesLoading = false;
+      notifyListeners();
+      return false;
+    }
+    _isServicesLoading = false;
+    notifyListeners();
+    return true;
+  }
+
+  Future<bool> addAcademicService({
+    String subtype = "ספריה",
+    String name = "ספריית בית המדרש",
+    String activityTime = "א'-ה': 09:00-12:50, 13:30-17:30,  ו': סגור. בזמן השיעור הכללי הספריה סגורה.",
+    String phoneNumber = "03-5317253",
+    String mail = "Yitzak.Rozen@biu.ac.il",
+    String website = "http://www.mgl.org.il/",
+    String area = "בניין 411",
+    bool isInArea = true,
+    String specificLocation = "חדר 11",
   }) async {
     _isServicesLoading = true;
     notifyListeners();

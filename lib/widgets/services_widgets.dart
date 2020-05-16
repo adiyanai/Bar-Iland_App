@@ -25,9 +25,9 @@ Map<String, Icon> mapToIcons() {
     "בית קפה": Icon(MaterialCommunityIcons.coffee),
     "מסעדה": Icon(MaterialIcons.restaurant),
     "בנק": Icon(MaterialCommunityIcons.bank),
-    "דואר": Icon(MaterialCommunityIcons.mailbox),
+    "דואר": Icon(Icons.mail),
     "ציוד משרדי וכלי כתיבה": Icon(MaterialCommunityIcons.pencil),
-    "סופר": Icon(MaterialCommunityIcons.cart),
+    "מינימרקט": Icon(MaterialCommunityIcons.cart),
     "חנות בגדים": Icon(MaterialCommunityIcons.shopping),
     "סנדלריה": Icon(MdiIcons.tools),
     "סוכנות נסיעות": Icon(MdiIcons.airplane),
@@ -289,7 +289,9 @@ Map<String, Container> prayersInfo(
 List<Widget> computersLabsContent(service) {
   ComputersLabService computersLab = service;
   Map<String, Widget> computersLabInfo = Map<String, Widget>();
-  computersLabInfo["שעות פעילות"] = Text(computersLab.ActivityTime);
+  computersLabInfo["שעות פעילות"] = 
+  Container(
+      padding: EdgeInsets.fromLTRB(0, 0, 0, 20), child: Text(computersLab.ActivityTime));
   if (computersLab.PhoneNumber != "") {
     computersLabInfo["טלפון"] = Container(
       padding: EdgeInsets.fromLTRB(0, 0, 0, 20),
@@ -325,7 +327,7 @@ List<Widget> computersLabsContent(service) {
       child: Column(
           children: (computersLabInfo.keys).map((info) {
         return Container(
-          padding: EdgeInsets.only(right: 15),
+          padding: EdgeInsets.fromLTRB(0, 0, 15, 0),
           child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [mapToIcons()[info], computersLabInfo[info]]),

@@ -30,7 +30,6 @@ class _ServicesState extends State<Services> {
   ListView _servicesListView;
   Map<String, Icon> _mapServicesToIcons;
   AutoCompleteTextField<String> _textField;
-  Widget _addingButton = Container();
   Widget _title = Container();
   ScrollController _scrollController;
   GlobalKey<AutoCompleteTextFieldState<String>> _key = new GlobalKey();
@@ -38,7 +37,8 @@ class _ServicesState extends State<Services> {
   String _selectedArea = "";
   bool _isNotPressable = true;
   bool _isSearchPressed = false;
-  Color _buttonColor = Colors.grey;
+  Color _searchButtonColor = Colors.grey;
+  String sortingButtonText = "מיון מהקרוב לרחוק";
 
   @override
   void initState() {
@@ -71,35 +71,59 @@ class _ServicesState extends State<Services> {
                   textDirection: TextDirection.rtl,
                   child: Scaffold(
                     appBar: AppBar(
-                      title: Container(
-                        width: MediaQuery.of(context).size.width,
-                        padding: EdgeInsets.only(left: 40),
-                        child: Center(
-                          child: Text(
-                            model.ServicesView,
-                          ),
-                        ),
+                      centerTitle: true,
+                      title: Text(
+                        model.ServicesView,
                       ),
                     ),
-                    body: Stack(
-                      children: [
-                        Container(
-                          child: _buildSpecificServiceTypePage(
-                              model.ServicesView, model.services),
+                    body: Stack(children: [
+                      Container(
+                        child: _buildSpecificServiceTypePage(
+                            model.ServicesView, model.services),
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                            color: Color.fromRGBO(200, 240, 245, 1),
+                            border: Border.all(
+                                width: 2,
+                                color: Color.fromRGBO(220, 250, 250, 0.9))),
+                        margin: EdgeInsets.only(top: 100),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Container(
+                              width: 170,
+                              child: RaisedButton.icon(
+                                icon: Icon(Icons.location_on),
+                                textColor: Colors.white,
+                                color: Colors.blue,
+                                label: Text(sortingButtonText),
+                                onPressed: () {
+                                  setState(() {
+                                    if (sortingButtonText ==
+                                        "מיון מהקרוב לרחוק") {
+                                      sortingButtonText = "מיון בסדר עולה";
+                                    } else {
+                                      sortingButtonText = "מיון מהקרוב לרחוק";
+                                    }
+                                  });
+                                },
+                              ),
+                            ),
+                            Container(
+                              width: 150,
+                              child: RaisedButton.icon(
+                                icon: Icon(Icons.add),
+                                textColor: Colors.white,
+                                color: Colors.blue,
+                                label: Text("הוספת שירות"),
+                                onPressed: () {},
+                              ),
+                            )
+                          ],
                         ),
-                        Container(
-                          margin: EdgeInsets.fromLTRB(0, 55, 15, 0),
-                          width: 145,
-                          child: RaisedButton.icon(
-                            icon: Icon(Icons.location_on),
-                            textColor: Colors.white,
-                            color: Colors.blue,
-                            label: const Text("מיון לפי מיקום"),
-                            onPressed: () {},
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ]),
                   ),
                 ),
               );
@@ -265,7 +289,7 @@ class _ServicesState extends State<Services> {
                     Colors.white.withOpacity(0.9), BlendMode.softLight),
               ),
             ),
-            padding: EdgeInsets.fromLTRB(0, 140, 0, 0),
+            padding: EdgeInsets.fromLTRB(0, 148, 0, 0),
             height: 600,
             child: _servicesListView),
         _title,
@@ -289,9 +313,9 @@ class _ServicesState extends State<Services> {
       return Center(
         child: Container(
           width: 600,
-          height: 100,
+          height: 150,
           color: Color.fromRGBO(200, 230, 230, 0.7),
-          margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
+          margin: EdgeInsets.fromLTRB(0, 44, 0, 0),
           padding: EdgeInsets.all(20),
           child: Text(
             'לא נמצאו שירותים באזור זה',
@@ -303,13 +327,27 @@ class _ServicesState extends State<Services> {
         ),
       );
     }
-    return _createServicesList(servicesInArea);
+    return _createServicesList(servicesInArea, "ServicesByArea");
   }
 
-  Widget _createServicesList(List<Service> servicesList) {
+  Widget _createServicesList(List<Service> servicesList, String servicesBy) {
     int expansionTileIndex = 0;
+    Container navigationButton = Container();
+    if (servicesBy == "ServicesByType") {
+      navigationButton = Container(
+        child: InkWell(
+            splashColor: Colors.blue,
+            child: Row(children: [
+              Icon(
+                Icons.near_me,
+                color: Colors.blue,
+              ),
+            ]),
+            onTap: () {}),
+      );
+    }
     return Container(
-      margin: EdgeInsets.fromLTRB(0, 10, 0, 20),
+      margin: EdgeInsets.fromLTRB(0, 40, 0, 20),
       child: Column(
           children: servicesList.map((service) {
         expansionTileIndex += 1;
@@ -350,7 +388,7 @@ class _ServicesState extends State<Services> {
               }
             },
             title: Container(
-              padding: EdgeInsets.only(bottom: 10),
+              padding: EdgeInsets.fromLTRB(0, 0, 0, 10),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
@@ -364,18 +402,23 @@ class _ServicesState extends State<Services> {
                       ),
                     ],
                   ),
+                  SizedBox(height: 3),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-                      Icon(
-                        Icons.location_on,
-                        size: 20,
-                      ),
-                      Text(
-                        serviceLocation,
-                        style: TextStyle(fontSize: 16),
-                      )
+                      Row(children: [
+                        Icon(
+                          Icons.location_on,
+                          size: 20,
+                        ),
+                        Text(
+                          serviceLocation,
+                          style: TextStyle(fontSize: 14),
+                        )
+                      ]),
+                      navigationButton,
                     ],
-                  )
+                  ),
                 ],
               ),
             ),
@@ -845,7 +888,7 @@ class _ServicesState extends State<Services> {
             child: IgnorePointer(
               ignoring: _isNotPressable,
               child: RaisedButton(
-                  color: _buttonColor,
+                  color: _searchButtonColor,
                   shape: CircleBorder(),
                   child: Container(
                       padding: EdgeInsets.only(left: 20),
@@ -909,7 +952,7 @@ class _ServicesState extends State<Services> {
             _selectedArea = area;
             _textField.textField.controller.text = _selectedArea;
             _isNotPressable = false;
-            _buttonColor = Colors.blue;
+            _searchButtonColor = Colors.blue;
           });
         },
         textChanged: (area) {
@@ -920,12 +963,12 @@ class _ServicesState extends State<Services> {
           if (widget.model.Areas.contains(_selectedArea)) {
             setState(() {
               _isNotPressable = false;
-              _buttonColor = Colors.blue;
+              _searchButtonColor = Colors.blue;
             });
           } else {
             setState(() {
               _isNotPressable = true;
-              _buttonColor = Colors.grey;
+              _searchButtonColor = Colors.grey;
             });
           }
         },
@@ -946,41 +989,60 @@ class _ServicesState extends State<Services> {
   }
 
   void _searchPress() {
-    //widget.model.addPrayerService();
+    //widget.model.addAcademicService();
     FocusScope.of(context).requestFocus(new FocusNode());
     _title = Container(
       width: 600,
-      height: 50,
-      color: Color.fromRGBO(200, 230, 230, 1),
+      height: 82,
       padding: EdgeInsets.fromLTRB(0, 0, 15, 0),
-      margin: EdgeInsets.fromLTRB(0, 100, 0, 0),
-      child: Text(
-        "השירותים באזור " + _selectedArea + ":",
-        style: TextStyle(
-            color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),
+      margin: EdgeInsets.fromLTRB(0, 110, 0, 0),
+      decoration: BoxDecoration(
+          color: Color.fromRGBO(205, 240, 235, 1),
+          border:
+              Border.all(width: 2, color: Color.fromRGBO(220, 250, 250, 0.9))),
+      child: Column(
+        children: <Widget>[
+          Text(
+            _selectedArea + ":",
+            style: TextStyle(
+                color: Colors.blue, fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(
+            height: 15,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              Container(
+                width: 110,
+                height: 30,
+                child: RaisedButton.icon(
+                  icon: Icon(Icons.near_me),
+                  textColor: Colors.white,
+                  color: Colors.blue,
+                  label: Text("ניווט"),
+                  onPressed: () {},
+                ),
+              ),
+              Container(
+                width: 140,
+                height: 30,
+                child: RaisedButton.icon(
+                  icon: Icon(Icons.add),
+                  textColor: Colors.white,
+                  color: Colors.blue,
+                  label: Text("הוספת שירות"),
+                  onPressed: () {},
+                ),
+              )
+            ],
+          ),
+        ],
       ),
     );
     _isSearchPressed = true;
     _textField.textField.controller.text = "";
-    _buttonColor = Colors.grey;
-    if (_selectedArea != null) {
-      _addingButton = Container(
-        padding: EdgeInsets.fromLTRB(0, 430, 270, 0),
-        child: RawMaterialButton(
-          shape: new CircleBorder(),
-          fillColor: Colors.blue,
-          padding: const EdgeInsets.all(3),
-          onPressed: () {
-            //widget._model.addService();
-          },
-          child: Icon(
-            Icons.add,
-            color: Colors.white,
-            size: 24,
-          ),
-        ),
-      );
-    }
+    _searchButtonColor = Colors.grey;
   }
 
   Map<String, AssetImage> _mapServicesToImages() {
@@ -1121,6 +1183,8 @@ class _ServicesState extends State<Services> {
         }
       });
     }
-    return ListView(children: <Widget>[_createServicesList(servicesByType)]);
+    return ListView(
+      children: <Widget>[_createServicesList(servicesByType, "ServicesByType")],
+    );
   }
 }
