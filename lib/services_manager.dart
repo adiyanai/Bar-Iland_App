@@ -20,7 +20,7 @@ class ServiceManager extends StatelessWidget {
           appBar: AppBar(
             centerTitle: true,
             title:
-                  Center(child: Text('שירותי האוניברסיטה')),
+                  Text('שירותי האוניברסיטה'),
             bottom: TabBar(
               tabs: <Widget>[
                 Tab(
