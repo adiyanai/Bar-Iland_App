@@ -27,38 +27,9 @@ class _ImportantLinksState extends State<ImportantLinks> {
     await widget.model.fetchAll();
     setState(() {
       _allData = widget.model.allData;
+      print(_allData);
     });
 
-  }
-
-  String convertFacultyType(String facultyName){
-      if(facultyName == 'engineering'){
-        return 'הנדסה';
-      }
-      else if(facultyName == 'exactSciences'){
-        return 'מדעים מדויקים';
-      } 
-      else if(facultyName == 'general'){
-        return 'כללי';
-      } 
-      else if(facultyName == 'humanities'){
-        return 'מדעי הרוח';
-      } 
-      else if(facultyName == 'interdisciplinaryStudies'){
-        return 'לימודים בין תחומיים';
-      } 
-      else if(facultyName == 'jewishStudies'){
-        return 'מדעי היהדות';
-      } 
-      else if(facultyName == 'lifeScience'){
-        return 'מדעי החיים';
-      } 
-      else if(facultyName == 'socialSciences'){
-        return 'מדעי החברה';
-      }
-    else{
-      return 'invalid faculty name';
-    }  
   }
 
   ListTile _buildhiperlink(Degree d) {
@@ -87,11 +58,21 @@ class _ImportantLinksState extends State<ImportantLinks> {
    return Directionality(
      textDirection: TextDirection.rtl,
      child:ExpansionTile(
-     title: Text(convertFacultyType(faculty_type)),
+       
+     backgroundColor:Colors.cyan[50].withOpacity(0.6),
+     title: Text(
+      faculty_type,
+      style:TextStyle(
+        //fontFamily: 'VarelaRound',
+        fontWeight:FontWeight.bold,
+        fontSize: 18,
+        
+      )),
      children:
         degrees_in_faculty.keys.map((dynamic department){
           if(degrees_in_faculty[department].length > 1){
                   return ExpansionTile(
+                    backgroundColor:Colors.cyan[50].withOpacity(0.6),
                     title: Text(department),
                     children:degrees_in_faculty[department].map((degree)
                     {return _buildhiperlink(degree);}).toList(),
@@ -113,21 +94,49 @@ class _ImportantLinksState extends State<ImportantLinks> {
     return list_of_faculties;
   }
 
+Container _buildBackgroundImage() {
+    return Container(
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage('assets/important_links_background.png'),
+          fit: BoxFit.cover,
+          colorFilter: ColorFilter.mode(
+            Colors.black.withOpacity(0.5),
+            BlendMode.dstATop,
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Directionality(
         textDirection: TextDirection.rtl,
-        child: MaterialApp(
-          home: Scaffold(
+        child: Scaffold(
             appBar: AppBar(
-              title: Center(
-                child: Text('קישורים חשובים'),
-              ),
+              centerTitle: true,
+              title: 
+                Text('קישורים חשובים   '),
             ),
-            body: ListView(children:
-              _buildFacultiesFolders(_allData),
+            
+            body: Stack(
+              children: <Widget>[
+                _buildBackgroundImage(),
+                widget.model.isLinksLoading ||
+                          widget.model.isLinksLoading
+                      ? Center(
+                          child: CircularProgressIndicator(),
+                        )
+                      : ListView(children:
+                          _buildFacultiesFolders(_allData),
             )
-            ),)
-        );
+              ],
+
+            ),
+             
+            ),
+            );
+        
   }
 }
