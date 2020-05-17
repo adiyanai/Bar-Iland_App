@@ -1,4 +1,5 @@
 import 'package:bar_iland_app/pages/important_links.dart';
+import 'package:bar_iland_app/pages/lost_and_found_manager.dart';
 import 'package:bar_iland_app/pages/services.dart';
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
@@ -52,11 +53,12 @@ class _MyAppState extends State<MyApp> {
           '/home': (BuildContext context) => HomePage(),
           '/signUp': (BuildContext context) => SignUp(),
           '/forgetPassword': (BuildContext context) => ForgetPassword(),
-          '/service_manager': (BuildContext context) => ServiceManager(model),
+          '/serviceManager': (BuildContext context) => ServiceManager(model),
           '/eventsCalendar': (BuildContext context) => EventsCalendar(model),
           '/campusMap': (BuildContext context) => CampusMap(),
           '/importantLinks': (BuildContext context) => ImportantLinks(model),
           '/services': (BuildContext context) => Services(model, model.ServicesView),
+          '/lostAndFound': (BuildContext context) => LostAndFoundManager(model),
         },
       ),
     );
