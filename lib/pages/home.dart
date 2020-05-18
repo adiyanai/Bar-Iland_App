@@ -113,7 +113,7 @@ class HomePage extends StatelessWidget {
                                 splashColor: Colors.cyanAccent, // splash color
                                 onTap: () {
                                   Navigator.pushNamed(
-                                      context, '/service_manager');
+                                      context, '/serviceManager');
                                 }, // button pressed
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
@@ -243,7 +243,10 @@ class HomePage extends StatelessWidget {
                               color: Colors.lightBlue[200], // button color
                               child: InkWell(
                                 splashColor: Colors.cyanAccent, // splash color
-                                onTap: () {}, // button pressed
+                                onTap: () {
+                                  Navigator.pushNamed(
+                                      context, '/lostAndFound');
+                                },
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: <Widget>[
