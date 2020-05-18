@@ -1,9 +1,9 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:searchable_dropdown/searchable_dropdown.dart';
 
 import '../scoped-models/main.dart';
+import '../models/event_location.dart';
 
 class AddEvent extends StatefulWidget {
   final MainModel _model;
@@ -28,7 +28,7 @@ class AddEventState extends State<AddEvent> {
   List<bool> _canSubmit = [false, false, false];
   AppBar _appBar;
   List<String> _eventTypes;
-  List<String> _eventLocations;
+  List<EventLocation> _eventLocations;
 
   @override
   void initState() {
@@ -97,14 +97,14 @@ class AddEventState extends State<AddEvent> {
 
   List<DropdownMenuItem<String>> _buildDropdownMenuItemsEventLocations() {
     List<DropdownMenuItem<String>> items = List();
-    for (String location in _eventLocations) {
+    for (EventLocation locationData in _eventLocations) {
       items.add(
         DropdownMenuItem(
-          value: location,
+          value: locationData.NumberName,
           child: Container(
             alignment: Alignment.center,
             child: Text(
-              location,
+              locationData.NumberName,
               style: TextStyle(
                 color: Colors.black54,
               ),
@@ -113,6 +113,20 @@ class AddEventState extends State<AddEvent> {
         ),
       );
     }
+    items.add(
+      DropdownMenuItem(
+        value: 'אחר',
+        child: Container(
+          alignment: Alignment.center,
+          child: Text(
+            'אחר',
+            style: TextStyle(
+              color: Colors.black54,
+            ),
+          ),
+        ),
+      ),
+    );
     return items;
   }
 
