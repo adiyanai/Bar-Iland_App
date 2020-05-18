@@ -84,7 +84,35 @@ Future<Null> fetchAllFaculties(){
       return;
     });
   }
-
+  String convertFacultyType(String facultyName){
+      if(facultyName == 'engineering'){
+        return 'הנדסה';
+      }
+      else if(facultyName == 'exactSciences'){
+        return 'מדעים מדויקים';
+      } 
+      else if(facultyName == 'general'){
+        return 'כללי';
+      } 
+      else if(facultyName == 'humanities'){
+        return 'מדעי הרוח';
+      } 
+      else if(facultyName == 'interdisciplinaryStudies'){
+        return 'לימודים בין תחומיים';
+      } 
+      else if(facultyName == 'jewishStudies'){
+        return 'מדעי היהדות';
+      } 
+      else if(facultyName == 'lifeScience'){
+        return 'מדעי החיים';
+      } 
+      else if(facultyName == 'socialSciences'){
+        return 'מדעי החברה';
+      }
+    else{
+      return 'invalid faculty name';
+    }  
+  }
 Future<Null> fetchAll(){
   _isLinksLoading = true;
   return http.get('https://bar-iland-app.firebaseio.com/importantLinks.json')
@@ -96,14 +124,13 @@ Future<Null> fetchAll(){
         notifyListeners();
         return;
       }
-    Map<String,List<Degree>> degrees_all_data;
     allData.forEach((String facultyType, dynamic facultyDataMap){
       if (facultyType == null){
         _isLinksLoading = false;
         notifyListeners();
         return;
-      }            
-        List<Degree> degreesList = [];
+      }   
+        String convertedFacultyType = convertFacultyType(facultyType); 
         Map<String,List<Degree>> degrees_all_data = {};
         
         facultyDataMap.forEach((String facultyId, dynamic degressInFaculty){
@@ -114,15 +141,16 @@ Future<Null> fetchAll(){
             if(degrees_all_data[degree.degreeType] == null){
               degrees_all_data[degree.degreeType] =[];
               degrees_all_data[degree.degreeType].add(degree);
-              facultiesToDegrees[facultyType] = degrees_all_data;
+              facultiesToDegrees[convertedFacultyType] = degrees_all_data;
             }else{
               degrees_all_data[degree.degreeType].add(degree);
-              facultiesToDegrees[facultyType] = degrees_all_data;
+              facultiesToDegrees[convertedFacultyType] = degrees_all_data;
             }
         });
        });;
     _fetchedData = facultiesToDegrees;
-    print(_fetchedData);
+    
+    print(_fetchedData.keys);
     _isLinksLoading = false;
     notifyListeners();
   }).catchError((error) {
