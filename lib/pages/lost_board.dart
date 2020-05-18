@@ -79,7 +79,9 @@ class _LostBoardState extends State<LostBoard> {
                     textColor: Colors.white,
                     color: Colors.blue,
                     label: Text("הוספת אבידה"),
-                    onPressed: () {},
+                    onPressed: () {
+                      widget.model.addLostFoundType();
+                    },
                   ),
                 ]),
           ),
