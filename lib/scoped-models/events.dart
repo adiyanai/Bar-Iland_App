@@ -2,12 +2,13 @@ import 'package:scoped_model/scoped_model.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../models/event.dart';
+import '../models/event_location.dart';
 
 class EventsModel extends Model {
   final databaseURL = 'https://bar-iland-app.firebaseio.com/events';
   List<Event> _events = [];
   List<String> _eventTypes = [];
-  List<String> _eventsLocations = [];
+  List<EventLocation> _eventsLocations = [];
   bool _isEventsLoading = false;
   bool _isEventTypeLoading = false;
   bool _isEventsLocationsLoading = false;
@@ -57,7 +58,7 @@ class EventsModel extends Model {
     return _eventTypes;
   }
 
-  List<String> get EventsLocations {
+  List<EventLocation> get EventsLocations {
     return _eventsLocations;
   }
 
@@ -191,37 +192,78 @@ class EventsModel extends Model {
     String locationsURL = 'https://bar-iland-app.firebaseio.com/locations.json';
     notifyListeners();
     return http.get(locationsURL).then<Null>((http.Response response) {
-      final List<String> fetchedEventsLocations = [];
+      final List<EventLocation> fetchedEventsLocations = [];
       final Map<String, dynamic> locationsData = json.decode(response.body);
-      String location;
+      String location, locationId;
+      double lat, lon;
       locationsData.forEach((String locationType, dynamic locationTypeData) {
         if (locationType == 'amphitheaters') {
           locationTypeData.forEach((String id, dynamic locationData) {
+            locationId = id;
             location = locationData['number'] + ' - ' + locationData['name'];
-            fetchedEventsLocations.add(location);
+            lat = locationData['lat'];
+            lon = locationData['lon'];
+            final EventLocation newEventLocation = EventLocation(
+              id: locationId,
+              type: locationType,
+              numberName: location,
+              lat: lat,
+              lon: lon,
+            );
+            fetchedEventsLocations.add(newEventLocation);
           });
         } else if (locationType == 'buildings') {
           locationTypeData.forEach((String id, dynamic locationData) {
             if (locationData['name'] != 'מעונות') {
+              locationId = id;
               location = locationData['number'] + ' - ' + locationData['name'];
-              fetchedEventsLocations.add(location);
+              lat = locationData['lat'];
+              lon = locationData['lon'];
+              final EventLocation newEventLocation = EventLocation(
+                id: locationId,
+                type: locationType,
+                numberName: location,
+                lat: lat,
+                lon: lon,
+              );
+              fetchedEventsLocations.add(newEventLocation);
             }
           });
         } else if (locationType == 'squares') {
           locationTypeData.forEach((String id, dynamic locationData) {
-            fetchedEventsLocations.add(locationData['name']);
+            locationId = id;
+            location = locationData['name'];
+            lat = locationData['lat'];
+            lon = locationData['lon'];
+            final EventLocation newEventLocation = EventLocation(
+              id: locationId,
+              type: locationType,
+              numberName: location,
+              lat: lat,
+              lon: lon,
+            );
+            fetchedEventsLocations.add(newEventLocation);
           });
         } else if (locationType == 'structures') {
           locationTypeData.forEach((String id, dynamic locationData) {
             if (locationData['name'] != 'בנק מזרחי-טפחות') {
+              locationId = id;
               location = locationData['number'] + ' - ' + locationData['name'];
-              fetchedEventsLocations.add(location);
+              lat = locationData['lat'];
+              lon = locationData['lon'];
+              final EventLocation newEventLocation = EventLocation(
+                id: locationId,
+                type: locationType,
+                numberName: location,
+                lat: lat,
+                lon: lon,
+              );
+              fetchedEventsLocations.add(newEventLocation);
             }
           });
         }
       });
       _eventsLocations = fetchedEventsLocations;
-      _eventsLocations.add('אחר');
       _isEventsLocationsLoading = false;
       notifyListeners();
       //_selEventId = null;
