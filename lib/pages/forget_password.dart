@@ -87,6 +87,7 @@ class _ForgetPasswordState extends State<ForgetPassword> {
       textDirection: TextDirection.rtl,
       child: Scaffold(
         appBar: AppBar(
+          centerTitle: true,
           title: Text(
             'שחזור סיסמה',
           ),
