@@ -63,6 +63,24 @@ class ServicesModel extends ConnectedServicesModel {
           });
         }
       });
+           fetchedLocations.sort((location1, location2) {
+        List<String> location1SplitNumber = location1.Number.split(" ");
+        List<String> location2SplitNumber = location2.Number.split(" ");
+        if (location1SplitNumber[0] != "שער" &&
+            location2SplitNumber[0] != "שער") {
+          return int.parse(location1SplitNumber[1])
+              .compareTo(int.parse(location2SplitNumber[1]));
+        } else {
+          int result =
+              location1SplitNumber[0].compareTo(location2SplitNumber[0]);
+          if (result != 0) {
+            return result;
+          } else {
+            return int.parse(location1SplitNumber[1])
+                .compareTo(int.parse(location2SplitNumber[1]));
+          }
+        }
+      });
       locations = fetchedLocations;
       _isServicesLoading = false;
       notifyListeners();

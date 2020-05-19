@@ -26,7 +26,7 @@ class _FoundBoardState extends State<FoundBoard> {
       child: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/lost_and_found.jpg'),
+            image: AssetImage('assets/lost_found.jpg'),
             fit: BoxFit.fill,
             colorFilter: ColorFilter.mode(
               Colors.black.withOpacity(0.7),

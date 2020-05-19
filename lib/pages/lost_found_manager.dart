@@ -5,9 +5,9 @@ import 'package:bar_iland_app/scoped-models/main.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 
 
-class LostAndFoundManager extends StatelessWidget {
+class LostFoundManager extends StatelessWidget {
   final MainModel model;
-  LostAndFoundManager(this.model);
+  LostFoundManager(this.model);
 
      @override
   Widget build(BuildContext context) {

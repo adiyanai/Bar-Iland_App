@@ -8,7 +8,8 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 import '../models/connection.dart';
 import '../scoped-models/main.dart';
 import '../models/event.dart';
-import './addEvent.dart';
+import '../models/event_location.dart';
+import './add_event.dart';
 import './google_map.dart';
 
 class EventsCalendar extends StatefulWidget {
@@ -27,13 +28,12 @@ class _EventsCalendarState extends State<EventsCalendar> {
   List<dynamic> _selectedEvents;
   ConnectionMode _connectionMode;
   Map<String, Icon> _eventTypesToIcons;
-  AppBar _appBar;
+  List<EventLocation> _eventLocations;
 
   // location properties
   Location _location;
   bool _serviceEnabled;
   PermissionStatus _permissionGranted;
-  LocationData _locationData;
 
   @override
   void initState() {
@@ -44,6 +44,7 @@ class _EventsCalendarState extends State<EventsCalendar> {
     _eventTypesToIcons = _mapEventTypesToIcons();
     _events = {};
     initEvents();
+    initEventsLocations();
     super.initState();
   }
 
@@ -52,6 +53,15 @@ class _EventsCalendarState extends State<EventsCalendar> {
     setState(() {
       final List<Event> eventsData = widget._model.allEvents;
       _events = fromListToMapEvents(eventsData);
+    });
+  }
+
+  void initEventsLocations() async {
+    if (widget._model.EventsLocations.isEmpty) {
+      await widget._model.fetchEventsLocations();
+    }
+    setState(() {
+      _eventLocations = widget._model.EventsLocations;
     });
   }
 
@@ -88,26 +98,6 @@ class _EventsCalendarState extends State<EventsCalendar> {
       });
     }
     return eventsMap;
-  }
-
-  Map<String, String> _mapToEventType() {
-    Map<String, String> moreInfoToEventType = {
-      'קפה ומאפה': '---',
-      'הופעה': 'אומנ/ים:',
-      'שבת בקמפוס': '---',
-      'קבלת שבת': 'אוכל/כיבוד:',
-      'ספורט': 'ענף ספורט:',
-      'אחר': '---',
-      'הפאב החברתי': '---',
-      'הרצאה': 'מרצה:',
-      'הפססקר': '---',
-      'מדרשה': '---',
-      'מסיבה': '---',
-      'סטנדאפ': 'אומנ/ים:',
-      'TimeOut': 'אוכל/כיבוד:',
-      'בקמפוס Live': 'אומנ/ים:'
-    };
-    return moreInfoToEventType;
   }
 
   Container _buildBackgroundImage() {
@@ -181,49 +171,52 @@ class _EventsCalendarState extends State<EventsCalendar> {
           ),
           child: ListTile(
             leading: _eventTypesToIcons[event.EventType],
-            trailing: SizedBox(
-              width: 35,
-              child: IconButton(
-                icon: Icon(
-                  Icons.near_me,
-                  color: Colors.blue[700],
-                ),
-                onPressed: () async {
-                  _serviceEnabled = await _location.serviceEnabled();
-                  if (!_serviceEnabled) {
-                    _serviceEnabled = await _location.requestService();
-                    if (!_serviceEnabled) {
-                      return;
-                    }
-                  }
+            // just if the event.EventType is not 'אחר' we can nevigate to this location
+            trailing: event.EventType != 'אחר'
+                ? SizedBox(
+                    width: 35,
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.near_me,
+                        color: Colors.blue[700],
+                      ),
+                      onPressed: () async {
+                        _serviceEnabled = await _location.serviceEnabled();
+                        if (!_serviceEnabled) {
+                          _serviceEnabled = await _location.requestService();
+                          if (!_serviceEnabled) {
+                            return;
+                          }
+                        }
 
-                  _permissionGranted = await _location.hasPermission();
-                  if (_permissionGranted == PermissionStatus.denied) {
-                    _permissionGranted = await _location.requestPermission();
-                    if (_permissionGranted != PermissionStatus.granted) {
-                      return;
-                    }
-                  }
+                        _permissionGranted = await _location.hasPermission();
+                        if (_permissionGranted == PermissionStatus.denied) {
+                          _permissionGranted =
+                              await _location.requestPermission();
+                          if (_permissionGranted != PermissionStatus.granted) {
+                            return;
+                          }
+                        }
 
-                  _locationData = await _location.getLocation();
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (BuildContext context) =>
-                              GMap(_locationData)));
-                },
+                        // get the data of the event location
+                        EventLocation eventLocationData =
+                            _eventLocations.firstWhere((EventLocation item) =>
+                                (event.Location == item.NumberName));
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (BuildContext context) =>
+                                    GMap(eventLocationData)));
+                      },
+                    ),
+                  )
+                : Container(),
+            title: Text(
+              event.EventType,
+              style: TextStyle(
+                fontSize: 18,
+                color: Colors.deepPurple[700],
               ),
-            ),
-            title: Row(
-              children: <Widget>[
-                Text(
-                  event.EventType,
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: Colors.deepPurple[700],
-                  ),
-                ),
-              ],
             ),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -240,7 +233,7 @@ class _EventsCalendarState extends State<EventsCalendar> {
                           ),
                           SizedBox(width: 3),
                           Container(
-                            width: _screenWidth * 0.55,
+                            width: _screenWidth * 0.53,
                             child: Text(
                               event.EventDescription,
                               style: TextStyle(
@@ -263,7 +256,7 @@ class _EventsCalendarState extends State<EventsCalendar> {
                     ),
                     SizedBox(width: 3),
                     Container(
-                      width: _screenWidth * 0.55,
+                      width: _screenWidth * 0.53,
                       child: Text(
                         event.Location,
                       ),
@@ -329,7 +322,7 @@ class _EventsCalendarState extends State<EventsCalendar> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        appBar: _appBar = AppBar(
+        appBar: AppBar(
           centerTitle: true,
           title: Text(
             'לוח אירועים',
@@ -344,7 +337,8 @@ class _EventsCalendarState extends State<EventsCalendar> {
                 children: [
                   // calendar
                   widget._model.isEventsLoading ||
-                          widget._model.isAddEventLoading
+                          widget._model.isAddEventLoading ||
+                          widget._model.isEventsLocationsLoading
                       ? Center(
                           child: CircularProgressIndicator(),
                         )

@@ -910,15 +910,17 @@ class _ServicesState extends State<Services> {
   }
 
   Widget _buildAutoCompleteTextField() {
+    List<String> suggestions = [];
+    widget.model.Locations.forEach((location) {
+      suggestions.add(location.Number + " - " + location.Name);
+    });
     return Container(
       width: 240,
       child: _textField = AutoCompleteTextField<String>(
         key: _key,
         clearOnSubmit: false,
         focusNode: _focusNode,
-        suggestions: (widget.model.Locations).map((location) {
-          return location.Number + " - " + location.Name;
-        }).toList(),
+        suggestions: suggestions,
         suggestionsAmount: 12,
         style: TextStyle(color: Colors.black, fontSize: 18.0),
         decoration: InputDecoration(
@@ -937,12 +939,9 @@ class _ServicesState extends State<Services> {
           return false;
         },
         itemSorter: (area1, area2) {
-          int result = area1.length.compareTo(area2.length);
-          if (result != 0) {
-            return result;
-          } else {
-            return area1.compareTo(area2);
-          }
+          return suggestions
+              .indexOf(area1)
+              .compareTo(suggestions.indexOf(area2));
         },
         itemSubmitted: (area) {
           setState(() {

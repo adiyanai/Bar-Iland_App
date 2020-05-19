@@ -128,6 +128,7 @@ class _SignUpState extends State<SignUp> {
       textDirection: TextDirection.rtl,
       child: Scaffold(
         appBar: AppBar(
+          centerTitle: true,
           title: Text(
             'הרשמה',
           ),

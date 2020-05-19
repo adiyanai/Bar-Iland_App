@@ -156,6 +156,7 @@ class _AutoPageState extends State<AuthPage> {
       textDirection: TextDirection.rtl,
       child: Scaffold(
         appBar: AppBar(
+          centerTitle: true,
           title: Text(
             'כניסה',
           ),
