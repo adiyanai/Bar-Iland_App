@@ -100,7 +100,6 @@ flutter:
     - assets/copy_and_print_services.jpg
     - assets/faucets.jpg
     - assets/important_links_background.png
-
     #  - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
