@@ -86,28 +86,28 @@ Future<Null> fetchAllFaculties(){
   }
   String convertFacultyType(String facultyName){
       if(facultyName == 'engineering'){
-        return 'הנדסה';
+        return 'הפקולטה להנדסה';
       }
       else if(facultyName == 'exactSciences'){
-        return 'מדעים מדויקים';
+        return 'הפקולטה למדעים מדויקים';
       } 
       else if(facultyName == 'general'){
-        return 'כללי';
+        return 'מאגרי מידע נוספים';
       } 
       else if(facultyName == 'humanities'){
-        return 'מדעי הרוח';
+        return 'הפקולטה למדעי הרוח';
       } 
       else if(facultyName == 'interdisciplinaryStudies'){
         return 'לימודים בין תחומיים';
       } 
       else if(facultyName == 'jewishStudies'){
-        return 'מדעי היהדות';
+        return 'הפקולטה למדעי היהדות';
       } 
       else if(facultyName == 'lifeScience'){
-        return 'מדעי החיים';
+        return 'הפקולטה למדעי החיים';
       } 
       else if(facultyName == 'socialSciences'){
-        return 'מדעי החברה';
+        return 'הפקולטה למדעי החברה';
       }
     else{
       return 'invalid faculty name';
@@ -150,7 +150,7 @@ Future<Null> fetchAll(){
        });;
     _fetchedData = facultiesToDegrees;
     
-    print(_fetchedData.keys);
+    //print(_fetchedData.keys);
     _isLinksLoading = false;
     notifyListeners();
   }).catchError((error) {
