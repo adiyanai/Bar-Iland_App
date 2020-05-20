@@ -5,13 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:bar_iland_app/scoped-models/main.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 
-
 class LostFoundManager extends StatelessWidget {
   final MainModel model;
   LostFoundManager(this.model);
 
-     @override
+  @override
   Widget build(BuildContext context) {
+    model.fetchLostFoundTypes();
+    model.fetchLostFoundLocations();
     return DefaultTabController(
       length: 2,
       child: Directionality(
@@ -20,8 +21,7 @@ class LostFoundManager extends StatelessWidget {
           resizeToAvoidBottomInset: false,
           appBar: AppBar(
             centerTitle: true,
-            title:
-                  Text('אבידות ומציאות'),
+            title: Text('אבידות ומציאות'),
             bottom: TabBar(
               tabs: <Widget>[
                 Tab(
@@ -36,8 +36,7 @@ class LostFoundManager extends StatelessWidget {
             ),
           ),
           body: TabBarView(
-            children: <Widget>[LostBoard(model), FoundBoard(model)
-            ],
+            children: <Widget>[LostBoard(model), FoundBoard(model)],
           ),
         ),
       ),
