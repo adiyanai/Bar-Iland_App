@@ -10,16 +10,15 @@ class LostFoundModel extends Model {
   List<LostFound> _lost = [];
   List<LostFound> _found = [];
   List<String> _lostFoundTypes = [];
-  List<String> _lostFoundLocations = [];
-  List<Location> locations = [];
-  bool _isLostFoundLoading = false;
+  List<Location> lostFoundLocations = [];
+  bool isLostFoundLoading = false;
 
   List<String> get LostFoundTypes {
     return _lostFoundTypes;
   }
 
   Future<bool> addLostFoundType({String lostFoundType = "אביזרי מחשב"}) async {
-    _isLostFoundLoading = true;
+    isLostFoundLoading = true;
     notifyListeners();
     final Map<String, dynamic> lostFoundTypeData = {
       'lostFoundType': lostFoundType
@@ -31,21 +30,21 @@ class LostFoundModel extends Model {
           body: json.encode(lostFoundTypeData));
 
       if (response.statusCode != 200 && response.statusCode != 201) {
-        _isLostFoundLoading = false;
+        isLostFoundLoading = false;
         notifyListeners();
         return false;
       }
       notifyListeners();
       return true;
     } catch (error) {
-      _isLostFoundLoading = false;
+      isLostFoundLoading = false;
       notifyListeners();
       return false;
     }
   }
 
   Future<Null> fetchLostFoundTypes() {
-    _isLostFoundLoading = true;
+    isLostFoundLoading = true;
     notifyListeners();
     return http
         .get(_lostFoundURL + '/lostFoundTypes.json')
@@ -53,7 +52,7 @@ class LostFoundModel extends Model {
       final List<String> fetchedLostFoundTypes = [];
       final Map<String, dynamic> eventTypesData = json.decode(response.body);
       if (eventTypesData == null) {
-        _isLostFoundLoading = false;
+        isLostFoundLoading = false;
         notifyListeners();
         return;
       }
@@ -66,17 +65,17 @@ class LostFoundModel extends Model {
       });
       _lostFoundTypes = fetchedLostFoundTypes;
       _lostFoundTypes.add('אחר');
-      _isLostFoundLoading = false;
+      isLostFoundLoading = false;
       notifyListeners();
     }).catchError((error) {
-      _isLostFoundLoading = false;
+      isLostFoundLoading = false;
       notifyListeners();
       return;
     });
   }
 
-  Future<Null> fetchServicesLocations() {
-    _isLostFoundLoading = true;
+  Future<Null> fetchLostFoundLocations() {
+    isLostFoundLoading = true;
     notifyListeners();
     return http
         .get('https://bar-iland-app.firebaseio.com/locations.json')
@@ -113,8 +112,8 @@ class LostFoundModel extends Model {
           }
         }
       });
-      locations = fetchedLocations;
-      _isLostFoundLoading = false;
+      lostFoundLocations = fetchedLocations;
+      isLostFoundLoading = false;
       notifyListeners();
     });
   }
