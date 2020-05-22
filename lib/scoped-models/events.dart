@@ -197,8 +197,9 @@ class EventsModel extends Model {
       String location, locationId;
       double lat, lon;
       locationsData.forEach((String locationType, dynamic locationTypeData) {
-        if (locationType == 'amphitheaters') {
-          locationTypeData.forEach((String id, dynamic locationData) {
+        locationTypeData.forEach((String id, dynamic locationData) {
+          if ((locationData['name'] != 'מעונות') &&
+              (locationData['name'] != 'בנק מזרחי-טפחות')) {
             locationId = id;
             location = locationData['number'] + ' - ' + locationData['name'];
             lat = locationData['lat'];
@@ -211,57 +212,8 @@ class EventsModel extends Model {
               lon: lon,
             );
             fetchedEventsLocations.add(newEventLocation);
-          });
-        } else if (locationType == 'buildings') {
-          locationTypeData.forEach((String id, dynamic locationData) {
-            if (locationData['name'] != 'מעונות') {
-              locationId = id;
-              location = locationData['number'] + ' - ' + locationData['name'];
-              lat = locationData['lat'];
-              lon = locationData['lon'];
-              final EventLocation newEventLocation = EventLocation(
-                id: locationId,
-                type: locationType,
-                numberName: location,
-                lat: lat,
-                lon: lon,
-              );
-              fetchedEventsLocations.add(newEventLocation);
-            }
-          });
-        } else if (locationType == 'squares') {
-          locationTypeData.forEach((String id, dynamic locationData) {
-            locationId = id;
-            location = locationData['name'];
-            lat = locationData['lat'];
-            lon = locationData['lon'];
-            final EventLocation newEventLocation = EventLocation(
-              id: locationId,
-              type: locationType,
-              numberName: location,
-              lat: lat,
-              lon: lon,
-            );
-            fetchedEventsLocations.add(newEventLocation);
-          });
-        } else if (locationType == 'structures') {
-          locationTypeData.forEach((String id, dynamic locationData) {
-            if (locationData['name'] != 'בנק מזרחי-טפחות') {
-              locationId = id;
-              location = locationData['number'] + ' - ' + locationData['name'];
-              lat = locationData['lat'];
-              lon = locationData['lon'];
-              final EventLocation newEventLocation = EventLocation(
-                id: locationId,
-                type: locationType,
-                numberName: location,
-                lat: lat,
-                lon: lon,
-              );
-              fetchedEventsLocations.add(newEventLocation);
-            }
-          });
-        }
+          }
+        });
       });
       _eventsLocations = fetchedEventsLocations;
       _isEventsLocationsLoading = false;
