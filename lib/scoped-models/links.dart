@@ -3,12 +3,13 @@ import 'dart:async';
 import 'package:bar_iland_app/models/degree.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:http/http.dart' as http;
+import "dart:collection";
 
 class Links extends Model {
 
 List<Degree> _degrees = [];
 List<String> _faculties = [];
-Map<String,Map<String,List<Degree>>> _fetchedData = {};
+Map<String,SplayTreeMap<String,List<Degree>>> _fetchedData = {};
 bool _isLinksLoading = false;
 
 List<Degree> get allDegrees{
@@ -19,7 +20,7 @@ List<String> get allFaculties{
   return List.from(_faculties);
 }
 
-Map<String,Map<String,List<Degree>>> get allData{
+Map<String,SplayTreeMap<String,List<Degree>>> get allData{
   return (_fetchedData);
 }
 
@@ -84,7 +85,8 @@ Future<Null> fetchAllFaculties(){
       return;
     });
   }
-  String convertFacultyType(String facultyName){
+
+String convertFacultyType(String facultyName){
       if(facultyName == 'engineering'){
         return 'הפקולטה להנדסה';
       }
@@ -113,12 +115,13 @@ Future<Null> fetchAllFaculties(){
       return 'invalid faculty name';
     }  
   }
+
 Future<Null> fetchAll(){
   _isLinksLoading = true;
   return http.get('https://bar-iland-app.firebaseio.com/importantLinks.json')
   .then<Null>((http.Response response){
-    Map<String,Map<String,List<Degree>>> facultiesToDegrees = {};
-    final Map<String, dynamic> allData = json.decode(response.body);
+    Map<String,SplayTreeMap<String,List<Degree>>> facultiesToDegrees = {};
+    Map<String, dynamic> allData = json.decode(response.body);
     if (allData == null) {
         _isLinksLoading = false;
         notifyListeners();
@@ -131,8 +134,8 @@ Future<Null> fetchAll(){
         return;
       }   
         String convertedFacultyType = convertFacultyType(facultyType); 
-        Map<String,List<Degree>> degrees_all_data = {};
-        
+         SplayTreeMap<String,List<Degree>> degrees_all_data = SplayTreeMap<String,List<Degree>>();
+
         facultyDataMap.forEach((String facultyId, dynamic degressInFaculty){
             Degree degree = Degree(
                 degreeType :degressInFaculty['degree'],
@@ -146,11 +149,11 @@ Future<Null> fetchAll(){
               degrees_all_data[degree.degreeType].add(degree);
               facultiesToDegrees[convertedFacultyType] = degrees_all_data;
             }
-        });
+          });
        });;
-    _fetchedData = facultiesToDegrees;
-    
-    //print(_fetchedData.keys);
+
+    _fetchedData = facultiesToDegrees;    
+    //print(_fetchedData);
     _isLinksLoading = false;
     notifyListeners();
   }).catchError((error) {

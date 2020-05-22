@@ -1,9 +1,12 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:bar_iland_app/scoped-models/main.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:grouped_buttons/grouped_buttons.dart';
 import 'package:scoped_model/scoped_model.dart';
+
+import 'package:bar_iland_app/scoped-models/main.dart';
 
 class LostBoard extends StatefulWidget {
   final MainModel model;
@@ -16,9 +19,13 @@ class LostBoard extends StatefulWidget {
 }
 
 class _LostBoardState extends State<LostBoard> {
+  ScrollController _lostScrollController = ScrollController();
+  ScrollController _typesScrollController = ScrollController();
+  ScrollController _locationsScrollController = ScrollController();
   String _selLostFoundType = "";
   String _selLostFoundDescription = "";
   List<String> _selOptionalLostLocations = [];
+  String _phoneNumber = "";
 
   @override
   void initState() {
@@ -94,36 +101,47 @@ class _LostBoardState extends State<LostBoard> {
                         color: Colors.blue,
                         label: Text("הוספת אבידה"),
                         onPressed: () {
+                           Navigator.pushReplacementNamed(
+                          context, '/addLost');
+                          /*
                           showDialog(
                             context: context,
+                            barrierDismissible: false,
                             builder: (BuildContext context) {
                               return _lostFoundTypeDialog();
                             },
                           );
+                          */
                         },
                       ),
                     ]),
               ),
               Container(
                 padding: EdgeInsets.only(top: 80),
-                child: ListView.builder(
-                  itemCount: losts.length,
-                  itemBuilder: (context, index) {
-                    return Container(
-                      alignment: Alignment.topRight,
-                      margin: EdgeInsets.symmetric(vertical: 6, horizontal: 8),
-                      decoration: BoxDecoration(
-                        color: Color.fromRGBO(210, 245, 250, 0.7),
-                        border: Border.all(
-                          color: Colors.blue[200],
+                child: Scrollbar(
+                  isAlwaysShown: true,
+                  controller: _lostScrollController,
+                  child: ListView.builder(
+                    controller: _lostScrollController,
+                    itemCount: losts.length,
+                    itemBuilder: (context, index) {
+                      return Container(
+                        alignment: Alignment.topRight,
+                        margin:
+                            EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+                        decoration: BoxDecoration(
+                          color: Color.fromRGBO(210, 245, 250, 0.7),
+                          border: Border.all(
+                            color: Colors.blue[200],
+                          ),
+                          borderRadius: BorderRadius.circular(15),
                         ),
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: losts[index],
-                    );
-                  },
+                        child: losts[index],
+                      );
+                    },
+                  ),
                 ),
-              ),
+              )
             ]),
           ),
         );
@@ -135,27 +153,33 @@ class _LostBoardState extends State<LostBoard> {
   }
 
   Widget _lostFoundTypeDialog() {
+    _selLostFoundType = "";
     return Directionality(
       textDirection: TextDirection.rtl,
       child: AlertDialog(
         title: Container(
-            padding: EdgeInsets.only(right: 10),
-            child: Text('בחר/י סוג אבידה:')),
-        content: SingleChildScrollView(
-            child: Container(
-          alignment: Alignment.topRight,
-          child: RadioButtonGroup(
-            labels: widget.model.LostFoundTypes,
-            onSelected: (String selected) => {_selLostFoundType = selected},
-          ),
-        )),
+            padding: EdgeInsets.all(5), child: Text('מהו סוג האבידה?')),
+        contentPadding: EdgeInsets.all(5),
+        content: Scrollbar(
+            isAlwaysShown: true,
+            controller: _typesScrollController,
+            child: ListView(controller: _typesScrollController, children: [
+              Container(
+                child: RadioButtonGroup(
+                  padding: EdgeInsets.only(right: 0),
+                  labels: widget.model.LostFoundTypes,
+                  onSelected: (String selected) =>
+                      {_selLostFoundType = selected},
+                ),
+              )
+            ])),
         actions: <Widget>[
           FlatButton(
             child: Text('הבא'),
             onPressed: () {
               if (_selLostFoundType != "") {
                 Navigator.of(context).pop();
-                _lostFoundDescriptionDialog(context);
+                _lostFoundDescriptionDialog();
               }
             },
           ),
@@ -170,7 +194,8 @@ class _LostBoardState extends State<LostBoard> {
     );
   }
 
-  Future<String> _lostFoundDescriptionDialog(BuildContext context) async {
+  Future<String> _lostFoundDescriptionDialog() async {
+    _selLostFoundDescription = "";
     return showDialog<String>(
       context: context,
       barrierDismissible: false,
@@ -178,7 +203,14 @@ class _LostBoardState extends State<LostBoard> {
         return Directionality(
           textDirection: TextDirection.rtl,
           child: AlertDialog(
-            title: Text('תיאור האבידה:'),
+            title: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text('תיאור האבידה:'),
+                Text('(לא חובה)',
+                    style: TextStyle(fontSize: 16, color: Colors.grey)),
+              ],
+            ),
             content: new Row(
               children: <Widget>[
                 new Expanded(
@@ -194,6 +226,21 @@ class _LostBoardState extends State<LostBoard> {
               ],
             ),
             actions: <Widget>[
+              /*
+              FlatButton(
+                child: Text('הקודם'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (BuildContext context) {
+                      return _lostFoundTypeDialog();
+                    },
+                  );
+                },
+              ),
+              */
               FlatButton(
                 child: Text('הבא'),
                 onPressed: () {
@@ -215,8 +262,9 @@ class _LostBoardState extends State<LostBoard> {
   }
 
   Future<String> _lostFoundLocationDialog(BuildContext context) async {
+    _selOptionalLostLocations = [];
     List<String> lostFoundLocations = [];
-    widget.model.Locations.forEach((location) {
+    widget.model.LostFoundLocations.forEach((location) {
       lostFoundLocations.add(location.Number + " - " + location.Name);
     });
     return showDialog<String>(
@@ -225,69 +273,80 @@ class _LostBoardState extends State<LostBoard> {
       builder: (BuildContext context) {
         return Directionality(
           textDirection: TextDirection.rtl,
-          child: Dialog(
-            child: Stack(children: [
+          child: AlertDialog(
+            contentPadding: EdgeInsets.all(5),
+            content: Stack(children: [
               Container(
                 height: 600,
                 padding: EdgeInsets.fromLTRB(0, 20, 15, 10),
-                child: Text(
-                  "היכן ייתכן שהאבידה נמצאת?",
-                  style: TextStyle(fontSize: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      "היכן ייתכן שהאבידה נמצאת?",
+                      style: TextStyle(fontSize: 20),
+                    ),
+                    Text('(לא חובה)',
+                        style: TextStyle(fontSize: 16, color: Colors.grey)),
+                  ],
                 ),
               ),
               Container(
-                  padding: EdgeInsets.only(top: 510),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: <Widget>[
-                      FlatButton(
-                        child: Text(
-                          "הבא",
-                          style: TextStyle(color: Colors.blue),
-                        ),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                          _lostFoundContactDialog(context);
-                        },
-                      ),
-                      FlatButton(
-                        child: Text(
-                          "ביטול",
-                          style: TextStyle(color: Colors.blue),
-                        ),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                      ),
-                    ],
-                  )),
-              Container(
-                padding: EdgeInsets.fromLTRB(0, 60, 0, 0),
+                padding: EdgeInsets.fromLTRB(0, 70, 0, 0),
                 height: 500,
-                child: ListView(children: [
-                  CheckboxGroup(
-                    padding: EdgeInsets.only(right: 10),
-                    labels: lostFoundLocations,
-                    onSelected: (List<String> checked) =>
-                        {_selOptionalLostLocations = checked},
-                    itemBuilder: (Checkbox cb, Text txt, int i) {
-                      Text text = Text(
-                        txt.data,
-                        style: TextStyle(
-                          fontSize: 15,
-                        ),
-                      );
-                      return Row(
-                        children: <Widget>[
-                          cb,
-                          text,
-                        ],
-                      );
-                    },
-                  )
-                ]),
-              ),
+                child: Scrollbar(
+                  isAlwaysShown: true,
+                  controller: _locationsScrollController,
+                  child: ListView(
+                      controller: _locationsScrollController,
+                      children: [
+                        CheckboxGroup(
+                          labels: lostFoundLocations,
+                          onSelected: (List<String> checked) =>
+                              {_selOptionalLostLocations = checked},
+                          itemBuilder: (Checkbox cb, Text txt, int i) {
+                            Text text = Text(
+                              txt.data,
+                              style: TextStyle(
+                                fontSize: 15,
+                              ),
+                            );
+                            return Row(
+                              children: <Widget>[
+                                cb,
+                                text,
+                              ],
+                            );
+                          },
+                        )
+                      ]),
+                ),
+              )
             ]),
+            actions: <Widget>[
+              /*
+              FlatButton(
+                child: Text('הקודם'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  _lostFoundDescriptionDialog();
+                },
+              ),
+              */
+              FlatButton(
+                child: Text('הבא'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  _lostFoundContactDialog(context);
+                },
+              ),
+              FlatButton(
+                child: Text('ביטול'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
           ),
         );
       },
@@ -295,6 +354,7 @@ class _LostBoardState extends State<LostBoard> {
   }
 
   Future<String> _lostFoundContactDialog(BuildContext context) async {
+    _phoneNumber = "";
     return showDialog<String>(
       context: context,
       barrierDismissible: false,
@@ -302,7 +362,13 @@ class _LostBoardState extends State<LostBoard> {
         return Directionality(
           textDirection: TextDirection.rtl,
           child: AlertDialog(
-            title: Text('טלפון ליצירת קשר:'),
+            title: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text('טלפון ליצירת קשר:'),
+                  Text('(יוצג לשאר משתמשי האפליקציה)',
+                      style: TextStyle(fontSize: 16, color: Colors.grey)),
+                ]),
             content: new Row(
               children: <Widget>[
                 new Expanded(
@@ -314,18 +380,32 @@ class _LostBoardState extends State<LostBoard> {
                     ],
                     decoration: new InputDecoration(icon: Icon(Icons.phone)),
                     onChanged: (value) {
-                      _selLostFoundDescription = value;
+                      _phoneNumber = value;
                     },
                   ),
                 )
               ],
             ),
             actions: <Widget>[
+              /*
+              FlatButton(
+                child: Text('הקודם'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  _lostFoundLocationDialog(context);
+                },
+              ),
+              */
               FlatButton(
                 child: Text('הבא'),
                 onPressed: () {
-                  if (_selLostFoundDescription != "" &&
-                      _selLostFoundDescription.length >= 9) {
+                  if (_phoneNumber != "" && _phoneNumber.length >= 9) {
+                    widget.model.addLost(
+                        "lost",
+                        _selLostFoundType,
+                        _selLostFoundDescription,
+                        _phoneNumber,
+                        _selOptionalLostLocations);
                     Navigator.of(context).pop();
                   }
                 },

@@ -17,6 +17,10 @@ class LostFoundModel extends Model {
     return _lostFoundTypes;
   }
 
+  List<Location> get LostFoundLocations {
+    return lostFoundLocations;
+  }
+
   Future<bool> addLostFoundType({String lostFoundType = "אביזרי מחשב"}) async {
     isLostFoundLoading = true;
     notifyListeners();
@@ -84,15 +88,17 @@ class LostFoundModel extends Model {
       Map<String, dynamic> locationsTypeData = json.decode(response.body);
       locationsTypeData
           .forEach((String locationType, dynamic locationsTypeData) {
-        Location location;
-        locationsTypeData.forEach((String id, dynamic locationData) {
-          location = Location(
-              id: id,
-              type: locationType,
-              name: locationData['name'],
-              number: locationData['number']);
-          fetchedLocations.add(location);
-        });
+        if (locationType != "squares") {
+          Location location;
+          locationsTypeData.forEach((String id, dynamic locationData) {
+            location = Location(
+                id: id,
+                type: locationType,
+                name: locationData['name'],
+                number: locationData['number']);
+            fetchedLocations.add(location);
+          });
+        }
       });
       fetchedLocations.sort((location1, location2) {
         List<String> location1SplitNumber = location1.Number.split(" ");
@@ -116,5 +122,40 @@ class LostFoundModel extends Model {
       isLostFoundLoading = false;
       notifyListeners();
     });
+  }
+
+  Future<bool> addLost(
+    String type,
+    String subtype,
+    String description,
+    String phoneNumber,
+    List<String> optionalLocations,
+  ) async {
+    isLostFoundLoading = true;
+    notifyListeners();
+    if (optionalLocations.length == 0) {
+      optionalLocations.add("");
+    }
+    DateTime today = new DateTime.now();
+    String currentDate =
+        "${today.day.toString()}/${today.month.toString().padLeft(2, '0')}/${today.year.toString().padLeft(2, '0')}";
+    final Map<String, dynamic> lostData = {
+      'subtype': subtype,
+      'description': description,
+      'reportDate': currentDate,
+      'optionalLocations': optionalLocations,
+      'phoneNumber': phoneNumber,
+    };
+    final http.Response response = await http.post(
+        'https://bar-iland-app.firebaseio.com/lostFound/${type}.json',
+        body: json.encode(lostData));
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      isLostFoundLoading = false;
+      notifyListeners();
+      return false;
+    }
+    isLostFoundLoading = false;
+    notifyListeners();
+    return true;
   }
 }
