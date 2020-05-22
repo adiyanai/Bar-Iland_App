@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:bar_iland_app/scoped-models/main.dart';
 
-
 class FoundBoard extends StatefulWidget {
   final MainModel model;
   FoundBoard(this.model);
-
 
   @override
   State<StatefulWidget> createState() {
@@ -14,12 +12,12 @@ class FoundBoard extends StatefulWidget {
 }
 
 class _FoundBoardState extends State<FoundBoard> {
-   @override
+  @override
   void initState() {
     super.initState();
   }
 
-     @override
+  @override
   Widget build(BuildContext context) {
     return Directionality(
       textDirection: TextDirection.rtl,
