@@ -100,7 +100,7 @@ class _ImportantLinksState extends State<ImportantLinks> {
           if(degrees_in_faculty[department].length > 1){
             degrees_in_faculty[department].sort(( Degree d1, Degree d2)=> (d1.name).compareTo(d2.name));
                   return ExpansionTile(
-                    leading: Container(padding: EdgeInsets.only(left: 0,right: 18,bottom:2 ,top:5),
+                    leading: Container(padding: EdgeInsets.only(left: 0,right: 33,bottom:2 ,top:5),
                        child: SizedBox( child:Icon(MaterialCommunityIcons.folder_outline))),
                     backgroundColor:Color.fromRGBO(220, 250, 250, 0.4),
                     title: Text(department,
