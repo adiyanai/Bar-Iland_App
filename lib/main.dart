@@ -1,3 +1,4 @@
+import 'package:bar_iland_app/pages/add_lost.dart';
 import 'package:bar_iland_app/pages/important_links.dart';
 import 'package:bar_iland_app/pages/lost_found_manager.dart';
 import 'package:bar_iland_app/pages/services.dart';
@@ -46,6 +47,7 @@ class _MyAppState extends State<MyApp> {
     return ScopedModel<MainModel>(
       model: model,
       child: MaterialApp(
+        theme: ThemeData(highlightColor: Colors.blue),
         //home: AuthPage(),
         routes: {
           '/': (BuildContext context) =>
@@ -58,7 +60,8 @@ class _MyAppState extends State<MyApp> {
           '/campusMap': (BuildContext context) => campus_map(),
           '/importantLinks': (BuildContext context) => ImportantLinks(model),
           '/services': (BuildContext context) => Services(model, model.ServicesView),
-          '/lostAndFound': (BuildContext context) => LostFoundManager(model),
+          '/lostFound': (BuildContext context) => LostFoundManager(model),
+          '/addLost':  (BuildContext context) => AddLost(model),
         },
       ),
     );
