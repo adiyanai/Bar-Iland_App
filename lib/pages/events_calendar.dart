@@ -4,13 +4,13 @@ import 'package:location/location.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../models/connection.dart';
 import '../scoped-models/main.dart';
 import '../models/event.dart';
 import '../models/event_location.dart';
 import './add_event.dart';
-import './google_map.dart';
 
 class EventsCalendar extends StatefulWidget {
   final MainModel _model;
@@ -24,22 +24,21 @@ class EventsCalendar extends StatefulWidget {
 
 class _EventsCalendarState extends State<EventsCalendar> {
   CalendarController _calendarController;
+  ScrollController _scrollController;
   Map<DateTime, List<dynamic>> _events;
   List<dynamic> _selectedEvents;
   ConnectionMode _connectionMode;
   Map<String, Icon> _eventTypesToIcons;
   List<EventLocation> _eventLocations;
-
-  // location properties
   Location _location;
-  bool _serviceEnabled;
-  PermissionStatus _permissionGranted;
+
 
   @override
   void initState() {
     _location = new Location();
     _connectionMode = widget._model.connectionMode;
     _calendarController = CalendarController();
+    _scrollController = ScrollController(initialScrollOffset: 0,keepScrollOffset: false);
     _selectedEvents = [];
     _eventTypesToIcons = _mapEventTypesToIcons();
     _events = {};
@@ -155,6 +154,14 @@ class _EventsCalendarState extends State<EventsCalendar> {
     );
   }
 
+  void _launchURL(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
   Column _buildEventLook(dynamic event) {
     double _screenWidth = MediaQuery.of(context).size.width;
     return Column(
@@ -181,32 +188,14 @@ class _EventsCalendarState extends State<EventsCalendar> {
                         color: Colors.blue[700],
                       ),
                       onPressed: () async {
-                        _serviceEnabled = await _location.serviceEnabled();
-                        if (!_serviceEnabled) {
-                          _serviceEnabled = await _location.requestService();
-                          if (!_serviceEnabled) {
-                            return;
-                          }
-                        }
-
-                        _permissionGranted = await _location.hasPermission();
-                        if (_permissionGranted == PermissionStatus.denied) {
-                          _permissionGranted =
-                              await _location.requestPermission();
-                          if (_permissionGranted != PermissionStatus.granted) {
-                            return;
-                          }
-                        }
-
                         // get the data of the event location
                         EventLocation eventLocationData =
                             _eventLocations.firstWhere((EventLocation item) =>
                                 (event.Location == item.NumberName));
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (BuildContext context) =>
-                                    GMap(eventLocationData)));
+
+                        LocationData userLocation = await _location.getLocation();
+                        String url = 'https://www.google.com/maps/dir/?api=1&origin=' + userLocation.latitude.toString() + ',' +  userLocation.longitude.toString() + '&destination=' + eventLocationData.Lat.toString() + ',' + eventLocationData.Lon.toString() + '&travelmode=walking';
+                        _launchURL(url);
                       },
                     ),
                   )
@@ -349,11 +338,17 @@ class _EventsCalendarState extends State<EventsCalendar> {
                   // events look
                   Container(
                     height: 160,
-                    child: ListView.builder(
-                      itemCount: _selectedEvents.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        return _buildEventLook(_selectedEvents[index]);
-                      },
+                    child: Scrollbar(
+                      controller: _scrollController,
+                      isAlwaysShown: _selectedEvents.length > 1 ? true : false,
+                      child: ListView.builder(
+                        padding: EdgeInsets.all(5),
+                        controller: _scrollController,
+                        itemCount: _selectedEvents.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return _buildEventLook(_selectedEvents[index]);
+                        },
+                      ),
                     ),
                   ),
                 ],
