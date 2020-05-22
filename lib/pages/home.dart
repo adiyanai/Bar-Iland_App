@@ -245,7 +245,7 @@ class HomePage extends StatelessWidget {
                                 splashColor: Colors.cyanAccent, // splash color
                                 onTap: () {
                                   Navigator.pushNamed(
-                                      context, '/lostAndFound');
+                                      context, '/lostFound');
                                 },
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,

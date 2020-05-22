@@ -10,8 +10,8 @@ class LostFoundManager extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    model.fetchLostFoundTypes();
     model.fetchLostFoundLocations();
+    model.fetchLostFoundTypes();
     return DefaultTabController(
       length: 2,
       child: Directionality(
