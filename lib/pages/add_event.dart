@@ -187,7 +187,7 @@ class AddEventState extends State<AddEvent> {
                               _timeText,
                               _selectedLocation,
                               _selectedEventType,
-                              _descriptionText);
+                              _descriptionText, widget._model);
                           Navigator.pushReplacementNamed(
                               context, '/eventsCalendar');
                         });
