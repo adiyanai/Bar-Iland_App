@@ -911,7 +911,7 @@ class _ServicesState extends State<Services> {
 
   Widget _buildAutoCompleteTextField() {
     List<String> suggestions = [];
-    widget.model.Locations.forEach((location) {
+    widget.model.AllServicesLocations.forEach((location) {
       suggestions.add(location.Number + " - " + location.Name);
     });
     return Container(
@@ -959,7 +959,7 @@ class _ServicesState extends State<Services> {
           _title = Container();
           _selectedArea = area;
           widget.model.SelectedServiceIndex = 0;
-          if (widget.model.Areas.contains(_selectedArea)) {
+          if (widget.model.ServicesAreas.contains(_selectedArea)) {
             setState(() {
               _isNotPressable = false;
               _searchButtonColor = Colors.blue;

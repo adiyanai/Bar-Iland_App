@@ -9,8 +9,8 @@ import '../models/service.dart';
 
 class ConnectedServicesModel extends Model {
   String _servicesView = "";
-  List<Location> locations = [];
-  List<String> areas = [];
+  List<Location> allServicesLocations = [];
+  List<String> servicesAreas = [];
   List<Service> services = [];
   bool _isServicesLoading = false;
   int _selectedServiceIndex = 0;
@@ -25,12 +25,12 @@ class ServicesModel extends ConnectedServicesModel {
     _servicesView = servicesView;
   }
 
-  List<String> get Areas {
-    return List.from(areas);
+  List<String> get ServicesAreas {
+    return List.from(servicesAreas);
   }
 
-  List<Location> get Locations {
-    return locations;
+  List<Location> get AllServicesLocations {
+    return allServicesLocations;
   }
 
   int get SelectedServiceIndex {
@@ -81,7 +81,7 @@ class ServicesModel extends ConnectedServicesModel {
           }
         }
       });
-      locations = fetchedLocations;
+      allServicesLocations = fetchedLocations;
       _isServicesLoading = false;
       notifyListeners();
     });
@@ -98,8 +98,8 @@ class ServicesModel extends ConnectedServicesModel {
       servicesData.forEach((String serviceType, dynamic servicesTypeData) {
         Service service;
         servicesTypeData.forEach((String id, dynamic serviceData) {
-          if (!areas.contains(serviceData['area'])) {
-            areas.add(serviceData['area']);
+          if (!servicesAreas.contains(serviceData['area'])) {
+            servicesAreas.add(serviceData['area']);
           }
           if (serviceType == "machines") {
             if (serviceData['subtype'] == "מקרר") {
