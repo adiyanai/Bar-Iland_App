@@ -1,9 +1,12 @@
-import 'package:bar_iland_app/models/degree.dart';
-import 'package:bar_iland_app/scoped-models/main.dart';
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import 'package:bar_iland_app/models/degree.dart';
+import 'package:bar_iland_app/scoped-models/main.dart';
 
 
 class ImportantLinks extends StatefulWidget {
@@ -18,7 +21,7 @@ class ImportantLinks extends StatefulWidget {
 }
 
 class _ImportantLinksState extends State<ImportantLinks> {
-  Map <String,Map<String,dynamic>> _allData = {};
+  Map <String,SplayTreeMap<String,List<Degree>>> _allData = {};
   @override
   void initState() {
     super.initState();
@@ -29,11 +32,13 @@ class _ImportantLinksState extends State<ImportantLinks> {
     await widget.model.fetchAll();
     setState(() {
       _allData = widget.model.allData;
-      //print(_allData);
-    });
+      var entries = _allData.entries.toList();
+      entries.sort((MapEntry <String,SplayTreeMap<String,List<Degree>>> a, MapEntry <String,SplayTreeMap<String,List<Degree>>> b) =>
+       a.key.toString().compareTo(b.key.toString()));
+      _allData = Map<String,SplayTreeMap<String,List<Degree>>>.fromEntries(entries);
+      });
+}
 
-  }
-  
  Map<String, Icon> _mapFacultiesTypesToIcons() {
     Map<String, Icon> eventsToIcons = {
       "הפקולטה להנדסה": Icon(MaterialCommunityIcons.folder),
@@ -70,8 +75,8 @@ class _ImportantLinksState extends State<ImportantLinks> {
             ));
   }
 
- Widget _buildFacultyFolder(String faculty_type,Map<String, List <Degree>> degrees_in_faculty){
-   
+ Widget _buildFacultyFolder(String faculty_type,SplayTreeMap<String,List<Degree>> degrees_in_faculty){
+
    Degree degree;
    return Directionality(
      textDirection: TextDirection.rtl,
@@ -93,8 +98,9 @@ class _ImportantLinksState extends State<ImportantLinks> {
      children:
         degrees_in_faculty.keys.map((dynamic department){
           if(degrees_in_faculty[department].length > 1){
+            degrees_in_faculty[department].sort(( Degree d1, Degree d2)=> (d1.name).compareTo(d2.name));
                   return ExpansionTile(
-                    leading: Container(padding: EdgeInsets.only(left: 0,right: 18,bottom:2 ,top:5),
+                    leading: Container(padding: EdgeInsets.only(left: 0,right: 33,bottom:2 ,top:5),
                        child: SizedBox( child:Icon(MaterialCommunityIcons.folder_outline))),
                     backgroundColor:Color.fromRGBO(220, 250, 250, 0.4),
                     title: Text(department,
@@ -111,7 +117,7 @@ class _ImportantLinksState extends State<ImportantLinks> {
    
   }
 
-  List<Widget> _buildFacultiesFolders(Map <String,Map<String,dynamic>> allData) {
+  List<Widget> _buildFacultiesFolders(Map<String,SplayTreeMap<String,List<Degree>>>allData) {
     List<Widget> list_of_faculties =[];
     allData.forEach((String faculty_type, dynamic degrees_in_faculties){
       Widget faculty_folder = _buildFacultyFolder(faculty_type, degrees_in_faculties);

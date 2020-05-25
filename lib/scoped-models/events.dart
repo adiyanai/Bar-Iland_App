@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../models/event.dart';
 import '../models/event_location.dart';
+import './main.dart';
 
 class EventsModel extends Model {
   final databaseURL = 'https://bar-iland-app.firebaseio.com/events';
@@ -63,7 +64,7 @@ class EventsModel extends Model {
   }
 
   Future<bool> addEvent(DateTime date, String time, String location,
-      String eventType, String eventDescription) async {
+      String eventType, String eventDescription, MainModel model) async {
     _isAddEventLoading = true;
     notifyListeners();
     final Map<String, dynamic> eventData = {
@@ -76,14 +77,13 @@ class EventsModel extends Model {
 
     try {
       final http.Response response = await http
-          .post(databaseURL + '/eventsData.json', body: json.encode(eventData));
+          .post(databaseURL + '/eventsData.json' + '?auth=${model.user.Token}', body: json.encode(eventData));
 
       if (response.statusCode != 200 && response.statusCode != 201) {
         _isAddEventLoading = false;
         notifyListeners();
         return false;
       }
-      print('end send event');
       final Map<String, dynamic> responseData = json.decode(response.body);
       final Event newEvent = Event(
           id: responseData['name'],
@@ -93,10 +93,8 @@ class EventsModel extends Model {
           eventType: eventType,
           eventDescription: eventDescription);
       _events.add(newEvent);
-      print('add event to list');
       _selEventId = responseData['name'];
       _isAddEventLoading = false;
-      print('isEventsLoading is false');
       notifyListeners();
       return true;
     } catch (error) {
@@ -197,8 +195,9 @@ class EventsModel extends Model {
       String location, locationId;
       double lat, lon;
       locationsData.forEach((String locationType, dynamic locationTypeData) {
-        if (locationType == 'amphitheaters') {
-          locationTypeData.forEach((String id, dynamic locationData) {
+        locationTypeData.forEach((String id, dynamic locationData) {
+          if ((locationData['name'] != 'מעונות') &&
+              (locationData['name'] != 'בנק מזרחי-טפחות')) {
             locationId = id;
             location = locationData['number'] + ' - ' + locationData['name'];
             lat = locationData['lat'];
@@ -211,57 +210,8 @@ class EventsModel extends Model {
               lon: lon,
             );
             fetchedEventsLocations.add(newEventLocation);
-          });
-        } else if (locationType == 'buildings') {
-          locationTypeData.forEach((String id, dynamic locationData) {
-            if (locationData['name'] != 'מעונות') {
-              locationId = id;
-              location = locationData['number'] + ' - ' + locationData['name'];
-              lat = locationData['lat'];
-              lon = locationData['lon'];
-              final EventLocation newEventLocation = EventLocation(
-                id: locationId,
-                type: locationType,
-                numberName: location,
-                lat: lat,
-                lon: lon,
-              );
-              fetchedEventsLocations.add(newEventLocation);
-            }
-          });
-        } else if (locationType == 'squares') {
-          locationTypeData.forEach((String id, dynamic locationData) {
-            locationId = id;
-            location = locationData['name'];
-            lat = locationData['lat'];
-            lon = locationData['lon'];
-            final EventLocation newEventLocation = EventLocation(
-              id: locationId,
-              type: locationType,
-              numberName: location,
-              lat: lat,
-              lon: lon,
-            );
-            fetchedEventsLocations.add(newEventLocation);
-          });
-        } else if (locationType == 'structures') {
-          locationTypeData.forEach((String id, dynamic locationData) {
-            if (locationData['name'] != 'בנק מזרחי-טפחות') {
-              locationId = id;
-              location = locationData['number'] + ' - ' + locationData['name'];
-              lat = locationData['lat'];
-              lon = locationData['lon'];
-              final EventLocation newEventLocation = EventLocation(
-                id: locationId,
-                type: locationType,
-                numberName: location,
-                lat: lat,
-                lon: lon,
-              );
-              fetchedEventsLocations.add(newEventLocation);
-            }
-          });
-        }
+          }
+        });
       });
       _eventsLocations = fetchedEventsLocations;
       _isEventsLocationsLoading = false;
