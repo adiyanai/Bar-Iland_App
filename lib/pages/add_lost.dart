@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:grouped_buttons/grouped_buttons.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 import '../scoped-models/main.dart';
@@ -18,19 +21,27 @@ class AddLost extends StatefulWidget {
 
 class AddLostState extends State<AddLost> {
   ScrollController _typesScrollController = ScrollController();
-  String _pageTitle = "סוג האבידה";
+  ScrollController _locationsScrollController = ScrollController();
+  String _pageTitle = "מהו סוג האבידה?";
   Color _nextButtonColor = Colors.grey;
+  String _nextButtonText = "הבא";
+  bool _isNextNotPressable = true;
   bool _isPreviousButtonVisible = false;
   String _selectedType = "";
   String _name = "";
   String _phoneNumber = "";
   String _description = "";
+  List<String> _selOptionalLostLocations = [];
   TextEditingController _nameController = TextEditingController();
   TextEditingController _phoneNumberController = TextEditingController();
   TextEditingController _descriptionController = TextEditingController();
   FocusNode _nameFocus = FocusNode();
   FocusNode _phoneNumberFocus = FocusNode();
   FocusNode _descriptionFocus = FocusNode();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  Future<File> _imageFile;
+  bool _isRemoveVisible = true;
+  Widget _image = Container();
 
   @override
   void initState() {
@@ -97,11 +108,18 @@ class AddLostState extends State<AddLost> {
 
   Widget _currentPageContent() {
     switch (_pageTitle) {
-      case "סוג האבידה":
+      case "מהו סוג האבידה?":
         return _lostTypeContent();
         break;
-      case "פרטים נוספים":
+      case "פרטים נוספים:":
         return _moreDetailsContent();
+        break;
+      case "היכן ייתכן שהאבידה נמצאת?":
+        return _possibleLocationsContent();
+        break;
+      case "תמונה להמחשה":
+        return _addingPictureContent();
+        break;
       default:
         return Container();
     }
@@ -134,12 +152,117 @@ class AddLostState extends State<AddLost> {
     return Container(
       height: MediaQuery.of(context).size.height / 1.4,
       color: Color.fromRGBO(220, 250, 250, 0.7),
-      child: Column(
+      child: Form(
+        key: _formKey,
+        child: Column(
+          children: <Widget>[
+            _nameFormField(),
+            _phoneNumberFormField(),
+            _descriptionFormField(),
+            _note()
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _possibleLocationsContent() {
+    _selOptionalLostLocations = [];
+    List<String> lostFoundLocations = [];
+    widget.model.LostFoundLocations.forEach((location) {
+      lostFoundLocations.add(location.Number + " - " + location.Name);
+    });
+    return Container(
+      height: MediaQuery.of(context).size.height / 1.4,
+      color: Color.fromRGBO(220, 250, 250, 0.7),
+      child: Scrollbar(
+        isAlwaysShown: true,
+        controller: _locationsScrollController,
+        child: ListView(controller: _locationsScrollController, children: [
+          CheckboxGroup(
+            onSelected: (List<String> checked) => setState(() {
+              _selOptionalLostLocations = checked;
+            }),
+            labels: lostFoundLocations,
+            onChange: (bool isChecked, String label, int index) {
+              _selOptionalLostLocations.add(label);
+            },
+            itemBuilder: (Checkbox cb, Text txt, int i) {
+              Text text = Text(
+                txt.data,
+                style: TextStyle(
+                  fontSize: 15,
+                ),
+              );
+              return Row(
+                children: <Widget>[
+                  cb,
+                  text,
+                ],
+              );
+            },
+          )
+        ]),
+      ),
+    );
+  }
+
+  void _pickImageFromGallery(ImageSource source) {
+    setState(() {
+      _imageFile = ImagePicker.pickImage(source: source);
+    });
+  }
+
+  Widget _showImage() {
+    return FutureBuilder<File>(
+        future: _imageFile,
+        builder: (BuildContext context, AsyncSnapshot<File> snapshot) {
+          if (snapshot.connectionState == ConnectionState.done &&
+              snapshot.data != null) {
+            return Column(children: <Widget>[
+              Row(mainAxisAlignment: MainAxisAlignment.end, children: <Widget>[
+                RaisedButton.icon(
+                  icon: Icon(MaterialCommunityIcons.trash_can),
+                  textColor: Colors.white,
+                  color: Colors.blue,
+                  label: Text("הסרת התמונה"),
+                  onPressed: () {
+                    setState(() {
+                      _image = Container();
+                    });
+                  },
+                ),
+              ]),
+              Image.file(snapshot.data,
+                  fit: BoxFit.scaleDown,
+                  height: MediaQuery.of(context).size.height / 1.6,
+                  width: MediaQuery.of(context).size.width)
+            ]);
+          } else
+            return Container();
+        });
+  }
+
+  Widget _addingPictureContent() {
+    return Container(
+      height: MediaQuery.of(context).size.height / 1.4,
+      width: MediaQuery.of(context).size.height,
+      color: Color.fromRGBO(220, 250, 250, 0.7),
+      child: Stack(
         children: <Widget>[
-          _nameFormField(),
-          _phoneNumberFormField(),
-          _descriptionFormField(),
-          _note()
+          RaisedButton.icon(
+            icon: Icon(Icons.add_photo_alternate),
+            textColor: Colors.white,
+            color: Colors.blue,
+            label: Text("הוספת תמונה"),
+            onPressed: () {
+              _pickImageFromGallery(ImageSource.gallery);
+              setState(() {
+                _image = _showImage();
+              });
+            },
+          ),
+          _image,
         ],
       ),
     );
@@ -156,6 +279,14 @@ class AddLostState extends State<AddLost> {
         inputFormatters: [
           LengthLimitingTextInputFormatter(30),
         ],
+        validator: (value) {
+          if (RegExp(r'[!@#<>?":_`~;[\]\\|=+)(*&^%0-9-]').hasMatch(value)) {
+            return 'יש להזין שם בעל אותיות בלבד';
+          }
+          if (value.length < 2) {
+            return 'יש להזין שם בעל שתי אותיות לפחות';
+          }
+        },
         onChanged: (value) {
           _name = value;
           setState(() {
@@ -185,6 +316,11 @@ class AddLostState extends State<AddLost> {
           WhitelistingTextInputFormatter.digitsOnly,
           LengthLimitingTextInputFormatter(10),
         ],
+        validator: (value) {
+          if (value.isEmpty || !RegExp(r"^[0][5][0-9]{8}$").hasMatch(value)) {
+            return 'יש להזין מספר טלפון תקין';
+          }
+        },
         textInputAction: TextInputAction.next,
         focusNode: _phoneNumberFocus,
         onChanged: (value) {
@@ -197,7 +333,7 @@ class AddLostState extends State<AddLost> {
           _fieldFocusChange(context, _phoneNumberFocus, _descriptionFocus);
         },
         decoration: InputDecoration(
-          hintText: "טלפון ליצירת קשר",
+          hintText: "טלפון נייד ליצירת קשר",
           icon: Icon(Icons.phone),
           fillColor: Colors.white,
         ),
@@ -245,12 +381,20 @@ class AddLostState extends State<AddLost> {
             onPressed: () {
               setState(() {
                 switch (_pageTitle) {
-                  case "פרטים נוספים":
-                    _pageTitle = "סוג האבידה";
-                    setState(() {
-                      _nextButtonView(_pageTitle);
-                      _isPreviousButtonVisible = false;
-                    });
+                  case "פרטים נוספים:":
+                    _isNextNotPressable = false;
+                    _pageTitle = "מהו סוג האבידה?";
+                    _nextButtonView(_pageTitle);
+                    _isPreviousButtonVisible = false;
+                    break;
+                  case "היכן ייתכן שהאבידה נמצאת?":
+                    _pageTitle = "תמונה להמחשה";
+                    _nextButtonView(_pageTitle);
+                    break;
+                  case "תמונה להמחשה":
+                    _pageTitle = "פרטים נוספים:";
+                    _nextButtonView(_pageTitle);
+                    break;
                 }
               });
             },
@@ -266,24 +410,40 @@ class AddLostState extends State<AddLost> {
             Navigator.pushReplacementNamed(context, '/lostFound');
           },
         ),
-        RaisedButton(
-          child: Text(
-            'הבא',
-            style: TextStyle(color: Colors.white),
-          ),
-          color: _nextButtonColor,
-          onPressed: () {
-            setState(() {
-              switch (_pageTitle) {
-                case "סוג האבידה":
-                  _pageTitle = "פרטים נוספים";
-                  setState(() {
+        IgnorePointer(
+          ignoring: _isNextNotPressable,
+          child: RaisedButton(
+            child: Text(
+              _nextButtonText,
+              style: TextStyle(color: Colors.white),
+            ),
+            color: _nextButtonColor,
+            onPressed: () {
+              setState(() {
+                switch (_pageTitle) {
+                  case "מהו סוג האבידה?":
+                    _pageTitle = "פרטים נוספים:";
                     _nextButtonView(_pageTitle);
                     _isPreviousButtonVisible = true;
-                  });
-              }
-            });
-          },
+                    break;
+                  case "פרטים נוספים:":
+                    if (_formKey.currentState.validate()) {
+                      _pageTitle = "תמונה להמחשה";
+                    }
+                    _nextButtonView(_pageTitle);
+                    break;
+                  case "תמונה להמחשה":
+                    _pageTitle = "היכן ייתכן שהאבידה נמצאת?";
+                    _nextButtonView(_pageTitle);
+                    break;
+                  case "היכן ייתכן שהאבידה נמצאת?":
+                    widget.model.addLost("lost", _selectedType, _name,
+                        _phoneNumber, _description, _selOptionalLostLocations);
+                    Navigator.pushReplacementNamed(context, '/lostFound');
+                }
+              });
+            },
+          ),
         ),
       ],
     );
@@ -292,54 +452,72 @@ class AddLostState extends State<AddLost> {
   Widget _note() {
     return Container(
       margin: EdgeInsets.fromLTRB(0, 80, 20, 0),
-      child: Column(children: <Widget>[
-        Row(
-          children: <Widget>[
-            Text(
-              "שימ/י ",
-              style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blue),
-            ),
-            Icon(MaterialCommunityIcons.heart, color: Colors.blue),
-            Text(
-              ":",
-              style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blue),
-            ),
-          ],
-        ),
-        Row(
-          children: <Widget>[
-            Text("המידע יוצג לשאר משתמשי האפליקציה",
+      child: Column(
+        children: <Widget>[
+          Row(
+            children: <Widget>[
+              Text(
+                "שימ/י ",
                 style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Colors.blue))
-          ],
-        )
-      ]),
+                    color: Colors.blue),
+              ),
+              Icon(MaterialCommunityIcons.heart, color: Colors.blue),
+              Text(
+                ":",
+                style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue),
+              ),
+            ],
+          ),
+          Row(
+            children: <Widget>[
+              Text(
+                "המידע יוצג לשאר משתמשי האפליקציה",
+                style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue),
+              )
+            ],
+          )
+        ],
+      ),
     );
   }
 
   void _nextButtonView(String pageTitle) {
     switch (pageTitle) {
-      case "סוג האבידה":
+      case "מהו סוג האבידה?":
+        _nextButtonText = "הבא";
         if (_selectedType != "") {
           _nextButtonColor = Colors.blue;
+          _isNextNotPressable = false;
         } else {
           _nextButtonColor = Colors.grey;
+          _isNextNotPressable = true;
         }
         break;
-      case "פרטים נוספים":
-        if (_name.length >= 2 && _phoneNumber.length == 10) {
+      case "פרטים נוספים:":
+        _nextButtonText = "הבא";
+        if (_name.length >= 1 && _phoneNumber.length >= 1) {
           _nextButtonColor = Colors.blue;
+          _isNextNotPressable = false;
         } else {
           _nextButtonColor = Colors.grey;
+          _isNextNotPressable = true;
         }
+        break;
+      case "תמונה להמחשה":
+        _nextButtonText = "הבא";
+        _nextButtonColor = Colors.blue;
+        break;
+      case "היכן ייתכן שהאבידה נמצאת?":
+        _nextButtonText = "סיום";
+        _nextButtonColor = Colors.blue;
     }
   }
 
