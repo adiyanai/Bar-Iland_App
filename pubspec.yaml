@@ -43,6 +43,7 @@ dependencies:
   flutter_emoji: ^2.2.1+1
   location: ^3.0.2
   grouped_buttons: ^1.0.3
+  image_picker: ^0.6.6+4
 
 
 
