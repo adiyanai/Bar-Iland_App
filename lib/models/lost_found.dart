@@ -4,16 +4,18 @@ class LostFound {
   final String id;
   final String type;
   final String subtype;
-  final String description;
+  final String name;
   final String phoneNumber;
+  final String description;
   final String picture;
 
   LostFound(
       {@required this.id,
       @required this.type,
       @required this.subtype,
-      @required this.description,
+      @required this.name,
       @required this.phoneNumber,
+      @required this.description,
       @required this.picture});
 
   String get Id {
@@ -28,12 +30,16 @@ class LostFound {
     return subtype;
   }
 
-  String get Description {
-    return description;
+  String get Name {
+    return name;
   }
 
   String get PhoneNumber {
     return phoneNumber;
+  }
+
+  String get Description {
+    return description;
   }
 
   String get Picture {
@@ -41,9 +47,8 @@ class LostFound {
   }
 }
 
-
 class Lost extends LostFound {
-  List<String> optionalLocations = []; 
+  List<String> optionalLocations = [];
   Lost({
     @required id,
     @required type,
