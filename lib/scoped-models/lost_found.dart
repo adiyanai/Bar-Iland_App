@@ -127,8 +127,9 @@ class LostFoundModel extends Model {
   Future<bool> addLost(
     String type,
     String subtype,
-    String description,
+    String name,
     String phoneNumber,
+    String description,
     List<String> optionalLocations,
   ) async {
     isLostFoundLoading = true;
@@ -141,10 +142,11 @@ class LostFoundModel extends Model {
         "${today.day.toString()}/${today.month.toString().padLeft(2, '0')}/${today.year.toString().padLeft(2, '0')}";
     final Map<String, dynamic> lostData = {
       'subtype': subtype,
-      'description': description,
-      'reportDate': currentDate,
-      'optionalLocations': optionalLocations,
+      'name': name,
       'phoneNumber': phoneNumber,
+      'description': description,
+      'optionalLocations': optionalLocations,
+      'reportDate': currentDate,
     };
     final http.Response response = await http.post(
         'https://bar-iland-app.firebaseio.com/lostFound/${type}.json',
