@@ -45,12 +45,8 @@ dependencies:
   location: ^3.0.2
   grouped_buttons: ^1.0.3
   image_picker: ^0.6.6+4
-<<<<<<< HEAD
- 
-=======
   firebase_storage: ^3.0.8
 
->>>>>>> f5c8b4a2b26d1dee47d23009418a4d2e0476f411
 
 
 
