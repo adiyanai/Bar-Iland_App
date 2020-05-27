@@ -131,6 +131,7 @@ class LostFoundModel extends Model {
     String phoneNumber,
     String description,
     List<String> optionalLocations,
+    String imageUrl
   ) async {
     isLostFoundLoading = true;
     notifyListeners();
@@ -147,6 +148,7 @@ class LostFoundModel extends Model {
       'description': description,
       'optionalLocations': optionalLocations,
       'reportDate': currentDate,
+      'imageUrl': imageUrl
     };
     final http.Response response = await http.post(
         'https://bar-iland-app.firebaseio.com/lostFound/${type}.json',

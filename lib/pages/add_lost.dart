@@ -2,10 +2,12 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:scoped_model/scoped_model.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:grouped_buttons/grouped_buttons.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:scoped_model/scoped_model.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 import '../scoped-models/main.dart';
 
@@ -39,7 +41,9 @@ class AddLostState extends State<AddLost> {
   FocusNode _phoneNumberFocus = FocusNode();
   FocusNode _descriptionFocus = FocusNode();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  Future<File> _imageFile;
+  Future<File> _futureImageFile;
+  File _imageFile;
+  String _imageUrl;
   bool _isRemoveVisible = true;
   Widget _image = Container();
 
@@ -114,11 +118,11 @@ class AddLostState extends State<AddLost> {
       case "פרטים נוספים:":
         return _moreDetailsContent();
         break;
-      case "היכן ייתכן שהאבידה נמצאת?":
-        return _possibleLocationsContent();
-        break;
       case "תמונה להמחשה":
         return _addingPictureContent();
+        break;
+      case "היכן ייתכן שהאבידה נמצאת?":
+        return _possibleLocationsContent();
         break;
       default:
         return Container();
@@ -209,16 +213,17 @@ class AddLostState extends State<AddLost> {
 
   void _pickImageFromGallery(ImageSource source) {
     setState(() {
-      _imageFile = ImagePicker.pickImage(source: source);
+      _futureImageFile = ImagePicker.pickImage(source: source);
     });
   }
 
   Widget _showImage() {
     return FutureBuilder<File>(
-        future: _imageFile,
+        future: _futureImageFile,
         builder: (BuildContext context, AsyncSnapshot<File> snapshot) {
           if (snapshot.connectionState == ConnectionState.done &&
               snapshot.data != null) {
+            _imageFile = snapshot.data;
             return Column(children: <Widget>[
               Row(mainAxisAlignment: MainAxisAlignment.end, children: <Widget>[
                 RaisedButton.icon(
@@ -437,8 +442,7 @@ class AddLostState extends State<AddLost> {
                     _nextButtonView(_pageTitle);
                     break;
                   case "היכן ייתכן שהאבידה נמצאת?":
-                    widget.model.addLost("lost", _selectedType, _name,
-                        _phoneNumber, _description, _selOptionalLostLocations);
+                    _uploadImage();
                     Navigator.pushReplacementNamed(context, '/lostFound');
                 }
               });
@@ -447,6 +451,18 @@ class AddLostState extends State<AddLost> {
         ),
       ],
     );
+  }
+
+  void _uploadImage() async {
+    final StorageReference postImageRef =
+        FirebaseStorage.instance.ref().child("lostImages");
+    var timeKey = new DateTime.now();
+    final StorageUploadTask uploadTask =
+        postImageRef.child(timeKey.toString() + ".jpg").putFile(_imageFile);
+    var ImageUrl = await (await uploadTask.onComplete).ref.getDownloadURL();
+    _imageUrl = ImageUrl.toString();
+    widget.model.addLost("lost", _selectedType, _name, _phoneNumber,
+        _description, _selOptionalLostLocations, _imageUrl);
   }
 
   Widget _note() {
