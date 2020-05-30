@@ -13,21 +13,18 @@ class HomePage extends StatelessWidget {
     List<Event> eventsData = [];
     List<Event> events = [];
 
-    void initEvents()async{
+    Future<List<Event>> initEvents()async{
       await _model.fetchEvents();
       eventsData = _model.allEvents;
-      if(_model.isEventsLoading){
-        CircularProgressIndicator();
-      }
-      events = getEventsOfCurrentDay(eventsData);
+      return eventsData;
     }
 
   List<Event> getEventsOfCurrentDay(List<Event>events_data){
       DateTime tomorrow  = DateTime(2020,04,15);
       DateTime today = new DateTime.now(); 
       List <Event> todays_events = [];
-      String tomorrow_date  = today.toString().substring(0,10);
-      eventsData.forEach((event) {
+      String tomorrow_date  = tomorrow.toString().substring(0,10);
+      events_data.forEach((event) {
       String event_date = event.date.toString().substring(0,10);
         if(tomorrow_date == event_date){
           todays_events.add(event);
@@ -180,16 +177,22 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  DecorationImage _buildBackgroungImage() {
-    return DecorationImage(
-      image: AssetImage('assets/background.jpg'),
-      fit: BoxFit.cover,
-      colorFilter: ColorFilter.mode(
-        Colors.black.withOpacity(0.55),
-        BlendMode.dstATop,
+
+Container _buildBackgroungImage() {
+    return Container(
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage('assets/background.jpg'),
+          fit: BoxFit.cover,
+          colorFilter: ColorFilter.mode(
+            Colors.black.withOpacity(0.55),
+            BlendMode.dstATop,
+          ),
+        ),
       ),
     );
   }
+
 
 Container _buildEventsBoard(List<Event> todays_events){
   SizedBox(height:4);
@@ -220,9 +223,35 @@ Container _buildEventsBoard(List<Event> todays_events){
   ));
 }
 
+
   @override
   Widget build(BuildContext context) {
-    initEvents(); 
+    return FutureBuilder(
+    future: initEvents(), 
+    builder: (BuildContext context, AsyncSnapshot snapshot) {
+      if (!snapshot.hasData) {
+        if (snapshot.connectionState == ConnectionState.done &&
+            snapshot.data != null) {
+          eventsData = snapshot.data;
+        }
+        else{
+            return Stack(
+              children: <Widget>[
+                _buildBackgroungImage(),
+              Center(
+                child: CircularProgressIndicator(),
+              )
+              ],
+            );
+        }
+      }
+      return _build(context);
+    });
+  }
+
+  
+  Widget _build(BuildContext context) {
+      events = getEventsOfCurrentDay(eventsData);
        return Directionality(
         textDirection: TextDirection.rtl,
         child: Scaffold(
@@ -241,10 +270,9 @@ Container _buildEventsBoard(List<Event> todays_events){
               ),
             ),
           ),
-          body: Container(
-            decoration: BoxDecoration(
-              image: _buildBackgroungImage(),
-            ),
+          body:  Stack(children: <Widget>[
+          _buildBackgroungImage(),
+           Container(
             child: GestureDetector(
               onTap: () {
                 FocusScope.of(context).requestFocus(FocusNode());
@@ -445,6 +473,8 @@ Container _buildEventsBoard(List<Event> todays_events){
               ),
             ),
           ),
-        ));
+          ])
+        ,)
+        );
       }
   }
