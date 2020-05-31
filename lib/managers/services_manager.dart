@@ -1,7 +1,7 @@
 import 'package:bar_iland_app/scoped-models/main.dart';
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import './pages/services.dart';
+import '../pages/services.dart';
 
 class ServiceManager extends StatelessWidget {
   final MainModel model;

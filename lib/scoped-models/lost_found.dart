@@ -7,7 +7,7 @@ import 'package:http/http.dart' as http;
 
 class LostFoundModel extends Model {
   final _lostFoundURL = 'https://bar-iland-app.firebaseio.com/lostFound';
-  List<LostFound> _lost = [];
+  List<LostFound> losts = [];
   List<LostFound> _found = [];
   List<String> _lostFoundTypes = [];
   List<Location> lostFoundLocations = [];
@@ -27,7 +27,6 @@ class LostFoundModel extends Model {
     final Map<String, dynamic> lostFoundTypeData = {
       'lostFoundType': lostFoundType
     };
-
     try {
       final http.Response response = await http.post(
           _lostFoundURL + '/lostFoundTypes.json',
@@ -54,13 +53,13 @@ class LostFoundModel extends Model {
         .get(_lostFoundURL + '/lostFoundTypes.json')
         .then<Null>((http.Response response) {
       final List<String> fetchedLostFoundTypes = [];
-      final Map<String, dynamic> eventTypesData = json.decode(response.body);
-      if (eventTypesData == null) {
+      final Map<String, dynamic> lostFoundTypesData = json.decode(response.body);
+      if (lostFoundTypesData == null) {
         isLostFoundLoading = false;
         notifyListeners();
         return;
       }
-      eventTypesData
+      lostFoundTypesData
           .forEach((String lostFoundTypeId, dynamic lostFoundTypeData) {
         fetchedLostFoundTypes.add(lostFoundTypeData['lostFoundType']);
       });
@@ -119,6 +118,38 @@ class LostFoundModel extends Model {
         }
       });
       lostFoundLocations = fetchedLocations;
+      isLostFoundLoading = false;
+      notifyListeners();
+    });
+  }
+
+   Future<Null> fetchLost() {
+    isLostFoundLoading = true;
+    notifyListeners();
+    return http
+        .get(_lostFoundURL + '/lost.json')
+        .then<Null>((http.Response response) {
+      final List<LostFound> fetchedLosts = [];
+      Map<String, dynamic> lostsData = json.decode(response.body);
+      lostsData
+          .forEach((String lostId, dynamic lostData) {
+            List<String> optLocations = [];
+            (lostData['optionalLocations']).forEach((location){
+              optLocations.add(location);
+            });           
+            Lost lost = Lost(
+                id: lostId,
+                type: "lost",
+                subtype: lostData['subtype'],
+                name: lostData['name'],
+                phoneNumber: lostData['phoneNumber'],
+                description: lostData['description'],
+                reportDate: lostData['reportDate'],
+                imageUrl: lostData['imageUrl'],
+                optionalLocations: optLocations);
+            fetchedLosts.add(lost);
+          });      
+      losts = fetchedLosts;
       isLostFoundLoading = false;
       notifyListeners();
     });
