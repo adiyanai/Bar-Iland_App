@@ -1,4 +1,4 @@
-import 'package:bar_iland_app/services_icons.dart';
+import 'package:bar_iland_app/utilities/services_icons.dart';
 import '../models/service.dart';
 
 import 'package:url_launcher/url_launcher.dart';
