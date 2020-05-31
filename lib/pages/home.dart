@@ -349,7 +349,9 @@ Container _buildEventsBoard(List<Event> todays_events){
                               color: Colors.lightBlue[200], // button color
                               child: InkWell(
                                 splashColor: Colors.cyanAccent, // splash color
-                                onTap: () {}, // button pressed
+                                onTap: () { 
+                                  Navigator.pushNamed(context, '/coursesInformation');
+                                  }, // button pressed
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: <Widget>[
