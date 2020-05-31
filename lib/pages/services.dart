@@ -1,6 +1,6 @@
 import 'package:autocomplete_textfield/autocomplete_textfield.dart';
 import 'package:bar_iland_app/models/connection.dart';
-import 'package:bar_iland_app/services_icons.dart';
+import 'package:bar_iland_app/utilities/services_icons.dart';
 import 'package:bar_iland_app/widgets/services_widgets.dart';
 
 import 'package:flutter/material.dart';

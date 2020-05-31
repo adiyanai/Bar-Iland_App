@@ -43,8 +43,7 @@ class AddLostState extends State<AddLost> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   Future<File> _futureImageFile;
   File _imageFile;
-  String _imageUrl;
-  bool _isRemoveVisible = true;
+  String _imageUrl = "";
   Widget _image = Container();
 
   @override
@@ -101,12 +100,13 @@ class AddLostState extends State<AddLost> {
   Widget _buildPageContent() {
     return Stack(children: [
       Container(
+          height: 550,
           padding: EdgeInsets.fromLTRB(0, 20, 0, 60),
           child: _currentPageContent()),
       Container(
         padding: EdgeInsets.only(top: 500),
         child: _navigationButtons(),
-      )
+      ),
     ]);
   }
 
@@ -171,7 +171,6 @@ class AddLostState extends State<AddLost> {
   }
 
   Widget _possibleLocationsContent() {
-    _selOptionalLostLocations = [];
     List<String> lostFoundLocations = [];
     widget.model.LostFoundLocations.forEach((location) {
       lostFoundLocations.add(location.Number + " - " + location.Name);
@@ -188,9 +187,11 @@ class AddLostState extends State<AddLost> {
               _selOptionalLostLocations = checked;
             }),
             labels: lostFoundLocations,
+            /*
             onChange: (bool isChecked, String label, int index) {
               _selOptionalLostLocations.add(label);
             },
+            */
             itemBuilder: (Checkbox cb, Text txt, int i) {
               Text text = Text(
                 txt.data,
@@ -224,25 +225,30 @@ class AddLostState extends State<AddLost> {
           if (snapshot.connectionState == ConnectionState.done &&
               snapshot.data != null) {
             _imageFile = snapshot.data;
-            return Column(children: <Widget>[
-              Row(mainAxisAlignment: MainAxisAlignment.end, children: <Widget>[
-                RaisedButton.icon(
-                  icon: Icon(MaterialCommunityIcons.trash_can),
-                  textColor: Colors.white,
-                  color: Colors.blue,
-                  label: Text("הסרת התמונה"),
-                  onPressed: () {
-                    setState(() {
-                      _image = Container();
-                    });
-                  },
+            return Column(
+              children: <Widget>[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: <Widget>[
+                    RaisedButton.icon(
+                      icon: Icon(MaterialCommunityIcons.trash_can),
+                      textColor: Colors.white,
+                      color: Colors.blue,
+                      label: Text("הסרת התמונה"),
+                      onPressed: () {
+                        setState(() {
+                          _image = Container();
+                        });
+                      },
+                    ),
+                  ],
                 ),
-              ]),
-              Image.file(snapshot.data,
-                  fit: BoxFit.scaleDown,
-                  height: MediaQuery.of(context).size.height / 1.6,
-                  width: MediaQuery.of(context).size.width)
-            ]);
+                Image.file(snapshot.data,
+                    fit: BoxFit.contain,
+                    height: MediaQuery.of(context).size.height / 1.6,
+                    width: MediaQuery.of(context).size.width)
+              ],
+            );
           } else
             return Container();
         });
@@ -286,10 +292,10 @@ class AddLostState extends State<AddLost> {
         ],
         validator: (value) {
           if (RegExp(r'[!@#<>?":_`~;[\]\\|=+)(*&^%0-9-]').hasMatch(value)) {
-            return 'יש להזין שם בעל אותיות בלבד';
+            return 'יש להזין שם המכיל אותיות בלבד';
           }
           if (value.length < 2) {
-            return 'יש להזין שם בעל שתי אותיות לפחות';
+            return 'יש להזין שם המכיל שתי אותיות לפחות';
           }
         },
         onChanged: (value) {
@@ -443,6 +449,7 @@ class AddLostState extends State<AddLost> {
                     break;
                   case "היכן ייתכן שהאבידה נמצאת?":
                     _uploadImage();
+
                     Navigator.pushReplacementNamed(context, '/lostFound');
                 }
               });
@@ -454,13 +461,16 @@ class AddLostState extends State<AddLost> {
   }
 
   void _uploadImage() async {
-    final StorageReference postImageRef =
+    if (_imageFile != null) {
+final StorageReference postImageRef =
         FirebaseStorage.instance.ref().child("lostImages");
     var timeKey = new DateTime.now();
     final StorageUploadTask uploadTask =
         postImageRef.child(timeKey.toString() + ".jpg").putFile(_imageFile);
     var ImageUrl = await (await uploadTask.onComplete).ref.getDownloadURL();
     _imageUrl = ImageUrl.toString();
+    }
+    
     widget.model.addLost("lost", _selectedType, _name, _phoneNumber,
         _description, _selOptionalLostLocations, _imageUrl);
   }

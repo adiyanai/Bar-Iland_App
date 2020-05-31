@@ -7,7 +7,8 @@ class LostFound {
   final String name;
   final String phoneNumber;
   final String description;
-  final String picture;
+  final String reportDate;
+  final String imageUrl;
 
   LostFound(
       {@required this.id,
@@ -16,7 +17,8 @@ class LostFound {
       @required this.name,
       @required this.phoneNumber,
       @required this.description,
-      @required this.picture});
+      @required this.reportDate,
+      @required this.imageUrl});
 
   String get Id {
     return id;
@@ -42,8 +44,12 @@ class LostFound {
     return description;
   }
 
-  String get Picture {
-    return picture;
+  String get ReportDate {
+    return reportDate;
+  }
+
+  String get ImageUrl {
+    return imageUrl;
   }
 }
 
@@ -53,11 +59,22 @@ class Lost extends LostFound {
     @required id,
     @required type,
     @required subtype,
-    @required description,
+    @required name,
     @required phoneNumber,
-    @required picture,
+    @required description,
+    @required reportDate,
+    @required imageUrl,
     @required this.optionalLocations,
-  });
+  }) : super(
+          id: id,
+          type: type,
+          subtype: subtype,
+          name: name,
+          phoneNumber: phoneNumber,
+          description: description,
+          reportDate: reportDate,
+          imageUrl: imageUrl,
+        );
 
   List<String> get OptionalLocations {
     return optionalLocations;
@@ -73,13 +90,24 @@ class Found extends LostFound {
     @required id,
     @required type,
     @required subtype,
-    @required description,
+    @required name,
     @required phoneNumber,
-    @required picture,
+    @required description,
+    @required reportDate,
+    @required imageUrl,
     @required this.area,
     @required this.isInArea,
     @required this.specificLocation,
-  });
+  }) : super(
+          id: id,
+          type: type,
+          subtype: subtype,
+          name: name,
+          phoneNumber: phoneNumber,
+          description: description,
+          reportDate: reportDate,
+          imageUrl: imageUrl,
+        );
 
   String get Area {
     return area;
