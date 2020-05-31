@@ -13,8 +13,9 @@ description: A new Flutter project.
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 version: 1.0.0+1
 
-environment:
+environment:  
   sdk: ">=2.2.2 <3.0.0"
+
 
 dependencies:
   flutter:
@@ -47,7 +48,7 @@ dependencies:
   image_picker: ^0.6.6+4
  
   firebase_storage: ^3.0.8
-
+  flutter_inappwebview: ^3.3.0
 
 
 
