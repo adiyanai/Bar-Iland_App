@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
-
 class CoursesInformation extends StatefulWidget {
   @override
   _CoursesInformationState createState() => _CoursesInformationState();
@@ -24,10 +23,10 @@ class _CoursesInformationState extends State<CoursesInformation> {
   Widget build(BuildContext context) {
     return Directionality(
       textDirection: TextDirection.rtl,
-      child: Scaffold(
+        child: Scaffold(
         appBar: AppBar(
           title: const Text('מידע על קורסים'),
-          centerTitle: true,
+          centerTitle: true,        
         ),
         body: Container(
             child: Column(children: <Widget>[
@@ -56,3 +55,4 @@ class _CoursesInformationState extends State<CoursesInformation> {
     );
   }
 }
+
