@@ -14,6 +14,7 @@ import './services_manager.dart';
 import './pages/events_calendar.dart';
 import './pages/campus_map.dart';
 import './pages/important_links.dart';
+import './pages/courses_information.dart';
 
 
 void main() {
@@ -57,11 +58,12 @@ class _MyAppState extends State<MyApp> {
           '/forgetPassword': (BuildContext context) => ForgetPassword(),
           '/serviceManager': (BuildContext context) => ServiceManager(model),
           '/eventsCalendar': (BuildContext context) => EventsCalendar(model),
-          '/campusMap': (BuildContext context) => campus_map(),
+          '/campusMap': (BuildContext context) => CampusMap(),
           '/importantLinks': (BuildContext context) => ImportantLinks(model),
           '/services': (BuildContext context) => Services(model, model.ServicesView),
           '/lostFound': (BuildContext context) => LostFoundManager(model),
           '/addLost':  (BuildContext context) => AddLost(model),
+          '/coursesInformation': (BuildContext context) => CoursesInformation()
         },
       ),
     );
