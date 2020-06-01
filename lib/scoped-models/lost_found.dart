@@ -7,11 +7,15 @@ import 'package:http/http.dart' as http;
 
 class LostFoundModel extends Model {
   final _lostFoundURL = 'https://bar-iland-app.firebaseio.com/lostFound';
-  List<LostFound> losts = [];
-  List<LostFound> _found = [];
+  List<LostFound> lostItems = [];
+  List<LostFound> foundItems = [];
   List<String> _lostFoundTypes = [];
   List<Location> lostFoundLocations = [];
   bool isLostFoundLoading = false;
+
+  List<LostFound> get LostItems {
+    return lostItems;
+  }
 
   List<String> get LostFoundTypes {
     return _lostFoundTypes;
@@ -31,7 +35,6 @@ class LostFoundModel extends Model {
       final http.Response response = await http.post(
           _lostFoundURL + '/lostFoundTypes.json',
           body: json.encode(lostFoundTypeData));
-
       if (response.statusCode != 200 && response.statusCode != 201) {
         isLostFoundLoading = false;
         notifyListeners();
@@ -123,7 +126,7 @@ class LostFoundModel extends Model {
     });
   }
 
-   Future<Null> fetchLost() {
+   Future<Null> fetchLostItems() {
     isLostFoundLoading = true;
     notifyListeners();
     return http
@@ -148,8 +151,8 @@ class LostFoundModel extends Model {
                 imageUrl: lostData['imageUrl'],
                 optionalLocations: optLocations);
             fetchedLosts.add(lost);
-          });      
-      losts = fetchedLosts;
+          });    
+      lostItems = fetchedLosts.reversed.toList();
       isLostFoundLoading = false;
       notifyListeners();
     });
