@@ -42,7 +42,7 @@ class _LostBoardState extends State<LostBoard> {
         content = Center(child: CircularProgressIndicator());
       } else if (!model.isLostFoundLoading) {
         _displayedLostItems =
-            _filterLostItems(widget.model.LostItems).map((lost) {
+            _filterLostItems().map((lost) {
           Lost specificLost = lost;
           Map<String, Widget> fieldsToWidgets =
               _mapFieldsToWidgets(specificLost);
@@ -126,12 +126,13 @@ class _LostBoardState extends State<LostBoard> {
     });
   }
 
-  List<LostFound> _filterLostItems(List<LostFound> allLostItems) {
+  List<LostFound> _filterLostItems() {
     if (!_filteredView) {
-      return allLostItems;
+      return widget.model.LostItems;
     } else {
+      
       List<LostFound> filteredLostItemsToDisplay = [];
-      _allLostItems.forEach((lost) {
+      widget.model.LostItems.forEach((lost) {
         if (lost.Subtype == _lostTypeFilter) {
           filteredLostItemsToDisplay.add(lost);
         }
