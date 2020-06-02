@@ -19,18 +19,18 @@ class LostBoard extends StatefulWidget {
 
 class _LostBoardState extends State<LostBoard> {
   ScrollController _lostScrollController = ScrollController();
+  ScrollController _lostTypesScrollController = ScrollController();
   Icon _filterButtonIcon = Icon(MaterialCommunityIcons.filter);
   String _filterButtonText = "סינון";
   List<Widget> _displayedLostItems = List<Widget>();
-  List<LostFound> _allLostItems = List<Lost>();
   bool _filteredView = false;
   String _lostTypeFilter = "";
+  bool _isScrollerAlwaysShown = true;
 
   @override
   void initState() {
     super.initState();
     widget.model.fetchLostItems();
-    _allLostItems = widget.model.LostItems;
   }
 
   @override
@@ -41,8 +41,7 @@ class _LostBoardState extends State<LostBoard> {
       if (model.isLostFoundLoading) {
         content = Center(child: CircularProgressIndicator());
       } else if (!model.isLostFoundLoading) {
-        _displayedLostItems =
-            _filterLostItems().map((lost) {
+        _displayedLostItems = _filterLostItems().map((lost) {
           Lost specificLost = lost;
           Map<String, Widget> fieldsToWidgets =
               _mapFieldsToWidgets(specificLost);
@@ -56,14 +55,38 @@ class _LostBoardState extends State<LostBoard> {
         if (_displayedLostItems.length == 0 && _filteredView) {
           _displayedLostItems = <Widget>[
             Container(
-                height: 200,
-                child: Center(child: Text("לא נמצאו אבידות מסוג זה")))
+              padding: EdgeInsets.only(right: 25),
+              height: 200,
+              child: Center(
+                child: Text(
+                  "לא נמצאו אבידות מסוג: " +
+                      _lostTypeFilter +
+                      ".\n" +
+                      "לידיעתך, לוח האבידות מתעדכן באופן שוטף.\n"
+                          "מומלץ לעקוב אחר שינויים מעת לעת.",
+                  style: TextStyle(fontSize: 16),
+                ),
+              ),
+            )
           ];
         } else if (_displayedLostItems.length == 0 && !_filteredView) {
           _displayedLostItems = <Widget>[
             Container(
-                height: 200, child: Center(child: Text("לא נמצאו אבידות")))
+              padding: EdgeInsets.only(right: 25),
+              height: 200,
+              child: Center(
+                child: Text(
+                  "לא פורסמו לאחרונה אבידות בלוח.\n" +
+                      "לידיעתך, לוח האבידות מתעדכן באופן שוטף.\n"
+                          "מומלץ לעקוב אחר שינויים מעת לעת.",
+                  style: TextStyle(fontSize: 16),
+                ),
+              ),
+            )
           ];
+        }
+        if (_displayedLostItems.length == 1) {
+          _isScrollerAlwaysShown = false;
         }
         content = Directionality(
           textDirection: TextDirection.rtl,
@@ -95,7 +118,7 @@ class _LostBoardState extends State<LostBoard> {
               Container(
                 padding: EdgeInsets.only(top: 80),
                 child: Scrollbar(
-                  isAlwaysShown: true,
+                  isAlwaysShown: _isScrollerAlwaysShown,
                   controller: _lostScrollController,
                   child: ListView.builder(
                     controller: _lostScrollController,
@@ -130,7 +153,6 @@ class _LostBoardState extends State<LostBoard> {
     if (!_filteredView) {
       return widget.model.LostItems;
     } else {
-      
       List<LostFound> filteredLostItemsToDisplay = [];
       widget.model.LostItems.forEach((lost) {
         if (lost.Subtype == _lostTypeFilter) {
@@ -239,35 +261,46 @@ class _LostBoardState extends State<LostBoard> {
           setState(() {
             if (_filterButtonText == "סינון") {
               showDialog(
-                context: context,
-                builder: (_) => new Directionality(
-                  textDirection: TextDirection.rtl,
-                  child: AlertDialog(
-                    title: new Center(child: Text("סינון לפי סוג האבידה")),
-                    content: ListView(
-                      children: widget.model.LostFoundTypes.map((type) {
-                        return FlatButton(
-                          child: Text(type),
-                          onPressed: () {
-                            setState(() {
-                              _filteredView = true;
-                              _lostTypeFilter = type;
-                              Navigator.pop(context);
-                            });
-                          },
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                ),
-              );
-              _filterButtonText = "ביטול הסינון";
-              _filterButtonIcon = Icon(MaterialCommunityIcons.filter_remove);
+                  context: context,
+                  builder: (_) => new Directionality(
+                        textDirection: TextDirection.rtl,
+                        child: AlertDialog(
+                          title:
+                              new Center(child: Text("סינון לפי סוג האבידה")),
+                          content: Scrollbar(
+                            isAlwaysShown: true,
+                            controller: _lostTypesScrollController,
+                            child: ListView(
+                              controller: _lostTypesScrollController,
+                              children: widget.model.LostFoundTypes.map((type) {
+                                return FlatButton(
+                                  child: Text(type),
+                                  onPressed: () {
+                                    setState(() {
+                                      _filterButtonAction(type);
+                                      Navigator.pop(context);
+                                    });
+                                  },
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                          actions: <Widget>[
+                            FlatButton(
+                              child: Text("ביטול"),
+                              onPressed: () {
+                                setState(() {
+                                  Navigator.pop(context);
+                                });
+                              },
+                            )
+                          ],
+                        ),
+                      ));
             } else {
-              _filterButtonText = "סינון";
-              _filterButtonIcon = Icon(MaterialCommunityIcons.filter);
-              _filteredView = false;
-              _lostTypeFilter = "";
+              setState(() {
+                _unfilterButtonAction();
+              });
             }
           });
         },
@@ -282,5 +315,20 @@ class _LostBoardState extends State<LostBoard> {
         },
       ),
     ]);
+  }
+
+  void _unfilterButtonAction() {
+    _filterButtonText = "סינון";
+    _filterButtonIcon = Icon(MaterialCommunityIcons.filter);
+    _filteredView = false;
+    _lostTypeFilter = "";
+    _isScrollerAlwaysShown = true;
+  }
+
+  void _filterButtonAction(String type) {
+    _filterButtonText = "ביטול הסינון";
+    _filterButtonIcon = Icon(MaterialCommunityIcons.filter_remove);
+    _filteredView = true;
+    _lostTypeFilter = type;
   }
 }
