@@ -39,7 +39,18 @@ class _LostBoardState extends State<LostBoard> {
         builder: (BuildContext context, Widget child, MainModel model) {
       Widget content;
       if (model.isLostFoundLoading) {
-        content = Center(child: CircularProgressIndicator());
+         content = Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/lost_found.jpg'),
+                fit: BoxFit.fill,
+                colorFilter: ColorFilter.mode(
+                  Colors.black.withOpacity(0.7),
+                  BlendMode.dstATop,
+                ),
+              ),
+            ),
+        child: Center(child: CircularProgressIndicator()));
       } else if (!model.isLostFoundLoading) {
         _displayedLostItems = _filterLostItems().map((lost) {
           Lost specificLost = lost;
