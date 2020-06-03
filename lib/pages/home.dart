@@ -7,6 +7,8 @@ import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import '../scoped-models/main.dart';
 import '../models/connection.dart';
+import 'package:carousel_slider/carousel_slider.dart';
+
 
 class HomePage extends StatelessWidget {
   final MainModel _model;
@@ -38,6 +40,45 @@ class HomePage extends StatelessWidget {
     return eventsToIcons;
   }
 
+String mapEventTypeToTitle(Event event){
+  String eventTitle;
+    if(event.EventType == 'קפה ומאפה'){
+    eventTitle =  'Keep clam and drink coffee';
+    }
+    else if (event.EventType == 'הופעה' || event.EventType == 'הפאב החברתי'){
+    eventTitle = "Let's party!";
+    }
+     else if (event.EventType == 'מסיבה' || event.EventType == 'Live בקמפוס'){
+      eventTitle = 'The show must go on!';
+    }
+     else if (event.EventType == 'הרצאה/כנס'){
+      eventTitle = 'אירועי היום';
+    }
+     else if (event.EventType == 'ספורט'){
+      eventTitle = 'אירועי היום';
+    }
+     else if (event.EventType == 'מדרשה'){
+      eventTitle = 'אירועי היום';
+    }
+     else if (event.EventType == 'הפססקר'){
+      eventTitle = 'אירועי היום';
+    }
+     else if (event.EventType == 'TimeOut'){
+      eventTitle = 'אירועי היום';
+    }
+     else if (event.EventType == 'קבלת שבת' || event.EventType == 'שבת בקמפוס'){
+      eventTitle = 'אירועי היום';
+    }
+    else if (event.EventType == 'סטנדאפ'){
+      eventTitle = 'אירועי היום';
+    }
+    else if (event.EventType == 'אחר'){
+      eventTitle = 'אירועי היום';
+    }
+  return eventTitle;
+}
+
+
   Future<List<Event>> initEvents() async {
     await _model.fetchEvents();
     eventsData = _model.allEvents;
@@ -57,6 +98,7 @@ class HomePage extends StatelessWidget {
     });
     return todays_events;
   }
+
 
   Widget _buildAnnouncementBoard(BuildContext context, Event event) {
     double _screenWidth = MediaQuery.of(context).size.width;
@@ -84,12 +126,12 @@ class HomePage extends StatelessWidget {
               ),
               child: ListTile(
                 contentPadding: EdgeInsets.only(
-                  top: 30,
+                  top: 34,
                 ),
                 title: Center(
                   heightFactor: 7,
                   child: Text(
-                    'אירועי היום',
+                    mapEventTypeToTitle(event),
                     style: TextStyle(
                       fontSize: 18,
                       height: 0,
@@ -100,6 +142,9 @@ class HomePage extends StatelessWidget {
                 subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
+                    SizedBox(
+                      height: 6,
+                    ),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
@@ -250,17 +295,25 @@ class HomePage extends StatelessWidget {
         bottom: 5,
       ),
       child: Container(
-        child: Swiper(
+        child: CarouselSlider.builder(
           //control:SwiperControl(),
           itemCount: todays_events.length,
           itemBuilder: (BuildContext context, int index) {
             return _buildAnnouncementBoard(context, todays_events[index]);
-          },
-          loop: false,
-          pagination: SwiperPagination(
-            alignment: Alignment.bottomCenter,
-            margin: EdgeInsets.all(24),
-          ),
+          }, 
+          options: CarouselOptions(
+          autoPlay: true,
+          enlargeCenterPage: true,
+          viewportFraction: 0.8,
+          aspectRatio: 2.0,
+          initialPage: 2,
+        
+        ),
+          // loop: false,
+          // pagination: SwiperPagination(
+          //   alignment: Alignment.bottomCenter,
+          //   margin: EdgeInsets.all(24),
+          // ),
         ),
         // decoration: BoxDecoration(
         //   color: Colors.lightBlue[100],
