@@ -43,41 +43,40 @@ class HomePage extends StatelessWidget {
 String mapEventTypeToTitle(Event event){
   String eventTitle;
     if(event.EventType == 'קפה ומאפה'){
-    eventTitle =  'Keep clam and drink coffee';
+    eventTitle =  'Keep calm and drink coffee';
     }
-    else if (event.EventType == 'הופעה' || event.EventType == 'הפאב החברתי'){
-    eventTitle = "Let's party!";
+    else if (event.EventType == 'מסיבה' || event.EventType == 'הפאב החברתי'){
+    eventTitle = "!Let's party";
     }
-     else if (event.EventType == 'מסיבה' || event.EventType == 'Live בקמפוס'){
-      eventTitle = 'The show must go on!';
+     else if (event.EventType == 'הופעה' || event.EventType == 'Live בקמפוס'){
+      eventTitle = '!The show must go on';
     }
      else if (event.EventType == 'הרצאה/כנס'){
       eventTitle = 'אירועי היום';
     }
      else if (event.EventType == 'ספורט'){
-      eventTitle = 'אירועי היום';
+      eventTitle = '!Support the sport';
     }
      else if (event.EventType == 'מדרשה'){
-      eventTitle = 'אירועי היום';
+      eventTitle = 'רק בגלל הרוח';
     }
      else if (event.EventType == 'הפססקר'){
-      eventTitle = 'אירועי היום';
+      eventTitle = 'מי שמצביע - משפיע!';
     }
      else if (event.EventType == 'TimeOut'){
-      eventTitle = 'אירועי היום';
+      eventTitle = 'צריכים פסק זמן מהלימודים?';
     }
      else if (event.EventType == 'קבלת שבת' || event.EventType == 'שבת בקמפוס'){
-      eventTitle = 'אירועי היום';
+      eventTitle = '"פני שבת נקבלה.."';
     }
     else if (event.EventType == 'סטנדאפ'){
-      eventTitle = 'אירועי היום';
+      eventTitle = 'Life is tough so laugh hard';
     }
     else if (event.EventType == 'אחר'){
-      eventTitle = 'אירועי היום';
+      eventTitle = 'היה לך יום גרוע? בו לאירוע!';
     }
   return eventTitle;
 }
-
 
   Future<List<Event>> initEvents() async {
     await _model.fetchEvents();
