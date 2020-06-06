@@ -8,10 +8,13 @@ class CoursesInformation extends StatefulWidget {
 
 class _CoursesInformationState extends State<CoursesInformation> {
   InAppWebViewController webView;
+  bool _isLoadingPage;
 
   @override
   void initState() {
     super.initState();
+        _isLoadingPage = true;
+
   }
 
   @override
@@ -29,28 +32,30 @@ class _CoursesInformationState extends State<CoursesInformation> {
           centerTitle: true,        
         ),
         body: Container(
-            child: Column(children: <Widget>[
-          Expanded(
-              child: InAppWebView(
-            initialUrl:
-                "https://shoham.biu.ac.il/BiuCoursesViewer/MainPage.aspx",
-            initialHeaders: {},
-            initialOptions: InAppWebViewGroupOptions(
-              crossPlatform: InAppWebViewOptions(
-                  debuggingEnabled: true,
-                  preferredContentMode: UserPreferredContentMode.DESKTOP),
-            ),
-            onWebViewCreated: (InAppWebViewController controller) {
-              webView = controller;
-            },
-            onLoadStart: (InAppWebViewController controller, String url) {
-
-            },
-            onLoadStop: (InAppWebViewController controller, String url) async {
-
-            },
-          ))
-        ])),
+            child: Column(
+              children: <Widget>[
+              _isLoadingPage ? Center(child: CircularProgressIndicator())
+            : Expanded(
+                child: InAppWebView(
+              initialUrl:
+                  "https://shoham.biu.ac.il/BiuCoursesViewer/MainPage.aspx",
+              initialHeaders: {},
+              initialOptions: InAppWebViewGroupOptions(
+                crossPlatform: InAppWebViewOptions(
+                    debuggingEnabled: true,
+                    preferredContentMode: UserPreferredContentMode.DESKTOP),
+              ),
+              onWebViewCreated: (InAppWebViewController controller) {
+                webView = controller;
+              },
+              onLoadStart: (InAppWebViewController controller, String url) {
+              
+              },
+              onLoadStop: (InAppWebViewController controller, String url) async {
+                
+              },
+            ))
+          ])),
       ),
     );
   }
