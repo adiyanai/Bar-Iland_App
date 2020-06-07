@@ -1,7 +1,8 @@
 import 'dart:convert';
 import 'dart:async';
 
-import 'package:bar_iland_app/models/location.dart';
+import 'package:bar_iland_app/models/bar_ilan_location.dart';
+import 'package:location/location.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:http/http.dart' as http;
 
@@ -9,11 +10,13 @@ import '../models/service.dart';
 
 class ConnectedServicesModel extends Model {
   String _servicesView = "";
-  List<Location> allServicesLocations = [];
+  List<BarIlanLocation> allServicesLocations = [];
   List<String> servicesAreas = [];
   List<Service> services = [];
   bool _isServicesLoading = false;
   int _selectedServiceIndex = 0;
+  Location _currentLocation = new Location();
+  LocationData userLocation;
 }
 
 class ServicesModel extends ConnectedServicesModel {
@@ -21,15 +24,20 @@ class ServicesModel extends ConnectedServicesModel {
     return _servicesView;
   }
 
-  void set ServicesView(String servicesView) {
-    _servicesView = servicesView;
+  Future<bool> setServicesView(String servicesView) async {
+    _isServicesLoading = true;
+    notifyListeners();
+    _servicesView = await servicesView;
+    _isServicesLoading = false;
+    notifyListeners();
+    return true;
   }
 
   List<String> get ServicesAreas {
     return List.from(servicesAreas);
   }
 
-  List<Location> get AllServicesLocations {
+  List<BarIlanLocation> get AllServicesLocations {
     return allServicesLocations;
   }
 
@@ -41,29 +49,40 @@ class ServicesModel extends ConnectedServicesModel {
     _selectedServiceIndex = selectedServiceIndex;
   }
 
+  void getCurrentLocation() async {
+    _isServicesLoading = true;
+    notifyListeners();
+    userLocation = await _currentLocation.getLocation();
+    _isServicesLoading = false;
+    notifyListeners();
+  }
+
   Future<Null> fetchServicesLocations() {
     _isServicesLoading = true;
     notifyListeners();
     return http
         .get('https://bar-iland-app.firebaseio.com/locations.json')
         .then<Null>((http.Response response) {
-      final List<Location> fetchedLocations = [];
+      final List<BarIlanLocation> fetchedLocations = [];
       Map<String, dynamic> locationsTypeData = json.decode(response.body);
       locationsTypeData
           .forEach((String locationType, dynamic locationsTypeData) {
         if (locationType != "squares") {
-          Location location;
+          BarIlanLocation location;
           locationsTypeData.forEach((String id, dynamic locationData) {
-            location = Location(
-                id: id,
-                type: locationType,
-                name: locationData['name'],
-                number: locationData['number']);
+            location = BarIlanLocation(
+              id: id,
+              type: locationType,
+              name: locationData['name'],
+              number: locationData['number'],
+              lon: locationData['lon'],
+              lat: locationData['lat'],
+            );
             fetchedLocations.add(location);
           });
         }
       });
-           fetchedLocations.sort((location1, location2) {
+      fetchedLocations.sort((location1, location2) {
         List<String> location1SplitNumber = location1.Number.split(" ");
         List<String> location2SplitNumber = location2.Number.split(" ");
         if (location1SplitNumber[0] != "שער" &&
@@ -235,12 +254,12 @@ class ServicesModel extends ConnectedServicesModel {
   }
 
   Future<bool> addMachineService({
-    String subtype = "מקרר",
-    String area = "מבנה 501",
+    String subtype = "קולר",
+    String area = "בניין 504",
     bool isInArea = true,
-    String specificLocation = "חדר 13",
+    String specificLocation = "קומה -1",
     bool availability = true,
-    bool milk = true,
+    //bool milk = true,
   }) async {
     _isServicesLoading = true;
     notifyListeners();
@@ -248,8 +267,8 @@ class ServicesModel extends ConnectedServicesModel {
     String currentDate =
         "${today.day.toString()}/${today.month.toString().padLeft(2, '0')}/${today.year.toString().padLeft(2, '0')}";
 
-    String currentTime =
-        "${today.hour.toString()}:${today.minute.toString().padLeft(2, '0')}";
+    //String currentTime =
+    "${today.hour.toString()}:${today.minute.toString().padLeft(2, '0')}";
 
     final Map<String, dynamic> serviceData = {
       'subtype': subtype,
@@ -258,9 +277,9 @@ class ServicesModel extends ConnectedServicesModel {
       'specificLocation': specificLocation,
       'availability': availability,
       'availabilityReportDate': currentDate,
-      'milk': milk,
-      'milkReportDate': currentDate,
-      'milkReportTime': currentTime
+      //'milk': milk,
+      //'milkReportDate': currentDate,
+      //'milkReportTime': currentTime
     };
     final http.Response response = await http.post(
         'https://bar-iland-app.firebaseio.com/services/machines.json',
@@ -312,15 +331,15 @@ class ServicesModel extends ConnectedServicesModel {
   }
 
   Future<bool> addAcademicService({
-    String subtype = "ספריה",
-    String name = "ספריית בית המדרש",
-    String activityTime = "א'-ה': 09:00-12:50, 13:30-17:30,  ו': סגור. בזמן השיעור הכללי הספריה סגורה.",
-    String phoneNumber = "03-5317253",
-    String mail = "Yitzak.Rozen@biu.ac.il",
-    String website = "http://www.mgl.org.il/",
-    String area = "בניין 411",
+    String subtype = "מזכירות",
+    String name = "שירותי סטודנט",
+    String activityTime = "א',ג': 14:00-11:30, ב', ה': 10:30-8:30",
+    String phoneNumber = "03-5318652",
+    String mail = "Students.Services@mail.biu.ac.il",
+    String website = "",
+    String area = "בניין 509",
     bool isInArea = true,
-    String specificLocation = "חדר 11",
+    String specificLocation = "",
   }) async {
     _isServicesLoading = true;
     notifyListeners();
@@ -351,16 +370,15 @@ class ServicesModel extends ConnectedServicesModel {
 
   Future<bool> addPrayerService({
     String subtype = "מניין",
-    String area = "בניין 304",
+    String area = "בניין 506",
     bool isInArea = true,
-    String specificLocation = "בית כנסת שלייפר",
-    String shacharitPrayersWinter = "07:00 (ימים ב', ה' ותעניות: 06:50)\n",
-    String minchaPrayersWinter = "12:30 (מנחה קצרה)\n13:20\n14:30\n15:35\n",
-    String arvitPrayersWinter = "17:35\n19:35\n",
-    String shacharitPrayersSummer = "07:00 (ימים ב', ה' ותעניות: 06:50)\n",
-    String minchaPrayersSummer =
-        "13:20 (מנחה קצרה)\n13:35\n14:30\n15:35\n17:35",
-    String arvitPrayersSummer = "",
+    String specificLocation = "מעונות גרוז",
+    String shacharitPrayersWinter = "",
+    String minchaPrayersWinter = "",
+    String arvitPrayersWinter = "22:00\n",
+    String shacharitPrayersSummer = "",
+    String minchaPrayersSummer = "",
+    String arvitPrayersSummer = "22:00\n",
   }) async {
     _isServicesLoading = true;
 

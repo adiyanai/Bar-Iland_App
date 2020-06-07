@@ -45,6 +45,7 @@ class AddLostState extends State<AddLost> {
   File _imageFile;
   String _imageUrl = "";
   Widget _image = Container();
+  bool _isAddLostLoading = false;
 
   @override
   void initState() {
@@ -84,7 +85,7 @@ class AddLostState extends State<AddLost> {
                 onTap: () {
                   FocusScope.of(context).requestFocus(FocusNode());
                 },
-                child: widget.model.isLostFoundLoading
+                child: widget.model.isLostFoundLoading || _isAddLostLoading
                     ? Center(
                         child: CircularProgressIndicator(),
                       )
@@ -244,9 +245,7 @@ class AddLostState extends State<AddLost> {
                   ],
                 ),
                 Image.file(snapshot.data,
-                    fit: BoxFit.contain,
-                    height: MediaQuery.of(context).size.height / 1.6,
-                    width: MediaQuery.of(context).size.width)
+                    fit: BoxFit.contain, height: 400, width: 400)
               ],
             );
           } else
@@ -448,9 +447,7 @@ class AddLostState extends State<AddLost> {
                     _nextButtonView(_pageTitle);
                     break;
                   case "היכן ייתכן שהאבידה נמצאת?":
-                    _uploadImage();
-
-                    Navigator.pushReplacementNamed(context, '/lostFound');
+                    _addLostToDatabase();
                 }
               });
             },
@@ -460,19 +457,21 @@ class AddLostState extends State<AddLost> {
     );
   }
 
-  void _uploadImage() async {
+  void _addLostToDatabase() async {
     if (_imageFile != null) {
-final StorageReference postImageRef =
-        FirebaseStorage.instance.ref().child("lostImages");
-    var timeKey = new DateTime.now();
-    final StorageUploadTask uploadTask =
-        postImageRef.child(timeKey.toString() + ".jpg").putFile(_imageFile);
-    var ImageUrl = await (await uploadTask.onComplete).ref.getDownloadURL();
-    _imageUrl = ImageUrl.toString();
+      _isAddLostLoading = true;
+      final StorageReference postImageRef =
+          FirebaseStorage.instance.ref().child("lostImages");
+      var timeKey = new DateTime.now();
+      final StorageUploadTask uploadTask =
+          postImageRef.child(timeKey.toString() + ".jpg").putFile(_imageFile);
+      var ImageUrl = await (await uploadTask.onComplete).ref.getDownloadURL();
+      _imageUrl = ImageUrl.toString();
     }
-    
     widget.model.addLost("lost", _selectedType, _name, _phoneNumber,
-        _description, _selOptionalLostLocations, _imageUrl);
+      _description, _selOptionalLostLocations, _imageUrl);
+                          Navigator.popAndPushNamed(context, '/lostFound');
+    _isAddLostLoading = false;
   }
 
   Widget _note() {

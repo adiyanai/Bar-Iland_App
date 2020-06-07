@@ -47,6 +47,7 @@ Map<String, Icon> mapToIcons() {
     "מעבדת מחשבים": Icon(Icons.computer),
     "מכשיר החייאה (דפיברילטור)": Icon(MdiIcons.medicalBag),
     "שירותי אבטחה": Icon(MaterialCommunityIcons.security),
+    "קולר": Icon(MdiIcons.waterPump),
   };
   return servicesIcons;
 }
@@ -137,11 +138,14 @@ List<Widget> welfareContent(Service service) {
 
 List<Widget> academicServicesContent(Service service) {
   AcademicService academicService = service;
-  Map<String, Widget> academicServiceInfo = {
-    "שעות פעילות": Container(
+  Map<String, Widget> academicServiceInfo = Map<String, Widget>();
+  if (academicService.ActivityTime != "") {
+    academicServiceInfo["שעות פעילות"] = Container(
         padding: EdgeInsets.fromLTRB(0, 0, 0, 20),
-        child: Text(academicService.ActivityTime)),
-    "טלפון": Container(
+        child: Text(academicService.ActivityTime));
+  }
+  if (academicService.PhoneNumber != "") {
+    academicServiceInfo["טלפון"] = Container(
       padding: EdgeInsets.fromLTRB(0, 0, 0, 20),
       child: GestureDetector(
         onTap: () {
@@ -153,8 +157,11 @@ List<Widget> academicServicesContent(Service service) {
               color: Colors.blue, decoration: TextDecoration.underline),
         ),
       ),
-    ),
-    "מייל": Container(
+    );
+  }
+
+   if (academicService.Mail != "") {
+    academicServiceInfo["מייל"] = Container(
       padding: EdgeInsets.fromLTRB(0, 0, 0, 20),
       child: GestureDetector(
         onTap: () {
@@ -166,8 +173,11 @@ List<Widget> academicServicesContent(Service service) {
               color: Colors.blue, decoration: TextDecoration.underline),
         ),
       ),
-    ),
-    "אתר": Container(
+    );
+  }
+
+   if (academicService.Website != "") {
+    academicServiceInfo["אתר"] = Container(
       padding: EdgeInsets.fromLTRB(0, 0, 0, 20),
       child: GestureDetector(
         onTap: () {
@@ -179,8 +189,9 @@ List<Widget> academicServicesContent(Service service) {
               color: Colors.blue, decoration: TextDecoration.underline),
         ),
       ),
-    ),
-  };
+    );
+  }
+
   return (academicServiceInfo.keys).map((infoType) {
     return Container(
       width: 320,
@@ -261,7 +272,7 @@ Map<String, Container> prayersInfo(
     }
     if (minchaPrayersWinter != "") {
       prayersTexts.add(Text(
-        "מנחה",
+        "מנחה:",
         style: TextStyle(
           fontWeight: FontWeight.bold,
         ),
@@ -270,7 +281,7 @@ Map<String, Container> prayersInfo(
     }
     if (arvitPrayersWinter != "") {
       prayersTexts.add(Text(
-        "ערבית",
+        "ערבית:",
         style: TextStyle(
           fontWeight: FontWeight.bold,
         ),
@@ -289,9 +300,9 @@ Map<String, Container> prayersInfo(
 List<Widget> computersLabsContent(service) {
   ComputersLabService computersLab = service;
   Map<String, Widget> computersLabInfo = Map<String, Widget>();
-  computersLabInfo["שעות פעילות"] = 
-  Container(
-      padding: EdgeInsets.fromLTRB(0, 0, 0, 20), child: Text(computersLab.ActivityTime));
+  computersLabInfo["שעות פעילות"] = Container(
+      padding: EdgeInsets.fromLTRB(0, 0, 0, 20),
+      child: Text(computersLab.ActivityTime));
   if (computersLab.PhoneNumber != "") {
     computersLabInfo["טלפון"] = Container(
       padding: EdgeInsets.fromLTRB(0, 0, 0, 20),

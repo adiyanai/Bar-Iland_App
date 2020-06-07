@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
 
-class Location {
+class BarIlanLocation {
   final String id;
   final String type;
   final String name;
   final String number;
+  final double lon;
+  final double lat;
 
-  Location({
+  BarIlanLocation({
     @required this.id,
     @required this.type,
     @required this.name,
     @required this.number,
+    @required this.lon,
+    @required this.lat,
   });
 
   String get Id {
@@ -27,5 +31,13 @@ class Location {
 
   String get Number {
     return number;
+  }
+
+  double get Lon {
+    return lon;
+  }
+
+  double get Lat {
+    return lat;
   }
 }

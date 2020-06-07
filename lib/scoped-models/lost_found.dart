@@ -1,23 +1,27 @@
 import 'dart:convert';
 
-import 'package:bar_iland_app/models/location.dart';
+import 'package:bar_iland_app/models/bar_ilan_location.dart';
 import 'package:bar_iland_app/models/lost_found.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:http/http.dart' as http;
 
 class LostFoundModel extends Model {
   final _lostFoundURL = 'https://bar-iland-app.firebaseio.com/lostFound';
-  List<LostFound> losts = [];
-  List<LostFound> _found = [];
+  List<LostFound> lostItems = [];
+  List<LostFound> foundItems = [];
   List<String> _lostFoundTypes = [];
-  List<Location> lostFoundLocations = [];
+  List<BarIlanLocation> lostFoundLocations = [];
   bool isLostFoundLoading = false;
+
+  List<LostFound> get LostItems {
+    return lostItems;
+  }
 
   List<String> get LostFoundTypes {
     return _lostFoundTypes;
   }
 
-  List<Location> get LostFoundLocations {
+  List<BarIlanLocation> get LostFoundLocations {
     return lostFoundLocations;
   }
 
@@ -31,7 +35,6 @@ class LostFoundModel extends Model {
       final http.Response response = await http.post(
           _lostFoundURL + '/lostFoundTypes.json',
           body: json.encode(lostFoundTypeData));
-
       if (response.statusCode != 200 && response.statusCode != 201) {
         isLostFoundLoading = false;
         notifyListeners();
@@ -83,18 +86,20 @@ class LostFoundModel extends Model {
     return http
         .get('https://bar-iland-app.firebaseio.com/locations.json')
         .then<Null>((http.Response response) {
-      final List<Location> fetchedLocations = [];
+      final List<BarIlanLocation> fetchedLocations = [];
       Map<String, dynamic> locationsTypeData = json.decode(response.body);
       locationsTypeData
           .forEach((String locationType, dynamic locationsTypeData) {
         if (locationType != "squares") {
-          Location location;
+          BarIlanLocation location;
           locationsTypeData.forEach((String id, dynamic locationData) {
-            location = Location(
+            location = BarIlanLocation(
                 id: id,
                 type: locationType,
                 name: locationData['name'],
-                number: locationData['number']);
+                number: locationData['number'],
+                lon: locationData['lon'],
+                lat: locationData['lat']);
             fetchedLocations.add(location);
           });
         }
@@ -123,7 +128,7 @@ class LostFoundModel extends Model {
     });
   }
 
-   Future<Null> fetchLost() {
+   Future<Null> fetchLostItems() {
     isLostFoundLoading = true;
     notifyListeners();
     return http
@@ -148,8 +153,8 @@ class LostFoundModel extends Model {
                 imageUrl: lostData['imageUrl'],
                 optionalLocations: optLocations);
             fetchedLosts.add(lost);
-          });      
-      losts = fetchedLosts;
+          });    
+      lostItems = fetchedLosts.reversed.toList();
       isLostFoundLoading = false;
       notifyListeners();
     });

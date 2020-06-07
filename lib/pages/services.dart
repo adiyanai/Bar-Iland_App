@@ -1,12 +1,16 @@
 import 'package:autocomplete_textfield/autocomplete_textfield.dart';
 import 'package:bar_iland_app/models/connection.dart';
+import 'package:bar_iland_app/models/bar_ilan_location.dart';
 import 'package:bar_iland_app/utilities/services_icons.dart';
 import 'package:bar_iland_app/widgets/services_widgets.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
+import 'package:latlong/latlong.dart';
+import 'package:location/location.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../models/service.dart';
 import '../scoped-models/main.dart';
@@ -18,7 +22,7 @@ class Services extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    model.ServicesView = servicesView;
+    model.setServicesView(servicesView);
     return _ServicesState();
   }
 }
@@ -38,13 +42,19 @@ class _ServicesState extends State<Services> {
   bool _isNotPressable = true;
   bool _isSearchPressed = false;
   Color _searchButtonColor = Colors.grey;
-  String sortingButtonText = "מיון מהקרוב לרחוק";
+  String _sortingButtonText = "מיון מהקרוב לרחוק";
+  Location _currentLocation = new Location();
+  String _sortingOrder = "Ascending";
+  List<BarIlanLocation> _allServicesLocations =
+      List<BarIlanLocation>();
+  LocationData _userLocation;
 
   @override
   void initState() {
     super.initState();
     _connectionMode = widget.model.connectionMode;
     _mapServicesToIcons = mapToIcons();
+    _allServicesLocations = widget.model.AllServicesLocations;
   }
 
   @override
@@ -63,9 +73,8 @@ class _ServicesState extends State<Services> {
             default:
               content = WillPopScope(
                 onWillPop: () {
-                  model.ServicesView = "לפי סוג שירות";
-                  Navigator.pop(context, false);
-                  return Future.value(false);
+                  Navigator.pop(context);
+                  return widget.model.setServicesView("לפי סוג שירות");
                 },
                 child: Directionality(
                   textDirection: TextDirection.rtl,
@@ -83,13 +92,14 @@ class _ServicesState extends State<Services> {
                       ),
                       Container(
                         decoration: BoxDecoration(
-                            color: Color.fromRGBO(200, 240, 245, 1),
-                            border: Border.all(
-                                width: 2,
-                                color: Color.fromRGBO(220, 250, 250, 0.9))),
+                          color: Color.fromRGBO(200, 240, 245, 1),
+                          border: Border.all(
+                              width: 2,
+                              color: Color.fromRGBO(220, 250, 250, 0.9)),
+                        ),
                         margin: EdgeInsets.only(top: 100),
                         child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             Container(
                               width: 170,
@@ -97,19 +107,22 @@ class _ServicesState extends State<Services> {
                                 icon: Icon(Icons.location_on),
                                 textColor: Colors.white,
                                 color: Colors.blue,
-                                label: Text(sortingButtonText),
+                                label: Text(_sortingButtonText),
                                 onPressed: () {
                                   setState(() {
-                                    if (sortingButtonText ==
+                                    if (_sortingButtonText ==
                                         "מיון מהקרוב לרחוק") {
-                                      sortingButtonText = "מיון בסדר עולה";
+                                      _sortingOrder = "Geographic";
+                                      _sortingButtonText = "מיון בסדר עולה";
                                     } else {
-                                      sortingButtonText = "מיון מהקרוב לרחוק";
+                                      _sortingOrder = "Ascending";
+                                      _sortingButtonText = "מיון מהקרוב לרחוק";
                                     }
                                   });
                                 },
                               ),
                             ),
+                            /*
                             Container(
                               width: 150,
                               child: RaisedButton.icon(
@@ -120,6 +133,7 @@ class _ServicesState extends State<Services> {
                                 onPressed: () {},
                               ),
                             )
+                            */
                           ],
                         ),
                       ),
@@ -130,11 +144,62 @@ class _ServicesState extends State<Services> {
               break;
           }
         } else if (model.isServicesLoading) {
-          content = Center(child: CircularProgressIndicator());
+          switch (model.ServicesView) {
+            case "לפי מיקום":
+              content = Container(
+                  decoration: new BoxDecoration(
+                    image: new DecorationImage(
+                      image: new AssetImage("assets/Bar_Ilan_Mini_Map.jpg"),
+                      fit: BoxFit.fill,
+                      colorFilter: ColorFilter.mode(
+                          Colors.white.withOpacity(0.9), BlendMode.softLight),
+                    ),
+                  ),
+                  child: Center(child: CircularProgressIndicator()));
+              break;
+            default:
+              content = Container(
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image:
+                          AssetImage('assets/services_by_type_background.png'),
+                      fit: BoxFit.cover,
+                      colorFilter: ColorFilter.mode(
+                        Colors.black.withOpacity(0.8),
+                        BlendMode.dstATop,
+                      ),
+                    ),
+                  ),
+                  child: Center(child: CircularProgressIndicator()));
+          }
         }
         return content;
       },
     );
+  }
+
+  List<Service> _sortByGeographicalProximity(List<Service> servicesList) {
+    _userLocation = widget.model.userLocation;
+    servicesList.sort((service1, service2) {
+      BarIlanLocation location1Data = _allServicesLocations.firstWhere(
+          (BarIlanLocation item) => (service1.Area == item.Number));
+      BarIlanLocation location2Data = _allServicesLocations.firstWhere(
+          (BarIlanLocation item) => (service2.Area == item.Number));
+
+      return (calculateDistance(_userLocation.latitude, _userLocation.longitude,
+              location1Data.Lat, location1Data.Lon))
+          .compareTo((calculateDistance(_userLocation.latitude,
+              _userLocation.longitude, location2Data.Lat, location2Data.Lon)));
+    });
+    servicesList.forEach((service) {
+      print(service.Area);
+    });
+    return servicesList;
+  }
+
+  double calculateDistance(lat1, lon1, lat2, lon2) {
+    final Distance distance = new Distance();
+    return distance(new LatLng(lat1, lon1), new LatLng(lat2, lon2));
   }
 
   Widget serviceTypeButton(String text, Icon icon) {
@@ -144,9 +209,9 @@ class _ServicesState extends State<Services> {
         child: Material(
           color: Colors.lightBlue[200],
           child: InkWell(
-            splashColor: Colors.cyanAccent,
+            splashColor: Colors.transparent,
             onTap: () {
-              widget.model.ServicesView = text;
+              widget.model.setServicesView(text);              
               Navigator.pushNamed(context, '/services');
             },
             child: Column(
@@ -173,7 +238,7 @@ class _ServicesState extends State<Services> {
             image: AssetImage('assets/services_by_type_background.png'),
             fit: BoxFit.cover,
             colorFilter: ColorFilter.mode(
-              Colors.black.withOpacity(0.55),
+              Colors.black.withOpacity(0.8),
               BlendMode.dstATop,
             ),
           ),
@@ -330,29 +395,81 @@ class _ServicesState extends State<Services> {
     return _createServicesList(servicesInArea, "ServicesByArea");
   }
 
-  Widget _createServicesList(List<Service> servicesList, String servicesBy) {
-    int expansionTileIndex = 0;
-    Container navigationButton = Container();
+  void _sortInAscendingOrder(List<Service> servicesList) {
+    servicesList.sort((service1, service2) {
+      List<String> location1SplitNumber = service1.Area.split(" ");
+      List<String> location2SplitNumber = service2.Area.split(" ");
+      if (location1SplitNumber[0] != "שער" &&
+          location2SplitNumber[0] != "שער") {
+        return int.parse(location1SplitNumber[1])
+            .compareTo(int.parse(location2SplitNumber[1]));
+      } else {
+        int result = location1SplitNumber[0].compareTo(location2SplitNumber[0]);
+        if (result != 0) {
+          return result;
+        } else {
+          return int.parse(location1SplitNumber[1])
+              .compareTo(int.parse(location2SplitNumber[1]));
+        }
+      }
+    });
+  }
+
+  Widget _buildNavigationButton(
+      String servicesBy, String selServiceLocationNumber) {
+    SizedBox navigationButton = SizedBox();
     if (servicesBy == "ServicesByType") {
-      navigationButton = Container(
-        child: InkWell(
-            splashColor: Colors.blue,
-            child: Row(children: [
-              Icon(
-                Icons.near_me,
-                color: Colors.blue,
-              ),
-            ]),
-            onTap: () {}),
+      navigationButton = SizedBox(
+        width: 35,
+        child: IconButton(
+          icon: Icon(
+            Icons.near_me,
+            color: Colors.blue,
+          ),
+          onPressed: () async {
+            // get the data of the location
+            BarIlanLocation locationData = widget
+                .model.AllServicesLocations
+                .firstWhere((BarIlanLocation item) =>
+                    (selServiceLocationNumber == item.Number));
+            LocationData userLocation = await _currentLocation.getLocation();
+            String url = 'https://www.google.com/maps/dir/?api=1&origin=' +
+                userLocation.latitude.toString() +
+                ',' +
+                userLocation.longitude.toString() +
+                '&destination=' +
+                locationData.Lat.toString() +
+                ',' +
+                locationData.Lon.toString() +
+                '&travelmode=walking';
+            _launchURL(url);
+          },
+        ),
       );
     }
+    return navigationButton;
+  }
+
+  Widget _createServicesList(List<Service> servicesList, String servicesBy) {
+    if (_sortingOrder == "Ascending") {
+      _sortInAscendingOrder(servicesList);
+    } else if (_sortingOrder == "Geographic") {
+      servicesList = _sortByGeographicalProximity(servicesList);
+    }
+    int expansionTileIndex = 0;
+    String selServiceLocationNumber = "";
     return Container(
       margin: EdgeInsets.fromLTRB(0, 40, 0, 20),
       child: Column(
           children: servicesList.map((service) {
         expansionTileIndex += 1;
         int currExpansionTileIndex = expansionTileIndex;
-        String serviceLocation = service.Area;
+        selServiceLocationNumber = service.Area;
+        String serviceLocation = "";
+        if (!service.IsInArea) {
+          serviceLocation += "בסמוך ל";
+        }
+        serviceLocation += service.Area;
         if (service.SpecificLocation != "") {
           serviceLocation += ", " + service.SpecificLocation;
         }
@@ -371,7 +488,7 @@ class _ServicesState extends State<Services> {
           padding: EdgeInsets.only(top: 10),
           decoration: BoxDecoration(
             border: Border.all(color: Color.fromRGBO(220, 250, 250, 0.9)),
-            color: Color.fromRGBO(200, 230, 230, 0.7),
+            color: Color.fromRGBO(190, 230, 240, 0.7),
           ),
           child: ExpansionTile(
             initiallyExpanded: _isTileExpanded(currExpansionTileIndex),
@@ -409,14 +526,15 @@ class _ServicesState extends State<Services> {
                       Row(children: [
                         Icon(
                           Icons.location_on,
-                          size: 20,
+                          size: 18,
                         ),
                         Text(
                           serviceLocation,
                           style: TextStyle(fontSize: 14),
                         )
                       ]),
-                      navigationButton,
+                      _buildNavigationButton(
+                          servicesBy, selServiceLocationNumber),
                     ],
                   ),
                 ],
@@ -911,7 +1029,7 @@ class _ServicesState extends State<Services> {
 
   Widget _buildAutoCompleteTextField() {
     List<String> suggestions = [];
-    widget.model.AllServicesLocations.forEach((location) {
+    _allServicesLocations.forEach((location) {
       suggestions.add(location.Number + " - " + location.Name);
     });
     return Container(
@@ -988,7 +1106,7 @@ class _ServicesState extends State<Services> {
   }
 
   void _searchPress() {
-    //widget.model.addAcademicService();
+    //widget.model.addMachineService();
     FocusScope.of(context).requestFocus(new FocusNode());
     _title = Container(
       width: 600,
@@ -1010,7 +1128,7 @@ class _ServicesState extends State<Services> {
             height: 15,
           ),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
               Container(
                 width: 110,
@@ -1020,9 +1138,30 @@ class _ServicesState extends State<Services> {
                   textColor: Colors.white,
                   color: Colors.blue,
                   label: Text("ניווט"),
-                  onPressed: () {},
+                  onPressed: () async {
+                    // get the data of the location
+                    BarIlanLocation locationData = widget
+                        .model.AllServicesLocations
+                        .firstWhere((BarIlanLocation item) =>
+                            ((_selectedArea.split(" - "))[0] == item.Number));
+
+                    LocationData userLocation =
+                        await _currentLocation.getLocation();
+                    String url =
+                        'https://www.google.com/maps/dir/?api=1&origin=' +
+                            userLocation.latitude.toString() +
+                            ',' +
+                            userLocation.longitude.toString() +
+                            '&destination=' +
+                            locationData.Lat.toString() +
+                            ',' +
+                            locationData.Lon.toString() +
+                            '&travelmode=walking';
+                    _launchURL(url);
+                  },
                 ),
               ),
+              /*
               Container(
                 width: 140,
                 height: 30,
@@ -1034,6 +1173,7 @@ class _ServicesState extends State<Services> {
                   onPressed: () {},
                 ),
               )
+              */
             ],
           ),
         ],
@@ -1133,7 +1273,7 @@ class _ServicesState extends State<Services> {
           servicesTypes.add("בית קפה");
           servicesTypes.add("מסעדה");
           break;
-        case "מזכירויות והנהלה":
+        case "מזכירויות ומנהלה":
           servicesTypes.add("מזכירות");
           break;
         case "ספריות":
@@ -1185,5 +1325,13 @@ class _ServicesState extends State<Services> {
     return ListView(
       children: <Widget>[_createServicesList(servicesByType, "ServicesByType")],
     );
+  }
+
+  void _launchURL(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
   }
 }
