@@ -55,6 +55,7 @@ class _ServicesState extends State<Services> {
     _connectionMode = widget.model.connectionMode;
     _mapServicesToIcons = mapToIcons();
     _allServicesLocations = widget.model.AllServicesLocations;
+
   }
 
   @override
@@ -113,6 +114,7 @@ class _ServicesState extends State<Services> {
                                     if (_sortingButtonText ==
                                         "מיון מהקרוב לרחוק") {
                                       _sortingOrder = "Geographic";
+                                              widget.model.getCurrentLocation();
                                       _sortingButtonText = "מיון בסדר עולה";
                                     } else {
                                       _sortingOrder = "Ascending";
