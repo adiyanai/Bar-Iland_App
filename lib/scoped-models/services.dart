@@ -25,8 +25,10 @@ class ServicesModel extends ConnectedServicesModel {
   }
 
   Future<bool> setServicesView(String servicesView) async {
+    _isServicesLoading = true;
     notifyListeners();
     _servicesView = await servicesView;
+    _isServicesLoading = false;
     notifyListeners();
     return true;
   }
@@ -50,7 +52,10 @@ class ServicesModel extends ConnectedServicesModel {
   void getCurrentLocation() async {
     _isServicesLoading = true;
     notifyListeners();
-    userLocation = await _currentLocation.getLocation();
+    try {
+      userLocation = await _currentLocation.getLocation();
+    } catch (e) {
+    }
     _isServicesLoading = false;
     notifyListeners();
   }
