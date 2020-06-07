@@ -25,10 +25,8 @@ class ServicesModel extends ConnectedServicesModel {
   }
 
   Future<bool> setServicesView(String servicesView) async {
-    _isServicesLoading = true;
     notifyListeners();
     _servicesView = await servicesView;
-    _isServicesLoading = false;
     notifyListeners();
     return true;
   }
