@@ -45,8 +45,7 @@ class _ServicesState extends State<Services> {
   String _sortingButtonText = "מיון מהקרוב לרחוק";
   Location _currentLocation = new Location();
   String _sortingOrder = "Ascending";
-  List<BarIlanLocation> _allServicesLocations =
-      List<BarIlanLocation>();
+  List<BarIlanLocation> _allServicesLocations = List<BarIlanLocation>();
   LocationData _userLocation;
 
   @override
@@ -55,7 +54,6 @@ class _ServicesState extends State<Services> {
     _connectionMode = widget.model.connectionMode;
     _mapServicesToIcons = mapToIcons();
     _allServicesLocations = widget.model.AllServicesLocations;
-
   }
 
   @override
@@ -74,6 +72,7 @@ class _ServicesState extends State<Services> {
             default:
               content = WillPopScope(
                 onWillPop: () {
+                  widget.model.SelectedServiceIndex = 0;
                   Navigator.pop(context);
                   return widget.model.setServicesView("לפי סוג שירות");
                 },
@@ -113,9 +112,11 @@ class _ServicesState extends State<Services> {
                                   setState(() {
                                     if (_sortingButtonText ==
                                         "מיון מהקרוב לרחוק") {
-                                      _sortingOrder = "Geographic";
-                                              widget.model.getCurrentLocation();
-                                      _sortingButtonText = "מיון בסדר עולה";
+                                      widget.model.getCurrentLocation();
+                                      if (widget.model.userLocation != null) {
+                                        _sortingOrder = "Geographic";
+                                        _sortingButtonText = "מיון בסדר עולה";
+                                      }
                                     } else {
                                       _sortingOrder = "Ascending";
                                       _sortingButtonText = "מיון מהקרוב לרחוק";
@@ -157,7 +158,7 @@ class _ServicesState extends State<Services> {
                           Colors.white.withOpacity(0.9), BlendMode.softLight),
                     ),
                   ),
-                  child: Center(child: CircularProgressIndicator()));
+                  child: Center(child: LinearProgressIndicator()));
               break;
             default:
               content = Container(
@@ -172,7 +173,7 @@ class _ServicesState extends State<Services> {
                       ),
                     ),
                   ),
-                  child: Center(child: CircularProgressIndicator()));
+                  child: Center(child: LinearProgressIndicator()));
           }
         }
         return content;
@@ -183,18 +184,15 @@ class _ServicesState extends State<Services> {
   List<Service> _sortByGeographicalProximity(List<Service> servicesList) {
     _userLocation = widget.model.userLocation;
     servicesList.sort((service1, service2) {
-      BarIlanLocation location1Data = _allServicesLocations.firstWhere(
-          (BarIlanLocation item) => (service1.Area == item.Number));
-      BarIlanLocation location2Data = _allServicesLocations.firstWhere(
-          (BarIlanLocation item) => (service2.Area == item.Number));
+      BarIlanLocation location1Data = _allServicesLocations
+          .firstWhere((BarIlanLocation item) => (service1.Area == item.Number));
+      BarIlanLocation location2Data = _allServicesLocations
+          .firstWhere((BarIlanLocation item) => (service2.Area == item.Number));
 
       return (calculateDistance(_userLocation.latitude, _userLocation.longitude,
               location1Data.Lat, location1Data.Lon))
           .compareTo((calculateDistance(_userLocation.latitude,
               _userLocation.longitude, location2Data.Lat, location2Data.Lon)));
-    });
-    servicesList.forEach((service) {
-      print(service.Area);
     });
     return servicesList;
   }
@@ -213,7 +211,7 @@ class _ServicesState extends State<Services> {
           child: InkWell(
             splashColor: Colors.transparent,
             onTap: () {
-              widget.model.setServicesView(text);              
+              widget.model.setServicesView(text);
               Navigator.pushNamed(context, '/services');
             },
             child: Column(
@@ -335,7 +333,7 @@ class _ServicesState extends State<Services> {
   Widget _buildServicesByAreaPage(List<Service> services) {
     //FocusScope.of(context).autofocus(_focusNode);
     _scrollController = ScrollController(
-        initialScrollOffset: (widget.model.SelectedServiceIndex - 1) * 35.0);
+        initialScrollOffset: (widget.model.SelectedServiceIndex - 1) * 80.0);
     _servicesListView = ListView(
       controller: _scrollController,
       children: <Widget>[
@@ -385,7 +383,7 @@ class _ServicesState extends State<Services> {
           margin: EdgeInsets.fromLTRB(0, 44, 0, 0),
           padding: EdgeInsets.all(20),
           child: Text(
-            'לא נמצאו שירותים באזור זה',
+            'לא נמצאו שירותים במיקום זה.',
             style: TextStyle(
               color: Colors.black,
               fontSize: 16,
@@ -430,21 +428,23 @@ class _ServicesState extends State<Services> {
           ),
           onPressed: () async {
             // get the data of the location
-            BarIlanLocation locationData = widget
-                .model.AllServicesLocations
+            BarIlanLocation locationData = widget.model.AllServicesLocations
                 .firstWhere((BarIlanLocation item) =>
                     (selServiceLocationNumber == item.Number));
-            LocationData userLocation = await _currentLocation.getLocation();
-            String url = 'https://www.google.com/maps/dir/?api=1&origin=' +
-                userLocation.latitude.toString() +
-                ',' +
-                userLocation.longitude.toString() +
-                '&destination=' +
-                locationData.Lat.toString() +
-                ',' +
-                locationData.Lon.toString() +
-                '&travelmode=walking';
-            _launchURL(url);
+            widget.model.getCurrentLocation();
+            if (widget.model.userLocation != null) {
+              LocationData userLocation = widget.model.userLocation;
+              String url = 'https://www.google.com/maps/dir/?api=1&origin=' +
+                  userLocation.latitude.toString() +
+                  ',' +
+                  userLocation.longitude.toString() +
+                  '&destination=' +
+                  locationData.Lat.toString() +
+                  ',' +
+                  locationData.Lon.toString() +
+                  '&travelmode=walking';
+              _launchURL(url);
+            }
           },
         ),
       );
@@ -1146,7 +1146,6 @@ class _ServicesState extends State<Services> {
                         .model.AllServicesLocations
                         .firstWhere((BarIlanLocation item) =>
                             ((_selectedArea.split(" - "))[0] == item.Number));
-
                     LocationData userLocation =
                         await _currentLocation.getLocation();
                     String url =
@@ -1324,7 +1323,10 @@ class _ServicesState extends State<Services> {
         }
       });
     }
+    _scrollController = ScrollController(
+        initialScrollOffset: (widget.model.SelectedServiceIndex - 1) * 100.0);
     return ListView(
+      controller: _scrollController,
       children: <Widget>[_createServicesList(servicesByType, "ServicesByType")],
     );
   }
