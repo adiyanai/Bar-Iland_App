@@ -11,7 +11,6 @@ class ServiceManager extends StatelessWidget {
   Widget build(BuildContext context) {
     model.fetchServicesLocations();
     model.fetchServices();
-    model.getCurrentLocation();
     return DefaultTabController(
       length: 2,
       child: Directionality(
