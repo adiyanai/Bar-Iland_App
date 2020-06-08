@@ -27,7 +27,9 @@ class CustomPageState extends State<CustomPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return Directionality(
+      textDirection: TextDirection.rtl,
+    child: Scaffold(
       appBar: AppBar(
         title: const Text('מידע על קורסים'),
         centerTitle: true,
@@ -71,18 +73,12 @@ class CustomPageState extends State<CustomPage> {
           ],
         ))
       ])),
-    );
+    ));
   }
 
   Widget _buildProgressBar() {
     if (progress != 1.0) {
       return CircularProgressIndicator();
-// You can use LinearProgressIndicator also
-//      return LinearProgressIndicator(
-//        value: progress,
-//        valueColor: new AlwaysStoppedAnimation<Color>(Colors.orange),
-//        backgroundColor: Colors.blue,
-//      );
     }
     return Container();
   }

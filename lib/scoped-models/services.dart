@@ -9,7 +9,6 @@ import 'package:http/http.dart' as http;
 import '../models/service.dart';
 
 class ConnectedServicesModel extends Model {
-  String _servicesView = "";
   List<BarIlanLocation> allServicesLocations = [];
   List<String> servicesAreas = [];
   List<Service> services = [];
@@ -20,16 +19,6 @@ class ConnectedServicesModel extends Model {
 }
 
 class ServicesModel extends ConnectedServicesModel {
-  String get ServicesView {
-    return _servicesView;
-  }
-
-  Future<bool> setServicesView(String servicesView) async {
-    notifyListeners();
-    _servicesView = await servicesView;
-    notifyListeners();
-    return true;
-  }
 
   List<String> get ServicesAreas {
     return List.from(servicesAreas);
@@ -50,7 +39,10 @@ class ServicesModel extends ConnectedServicesModel {
   void getCurrentLocation() async {
     _isServicesLoading = true;
     notifyListeners();
-    userLocation = await _currentLocation.getLocation();
+    try {
+      userLocation = await _currentLocation.getLocation();
+    } catch (e) {
+    }
     _isServicesLoading = false;
     notifyListeners();
   }
