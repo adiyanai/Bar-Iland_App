@@ -22,7 +22,6 @@ class Services extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    //model.setServicesView(servicesView);
     return _ServicesState();
   }
 }
@@ -1308,7 +1307,7 @@ class _ServicesState extends State<Services> {
           servicesTypes.add("שירותי אבטחה");
           break;
         case "מכשירי החייאה":
-          servicesTypes.add("מכשיר החייאה (דפיברילטור)");
+          servicesTypes.add("מכשיר החייאה");
           break;
         case "שירותי צילום והדפסה":
           servicesTypes.add("מכונת צילום והדפסה");
