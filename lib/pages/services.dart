@@ -22,12 +22,13 @@ class Services extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    model.setServicesView(servicesView);
+    //model.setServicesView(servicesView);
     return _ServicesState();
   }
 }
 
 class _ServicesState extends State<Services> {
+  String _servicesView;
   ConnectionMode _connectionMode;
   Future<List<Service>> _servicesList;
   Widget _displayedServicesByArea = Column();
@@ -51,6 +52,7 @@ class _ServicesState extends State<Services> {
   @override
   void initState() {
     super.initState();
+    _servicesView = widget.servicesView;
     _connectionMode = widget.model.connectionMode;
     _mapServicesToIcons = mapToIcons();
     _allServicesLocations = widget.model.AllServicesLocations;
@@ -62,7 +64,7 @@ class _ServicesState extends State<Services> {
       builder: (BuildContext context, Widget child, MainModel model) {
         Widget content;
         if (!model.isServicesLoading) {
-          switch (model.ServicesView) {
+          switch (_servicesView) {
             case "לפי מיקום":
               content = _buildServicesByAreaPage(model.services);
               break;
@@ -74,7 +76,8 @@ class _ServicesState extends State<Services> {
                 onWillPop: () {
                   widget.model.SelectedServiceIndex = 0;
                   Navigator.pop(context);
-                  return widget.model.setServicesView("לפי סוג שירות");
+                  _servicesView = "לפי סוג שירות";
+                  return Future.value(true);
                 },
                 child: Directionality(
                   textDirection: TextDirection.rtl,
@@ -82,13 +85,13 @@ class _ServicesState extends State<Services> {
                     appBar: AppBar(
                       centerTitle: true,
                       title: Text(
-                        model.ServicesView,
+                        _servicesView,
                       ),
                     ),
                     body: Stack(children: [
                       Container(
                         child: _buildSpecificServiceTypePage(
-                            model.ServicesView, model.services),
+                            _servicesView, model.services),
                       ),
                       Container(
                         decoration: BoxDecoration(
@@ -147,7 +150,7 @@ class _ServicesState extends State<Services> {
               break;
           }
         } else if (model.isServicesLoading) {
-          switch (model.ServicesView) {
+          switch (_servicesView) {
             case "לפי מיקום":
               content = Container(
                   decoration: new BoxDecoration(
@@ -158,7 +161,7 @@ class _ServicesState extends State<Services> {
                           Colors.white.withOpacity(0.9), BlendMode.softLight),
                     ),
                   ),
-                  child: Center(child: LinearProgressIndicator()));
+                  child: Center(child: CircularProgressIndicator()));
               break;
             default:
               content = Container(
@@ -173,7 +176,7 @@ class _ServicesState extends State<Services> {
                       ),
                     ),
                   ),
-                  child: Center(child: LinearProgressIndicator()));
+                  child: Center(child: CircularProgressIndicator()));
           }
         }
         return content;
@@ -211,8 +214,7 @@ class _ServicesState extends State<Services> {
           child: InkWell(
             splashColor: Colors.transparent,
             onTap: () {
-              widget.model.setServicesView(text);
-              Navigator.pushNamed(context, '/services');
+              Navigator.pushNamed(context, '/' + text);
             },
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,

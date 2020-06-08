@@ -16,13 +16,11 @@ import './pages/campus_map.dart';
 import './pages/important_links.dart';
 import './pages/courses_information.dart';
 
-
 void main() {
   initializeDateFormatting().then((_) => runApp(MyApp()));
 }
 
 class MyApp extends StatefulWidget {
-
   @override
   State<StatefulWidget> createState() {
     return _MyAppState();
@@ -60,9 +58,40 @@ class _MyAppState extends State<MyApp> {
           '/eventsCalendar': (BuildContext context) => EventsCalendar(model),
           '/campusMap': (BuildContext context) => CampusMap(),
           '/importantLinks': (BuildContext context) => ImportantLinks(model),
-          '/services': (BuildContext context) => Services(model, model.ServicesView),
+          '/servicesByType': (BuildContext context) =>
+              Services(model, "לפי סוג שירות"),
+          '/servicesByArea': (BuildContext context) =>
+              Services(model, "לפי מיקום"),
+          '/בתי קפה ומסעדות': (BuildContext context) =>
+              Services(model, "בתי קפה ומסעדות"),
+          '/חנויות ועסקים': (BuildContext context) =>
+              Services(model, "חנויות ועסקים"),
+          '/מזכירויות ומנהלה': (BuildContext context) =>
+              Services(model, "מזכירויות ומנהלה"),
+          '/ספריות': (BuildContext context) => Services(model, "ספריות"),
+          '/חדרי הנקה': (BuildContext context) => Services(model, "חדרי הנקה"),
+          '/חדרי רווחה': (BuildContext context) =>
+              Services(model, "חדרי רווחה"),
+          '/פינות קפה': (BuildContext context) => Services(model, "פינות קפה"),
+          '/מים חמים': (BuildContext context) => Services(model, "מים חמים"),
+          '/מקררים': (BuildContext context) => Services(model, "מקררים"),
+          '/מיקרוגלים': (BuildContext context) => Services(model, "מיקרוגלים"),
+          '/מכונות חטיפים': (BuildContext context) =>
+              Services(model, "מכונות חטיפים"),
+          '/מכונות שתייה': (BuildContext context) =>
+              Services(model, "מכונות שתייה"),
+          '/מעבדות מחשבים': (BuildContext context) =>
+              Services(model, "מעבדות מחשבים"),
+          '/מניינים': (BuildContext context) => Services(model, "מניינים"),
+          '/שערים ואבטחה': (BuildContext context) =>
+              Services(model, "שערים ואבטחה"),
+          '/מכשירי החייאה': (BuildContext context) =>
+              Services(model, "מכשירי החייאה"),
+          '/שירותי צילום והדפסה': (BuildContext context) =>
+              Services(model, "שירותי צילום והדפסה"),
+          '/קולרים': (BuildContext context) => Services(model, "קולרים"),
           '/lostFound': (BuildContext context) => LostFoundManager(model),
-          '/addLost':  (BuildContext context) => AddLost(model),
+          '/addLost': (BuildContext context) => AddLost(model),
           '/coursesInformation': (BuildContext context) => CoursesInformation()
         },
       ),
