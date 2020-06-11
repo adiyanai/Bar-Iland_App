@@ -80,6 +80,7 @@ class _EventsCalendarState extends State<EventsCalendar> {
       "Live בקמפוס": Icon(MdiIcons.microphoneVariant),
       "אחר": Icon(MaterialCommunityIcons.dots_horizontal),
       "מסיבה": Icon(MdiIcons.balloon),
+      "טקס": Icon(MdiIcons.microphoneVariant)
     };
     return eventsToIcons;
   }
