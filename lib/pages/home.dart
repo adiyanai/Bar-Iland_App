@@ -85,10 +85,10 @@ String mapEventTypeToTitle(Event event){
   }
 
   List<Event> getEventsOfCurrentDay(List<Event> events_data) {
-    DateTime tomorrow = DateTime(2020, 04, 15);
+    //DateTime tomorrow = DateTime(2020, 04, 15);
     DateTime today = new DateTime.now();
     List<Event> todays_events = [];
-    String tomorrow_date = tomorrow.toString().substring(0, 10);
+    String tomorrow_date = today.toString().substring(0, 10);
     events_data.forEach((event) {
       String event_date = event.date.toString().substring(0, 10);
       if (tomorrow_date == event_date) {
