@@ -13,9 +13,6 @@ class BusesModel extends Model {
   List<String> _busesLocations = [];
   bool _isBusesLoading = false;
   bool _isStationsLoading = false;
-  int _selectedBusIndex = 0;
-  String _selBusId;
-  String _selStationId;
 
   List<Bus> get allBuses {
     return List.from(_buses);
@@ -35,14 +32,6 @@ class BusesModel extends Model {
 
   bool get isStationsLoading {
     return _isStationsLoading;
-  }
-
-  int get SelectedBusIndex {
-    return _selectedBusIndex;
-  }
-
-  void set SelectedBusIndex(selectedBusIndex) {
-    _selectedBusIndex = selectedBusIndex;
   }
 
   Future<Null> fetchBuses() {
