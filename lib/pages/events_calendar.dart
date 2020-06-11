@@ -222,7 +222,7 @@ class _EventsCalendarState extends State<EventsCalendar> {
                           ),
                           SizedBox(width: 3),
                           Container(
-                            width: _screenWidth * 0.53,
+                            width: _screenWidth * 0.5,
                             child: Text(
                               event.EventDescription,
                               style: TextStyle(
@@ -245,7 +245,7 @@ class _EventsCalendarState extends State<EventsCalendar> {
                     ),
                     SizedBox(width: 3),
                     Container(
-                      width: _screenWidth * 0.53,
+                      width: _screenWidth * 0.5,
                       child: Text(
                         event.Location,
                       ),
@@ -306,8 +306,6 @@ class _EventsCalendarState extends State<EventsCalendar> {
 
   @override
   Widget build(BuildContext context) {
-    //double _screenHeight = MediaQuery.of(context).size.height;
-    //var padding = MediaQuery.of(context).padding;
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
