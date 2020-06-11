@@ -108,6 +108,8 @@ flutter:
     - assets/faucets.jpg
     - assets/lost_found.jpg
     - assets/important_links_background.png
+    - assets/moovit _icon.png
+    - assets/station_sign.png
     #  - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

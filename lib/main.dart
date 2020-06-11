@@ -15,6 +15,7 @@ import './pages/events_calendar.dart';
 import './pages/campus_map.dart';
 import './pages/important_links.dart';
 import './pages/courses_information.dart';
+import './managers/buses_shuttles_manager.dart';
 
 void main() {
   initializeDateFormatting().then((_) => runApp(MyApp()));
@@ -92,7 +93,8 @@ class _MyAppState extends State<MyApp> {
           '/קולרים': (BuildContext context) => Services(model, "קולרים"),
           '/lostFound': (BuildContext context) => LostFoundManager(model),
           '/addLost': (BuildContext context) => AddLost(model),
-          '/coursesInformation': (BuildContext context) => CoursesInformation()
+          '/coursesInformation': (BuildContext context) => CoursesInformation(),
+          '/busesShuttlesmanager': (BuildContext context) => BusesShuttlesManager(model),
         },
       ),
     );

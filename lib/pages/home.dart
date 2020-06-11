@@ -36,6 +36,7 @@ class HomePage extends StatelessWidget {
       "Live בקמפוס": Icon(MdiIcons.microphoneVariant, size: 15),
       "אחר": Icon(MaterialCommunityIcons.dots_horizontal, size: 15),
       "מסיבה": Icon(MdiIcons.balloon, size: 15),
+      "טקס": Icon(MdiIcons.microphoneVariant, size: 15)
     };
     return eventsToIcons;
   }
@@ -51,7 +52,7 @@ String mapEventTypeToTitle(Event event){
      else if (event.EventType == 'הופעה' || event.EventType == 'Live בקמפוס'){
       eventTitle = '!The show must go on';
     }
-     else if (event.EventType == 'הרצאה/כנס'){
+     else if (event.EventType == 'הרצאה/כנס' || event.EventType == 'טקס'){
       eventTitle = 'אירועי היום';
     }
      else if (event.EventType == 'ספורט'){
@@ -518,7 +519,10 @@ String mapEventTypeToTitle(Event event){
                               color: Colors.lightBlue[200], // button color
                               child: InkWell(
                                 splashColor: Colors.cyanAccent, // splash color
-                                onTap: () {}, // button pressed
+                                onTap: () {
+                                  Navigator.pushNamed(
+                                      context, '/busesShuttlesmanager');
+                                }, // button pressed
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: <Widget>[

@@ -4,7 +4,8 @@ import './links.dart';
 import './user.dart';
 import './services.dart';
 import './events.dart';
+import './buses.dart';
 
-class MainModel extends Model with UserModel, ConnectedServicesModel, ServicesModel,  UtilityModel, EventsModel, Links, LostFoundModel {
+class MainModel extends Model with UserModel, ConnectedServicesModel, ServicesModel,  UtilityModel, EventsModel, Links, LostFoundModel, BusesModel {
 
 }

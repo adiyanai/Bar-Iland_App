@@ -244,10 +244,10 @@ class ServicesModel extends ConnectedServicesModel {
   }
 
   Future<bool> addMachineService({
-    String subtype = "קולר",
-    String area = "בניין 504",
+    String subtype = "מכשיר החייאה",
+    String area = "בניין 213",
     bool isInArea = true,
-    String specificLocation = "קומה -1",
+    String specificLocation = "קומה 0, בכניסה הצפונית",
     bool availability = true,
     //bool milk = true,
   }) async {
@@ -256,9 +256,7 @@ class ServicesModel extends ConnectedServicesModel {
     DateTime today = new DateTime.now();
     String currentDate =
         "${today.day.toString()}/${today.month.toString().padLeft(2, '0')}/${today.year.toString().padLeft(2, '0')}";
-
-    //String currentTime =
-    "${today.hour.toString()}:${today.minute.toString().padLeft(2, '0')}";
+    //String currentTime = "${today.hour.toString()}:${today.minute.toString().padLeft(2, '0')}";
 
     final Map<String, dynamic> serviceData = {
       'subtype': subtype,

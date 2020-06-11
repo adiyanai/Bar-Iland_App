@@ -45,7 +45,7 @@ Map<String, Icon> mapToIcons() {
     "שעון קיץ": Icon(MaterialCommunityIcons.clock_outline),
     "שעון חורף": Icon(MaterialCommunityIcons.clock_outline),
     "מעבדת מחשבים": Icon(Icons.computer),
-    "מכשיר החייאה (דפיברילטור)": Icon(MdiIcons.medicalBag),
+    "מכשיר החייאה": Icon(MdiIcons.medicalBag),
     "שירותי אבטחה": Icon(MaterialCommunityIcons.security),
     "קולר": Icon(MdiIcons.waterPump),
   };
