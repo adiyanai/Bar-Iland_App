@@ -113,88 +113,61 @@ class _BusesByCityState extends State<BusesByCity> {
               height: 20,
             ),
             Container(
-                padding: EdgeInsets.only(
-                  right: 6,
-                  top: 10,
-                  bottom: 10,
-                ),
-                decoration: BoxDecoration(
-                  color: Color.fromRGBO(200, 240, 255, 0.8),
-                ),
-                child: ListTile(
-                  leading:
-                      /*Image(
+              padding: EdgeInsets.only(
+                right: 6,
+                top: 10,
+                bottom: 10,
+              ),
+              decoration: BoxDecoration(
+                color: Color.fromRGBO(200, 240, 255, 0.8),
+              ),
+              child: ListTile(
+                leading:
+                    /*Image(
                     image: AssetImage('assets/station_sign_without_border.png'),
                     height: 25,
                     width: 25,*/
-                      Container(
-                    width: 25,
-                    height: 25,
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: Colors.black,
-                        width: 0.8,
-                      ),
-                      borderRadius: BorderRadius.all(Radius.circular(2)),
-                      image: DecorationImage(
-                        image: AssetImage('assets/station_sign.png'),
-                      ),
+                    Container(
+                  width: 25,
+                  height: 25,
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Colors.black,
+                      width: 0.8,
+                    ),
+                    borderRadius: BorderRadius.all(Radius.circular(2)),
+                    image: DecorationImage(
+                      image: AssetImage('assets/station_sign.png'),
                     ),
                   ),
-                  title: Text(
-                    stationData.Number + ' - ' + stationData.Name,
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  trailing: IconButton(
-                    icon: Icon(
-                      Icons.near_me,
-                      size: 30,
-                    ),
-                    color: Colors.blue,
-                    onPressed: () async {
-                      LocationData userLocation = await _location.getLocation();
-                      String url =
-                          'https://www.google.com/maps/dir/?api=1&origin=' +
-                              userLocation.latitude.toString() +
-                              ',' +
-                              userLocation.longitude.toString() +
-                              '&destination=' +
-                              stationData.Lat +
-                              ',' +
-                              stationData.Lon +
-                              '&travelmode=walking';
-                      _launchURL(url);
-                    },
-                  ),
-                )
-                /*Row(
-                children: <Widget>[
-                  Image(
-                    image: AssetImage('assets/station_sign.png'),
-                    height: 25,
-                    width: 25,
-                  ),
-                  SizedBox(
-                    width: 3,
-                  ),
-                  Text(
-                    stationData.Number + '-' + stationData.Name,
-                    style: TextStyle(
-                      fontSize: 16,
-                    ),
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.near_me, size: 30,),
-                    color: Colors.blue,
-                    onPressed: () async {
-                        LocationData userLocation = await _location.getLocation();
-                        String url = 'https://www.google.com/maps/dir/?api=1&origin=' + userLocation.latitude.toString() + ',' +  userLocation.longitude.toString() + '&destination=' + stationData.Lat + ',' + stationData.Lon + '&travelmode=walking';
-                        _launchURL(url);
-                      },
-                  ),
-                ],
-              ),*/
                 ),
+                title: Text(
+                  stationData.Number + ' - ' + stationData.Name,
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                trailing: IconButton(
+                  icon: Icon(
+                    Icons.near_me,
+                    size: 30,
+                  ),
+                  color: Colors.blue,
+                  onPressed: () async {
+                    LocationData userLocation = await _location.getLocation();
+                    String url =
+                        'https://www.google.com/maps/dir/?api=1&origin=' +
+                            userLocation.latitude.toString() +
+                            ',' +
+                            userLocation.longitude.toString() +
+                            '&destination=' +
+                            stationData.Lat +
+                            ',' +
+                            stationData.Lon +
+                            '&travelmode=walking';
+                    _launchURL(url);
+                  },
+                ),
+              ),
+            ),
           ];
           return Column(
             children: List.from(busesUI)
@@ -494,15 +467,15 @@ class _BusesByCityState extends State<BusesByCity> {
     return Stack(
       children: <Widget>[
         Container(
-            /*decoration: new BoxDecoration(
+            decoration: new BoxDecoration(
               image: new DecorationImage(
-                image: new AssetImage("assets/Bar_Ilan_Mini_Map.jpg"),
-                fit: BoxFit.fill,
+                image: new AssetImage("assets/buses.png"),
+                fit: BoxFit.cover,
                 colorFilter: ColorFilter.mode(
                     Colors.white.withOpacity(0.9), BlendMode.softLight),
               ),
-            ),*/
-            color: Colors.yellow[200],
+            ),
+            //color: Colors.yellow[200],
             padding: EdgeInsets.fromLTRB(0, 148, 0, 0),
             height: 600,
             child: _busesListView),
