@@ -16,6 +16,7 @@ import './pages/campus_map.dart';
 import './pages/important_links.dart';
 import './pages/courses_information.dart';
 import './managers/buses_shuttles_manager.dart';
+import './pages/shuttle_timetable.dart';
 
 void main() {
   initializeDateFormatting().then((_) => runApp(MyApp()));
@@ -95,6 +96,7 @@ class _MyAppState extends State<MyApp> {
           '/addLost': (BuildContext context) => AddLost(model),
           '/coursesInformation': (BuildContext context) => CoursesInformation(),
           '/busesShuttlesmanager': (BuildContext context) => BusesShuttlesManager(model),
+          '/shuttleTimetable': (BuildContext context) => ShuttleTimetable()
         },
       ),
     );
