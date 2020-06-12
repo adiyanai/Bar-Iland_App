@@ -286,7 +286,8 @@ String mapEventTypeToTitle(Event event){
   }
 
   Container _buildEventsBoard(List<Event> todays_events) {
-    return Container(
+    if(todays_events.length > 1){
+      return Container(
       margin: EdgeInsets.only(bottom:1),
       width: 30,
       height: 180,
@@ -300,7 +301,7 @@ String mapEventTypeToTitle(Event event){
           itemCount: todays_events.length,
           itemBuilder: (BuildContext context, int index) {
             return _buildAnnouncementBoard(context, todays_events[index]);
-          }, 
+          },
           options: CarouselOptions(
           autoPlay: true,
           enlargeCenterPage: true,
@@ -322,8 +323,36 @@ String mapEventTypeToTitle(Event event){
         //   ),
       ),
     );
+    }
+    else{
+      return Container(
+      margin: EdgeInsets.only(bottom:1),
+      width: 30,
+      height: 180,
+      alignment: AlignmentDirectional.center,
+      padding: EdgeInsets.only(
+        bottom: 5,
+      ),
+      child: Container(
+        child: CarouselSlider.builder(
+          itemCount: todays_events.length,
+          itemBuilder: (BuildContext context, int index) {
+            return _buildAnnouncementBoard(context, todays_events[index]);
+          },
+          options: CarouselOptions(
+          enableInfiniteScroll:false,
+          reverse: false,
+          autoPlay: false,
+          viewportFraction: 0.8,
+          aspectRatio: 2.0,
+          initialPage: 2,
+        
+        ),
+        ),
+      ),
+    );
   }
-
+}
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
