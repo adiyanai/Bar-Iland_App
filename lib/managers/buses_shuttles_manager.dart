@@ -1,6 +1,7 @@
 import 'package:bar_iland_app/scoped-models/main.dart';
 import 'package:flutter/material.dart';
 import '../pages/buses_by_city.dart';
+import '../pages/shuttles.dart';
 
 class BusesShuttlesManager extends StatelessWidget {
   final MainModel model;
@@ -42,7 +43,7 @@ class BusesShuttlesManager extends StatelessWidget {
           ),
           body: TabBarView(
             children: <Widget>[
-              Container(),
+              Shuttles(model),
               Container(),
               BusesByCity(model),
               Container(),
