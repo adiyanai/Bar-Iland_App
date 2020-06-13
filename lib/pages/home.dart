@@ -86,13 +86,13 @@ String mapEventTypeToTitle(Event event){
   }
 
   List<Event> getEventsOfCurrentDay(List<Event> events_data) {
-    //DateTime tomorrow = DateTime(2020, 04, 15);
+    DateTime tomorrow = DateTime(2020, 04, 15);
     DateTime today = new DateTime.now();
     List<Event> todays_events = [];
-    String tomorrow_date = today.toString().substring(0, 10);
+    String today_date = today.toString().substring(0, 10);
     events_data.forEach((event) {
       String event_date = event.date.toString().substring(0, 10);
-      if (tomorrow_date == event_date) {
+      if (today_date == event_date) {
         todays_events.add(event);
       }
     });
@@ -637,8 +637,61 @@ String mapEventTypeToTitle(Event event){
                     ),
                     events.isNotEmpty
                         ? _buildEventsBoard(events)
-                        : SizedBox(height: 180),
-                    Container(
+                        : Container(
+                          margin: EdgeInsets.only(bottom:1),
+                          width: 30,
+                          height: 180,
+                          alignment: AlignmentDirectional.center,
+                          padding: EdgeInsets.only(
+                            bottom: 5,
+                          ),
+                          child: Container(
+                            child: SingleChildScrollView(
+                              child: Container(
+                                child: Column(
+                                  children: <Widget>[
+                                    Container(
+                                      margin: EdgeInsets.symmetric(
+                                        vertical: 5,
+                                        horizontal: 5,
+                                      ),
+                                      height: 150,
+                                      width: 270,
+                                      padding: EdgeInsets.only(
+                                        right: 5,
+                                        bottom: 5,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white38,
+                                        border: Border.all(
+                                          color: Colors.black26,
+                                          width: 0.5,
+                                        ),
+                                        borderRadius: BorderRadius.all(Radius.circular(15)),
+                                      ),
+                                      child: ListTile(
+                                        contentPadding: EdgeInsets.only(
+                                          top: 45,
+                                        ),
+                                        title: Center(
+                                          heightFactor: 7,
+                                          child: Text(
+                                            'אין אירועים',
+                                            style: TextStyle(
+                                              fontSize: 18,
+                                              height: 0,
+                                              color: Colors.deepPurple[700],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      ),
+                                  ]),
+                              ),
+                              ),
+                              ),
+                              ), 
+                      Container(
                       alignment: Alignment.bottomRight,
                       margin: EdgeInsets.only(
                         bottom: 20,
@@ -662,15 +715,13 @@ String mapEventTypeToTitle(Event event){
                           ),
                           textAlign: TextAlign.center,
                         ),
-                      ),
-                    ),
-                  ],
                 ),
-              ),
+              )],
             ),
-          ],
+          ),
+        )]
         ),
-      ),
+       ),
     );
   }
 }
