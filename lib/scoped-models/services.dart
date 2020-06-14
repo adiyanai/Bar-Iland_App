@@ -57,7 +57,7 @@ class ServicesModel extends ConnectedServicesModel {
       Map<String, dynamic> locationsTypeData = json.decode(response.body);
       locationsTypeData
           .forEach((String locationType, dynamic locationsTypeData) {
-        if (locationType != "squares") {
+        if (locationType != "squares" && locationType != "shuttleStations") {
           BarIlanLocation location;
           locationsTypeData.forEach((String id, dynamic locationData) {
             location = BarIlanLocation(
@@ -244,10 +244,10 @@ class ServicesModel extends ConnectedServicesModel {
   }
 
   Future<bool> addMachineService({
-    String subtype = "מכשיר החייאה",
-    String area = "בניין 213",
+    String subtype = "מכונת צילום והדפסה",
+    String area = "בניין 504",
     bool isInArea = true,
-    String specificLocation = "קומה 0, בכניסה הצפונית",
+    String specificLocation = "קומה -1, בסמוך לספריית כלכלה",
     bool availability = true,
     //bool milk = true,
   }) async {
@@ -283,13 +283,13 @@ class ServicesModel extends ConnectedServicesModel {
   }
 
   Future<bool> addBusinessService({
-    String subtype = "ציוד משרדי וכלי כתיבה",
-    String name = "האקדמון",
-    String activityTime = "ימים א'-ה': 17:00-08:00, יום ו': 12:00-08:00",
-    String phoneNumber = "08-9147788",
+    String subtype = "בית קפה",
+    String name = "עגלת קפה ג'ו",
+    String activityTime = "בעגלה ניתן לרכוש אוכל וקפה במחירים מוזלים.",
+    String phoneNumber = "",
     String generalInfo = "",
     String area = "בניין 107",
-    bool isInArea = true,
+    bool isInArea = false,
     String specificLocation = "",
   }) async {
     _isServicesLoading = true;
@@ -320,12 +320,12 @@ class ServicesModel extends ConnectedServicesModel {
 
   Future<bool> addAcademicService({
     String subtype = "מזכירות",
-    String name = "שירותי סטודנט",
-    String activityTime = "א',ג': 14:00-11:30, ב', ה': 10:30-8:30",
-    String phoneNumber = "03-5318652",
-    String mail = "Students.Services@mail.biu.ac.il",
-    String website = "",
-    String area = "בניין 509",
+    String name = "משרדי אגודת הסטודנטים",
+    String activityTime = "א'-ה': 17:00-09:00",
+    String phoneNumber = "03-5343666",
+    String mail = "pniyot@bis.org.il",
+    String website = "https://www.bis.org.il/",
+    String area = "בניין 107",
     bool isInArea = true,
     String specificLocation = "",
   }) async {
@@ -386,6 +386,37 @@ class ServicesModel extends ConnectedServicesModel {
 
     final http.Response response = await http.post(
         'https://bar-iland-app.firebaseio.com/services/prayerServices.json',
+        body: json.encode(serviceData));
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      _isServicesLoading = false;
+      notifyListeners();
+      return false;
+    }
+    _isServicesLoading = false;
+    notifyListeners();
+    return true;
+  }
+
+    Future<bool> addWelfareService({
+    String subtype = "חדר הנקה",
+    String area = "בניין 405",
+    bool isInArea = true,
+    String specificLocation = "קומה 2, חדר 102",
+  }) async {
+      List<String> contains = List();
+    contains.add("משטחי החתלה");
+    _isServicesLoading = true;
+    notifyListeners();
+    final Map<String, dynamic> serviceData = {
+      'subtype': subtype,
+      'area': area,
+      'isInArea': isInArea,
+      'specificLocation': specificLocation,
+      'contains': contains,
+    };
+
+    final http.Response response = await http.post(
+        'https://bar-iland-app.firebaseio.com/services/welfare.json',
         body: json.encode(serviceData));
     if (response.statusCode != 200 && response.statusCode != 201) {
       _isServicesLoading = false;
