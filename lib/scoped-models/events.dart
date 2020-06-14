@@ -76,8 +76,9 @@ class EventsModel extends Model {
     };
 
     try {
-      final http.Response response = await http
-          .post(databaseURL + '/eventsData.json' + '?auth=${model.user.Token}', body: json.encode(eventData));
+      final http.Response response = await http.post(
+          databaseURL + '/eventsData.json' + '?auth=${model.user.Token}',
+          body: json.encode(eventData));
 
       if (response.statusCode != 200 && response.statusCode != 201) {
         _isAddEventLoading = false;
@@ -195,23 +196,25 @@ class EventsModel extends Model {
       String location, locationId;
       double lat, lon;
       locationsData.forEach((String locationType, dynamic locationTypeData) {
-        locationTypeData.forEach((String id, dynamic locationData) {
-          if ((locationData['name'] != 'מעונות') &&
-              (locationData['name'] != 'בנק מזרחי-טפחות')) {
-            locationId = id;
-            location = locationData['number'] + ' - ' + locationData['name'];
-            lat = locationData['lat'];
-            lon = locationData['lon'];
-            final EventLocation newEventLocation = EventLocation(
-              id: locationId,
-              type: locationType,
-              numberName: location,
-              lat: lat,
-              lon: lon,
-            );
-            fetchedEventsLocations.add(newEventLocation);
-          }
-        });
+        if (locationType != 'shuttleStations' && locationType != 'gates') {
+          locationTypeData.forEach((String id, dynamic locationData) {
+            if ((locationData['name'] != 'מעונות') &&
+                (locationData['name'] != 'בנק מזרחי-טפחות')) {
+              locationId = id;
+              location = locationData['number'] + ' - ' + locationData['name'];
+              lat = locationData['lat'];
+              lon = locationData['lon'];
+              final EventLocation newEventLocation = EventLocation(
+                id: locationId,
+                type: locationType,
+                numberName: location,
+                lat: lat,
+                lon: lon,
+              );
+              fetchedEventsLocations.add(newEventLocation);
+            }
+          });
+        }
       });
       _eventsLocations = fetchedEventsLocations;
       _isEventsLocationsLoading = false;
