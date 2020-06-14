@@ -394,6 +394,8 @@ class _LostFoundBoardState extends State<LostFoundBoard> {
                           content: Scrollbar(
                             isAlwaysShown: true,
                             controller: _lostTypesScrollController,
+                             child: SizedBox(
+      height: 300,
                             child: ListView(
                               controller: _lostTypesScrollController,
                               children: widget.model.LostFoundTypes.map((type) {
@@ -407,7 +409,7 @@ class _LostFoundBoardState extends State<LostFoundBoard> {
                                   },
                                 );
                               }).toList(),
-                            ),
+                            )),
                           ),
                           actions: <Widget>[
                             FlatButton(
