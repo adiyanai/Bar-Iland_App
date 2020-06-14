@@ -22,7 +22,6 @@ class BusesByCity extends StatefulWidget {
 
 class _BusesByCityState extends State<BusesByCity> {
   ScrollController _scrollController;
-  Widget _displayedBusesByCity;
   AutoCompleteTextField<String> _textField;
   GlobalKey<AutoCompleteTextFieldState<String>> _key = new GlobalKey();
   final FocusNode _focusNode = FocusNode();
@@ -41,7 +40,6 @@ class _BusesByCityState extends State<BusesByCity> {
     _location = new Location();
     _scrollController =
         ScrollController(initialScrollOffset: 0, keepScrollOffset: false);
-    _displayedBusesByCity = Column();
     _isSearchPressed = false;
     _selectedCity = "";
     _title = Container();
@@ -122,12 +120,7 @@ class _BusesByCityState extends State<BusesByCity> {
                 color: Color.fromRGBO(200, 240, 255, 0.8),
               ),
               child: ListTile(
-                leading:
-                    /*Image(
-                    image: AssetImage('assets/station_sign_without_border.png'),
-                    height: 25,
-                    width: 25,*/
-                    Container(
+                leading: Container(
                   width: 25,
                   height: 25,
                   decoration: BoxDecoration(
@@ -252,7 +245,6 @@ class _BusesByCityState extends State<BusesByCity> {
                         ),
                       ],
                     ),
-                    //color: Color.fromRGBO(200, 240, 255, 0.8),
                   ),
                 );
               }).toList()),
@@ -386,7 +378,6 @@ class _BusesByCityState extends State<BusesByCity> {
     _title = Container(
       width: 600,
       height: 50,
-      //padding: EdgeInsets.fromLTRB(0, 0, 15, 0),
       margin: EdgeInsets.fromLTRB(0, 110, 0, 0),
       decoration: BoxDecoration(
         color: Color.fromRGBO(205, 240, 235, 1),
@@ -458,7 +449,7 @@ class _BusesByCityState extends State<BusesByCity> {
     _busesListView = ListView(
       controller: _scrollController,
       children: <Widget>[
-        _displayedBusesByCity = _showBusesByCity(
+        _showBusesByCity(
           _selectedCity,
           buses,
         )
@@ -467,18 +458,21 @@ class _BusesByCityState extends State<BusesByCity> {
     return Stack(
       children: <Widget>[
         Container(
-            decoration: new BoxDecoration(
-              image: new DecorationImage(
-                image: new AssetImage("assets/buses.png"),
-                fit: BoxFit.cover,
-                colorFilter: ColorFilter.mode(
-                    Colors.white.withOpacity(0.9), BlendMode.softLight),
-              ),
+          decoration: new BoxDecoration(
+            image: new DecorationImage(
+              image: new AssetImage("assets/buses.png"),
+              fit: BoxFit.cover,
+              colorFilter: ColorFilter.mode(
+                  Colors.white.withOpacity(0.9), BlendMode.softLight),
             ),
-            //color: Colors.yellow[200],
-            padding: EdgeInsets.fromLTRB(0, 148, 0, 0),
-            height: 600,
-            child: _busesListView),
+          ),
+          padding: EdgeInsets.fromLTRB(0, 148, 0, 0),
+          height: 600,
+          child: Scrollbar(
+            controller: _scrollController,
+            child: _busesListView,
+          ),
+        ),
         _title,
         _busesByCitySearch(),
       ],
