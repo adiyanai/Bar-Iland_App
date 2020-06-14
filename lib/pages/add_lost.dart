@@ -361,6 +361,8 @@ class _AddLostState extends State<AddLost> {
       width: 320,
       margin: EdgeInsets.only(top: 30),
       child: TextFormField(
+        minLines: 2,
+        maxLines: 2,
           controller: _descriptionController,
           textInputAction: TextInputAction.done,
           focusNode: _descriptionFocus,
