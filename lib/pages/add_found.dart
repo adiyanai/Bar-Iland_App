@@ -43,13 +43,14 @@ class _AddFoundState extends State<AddFound> {
   FocusNode _phoneNumberFocus = FocusNode();
   FocusNode _descriptionFocus = FocusNode();
   FocusNode _specificLocationFocus = FocusNode();
-
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   Future<File> _futureImageFile;
   File _imageFile;
   String _imageUrl = "";
   Widget _image = Container();
   bool _isAddFoundLoading = false;
+
+  
 
   @override
   void initState() {
@@ -105,7 +106,7 @@ class _AddFoundState extends State<AddFound> {
   Widget _buildPageContent() {
     return Stack(children: [
       Container(
-          height: 500,
+          height: 550,
           padding: EdgeInsets.fromLTRB(0, 20, 0, 60),
           child: _currentPageContent()),
       Container(
@@ -170,7 +171,7 @@ class _AddFoundState extends State<AddFound> {
           children: <Widget>[
             SizedBox(height: 20),
             _descriptionFormField(),
-            SizedBox(height: 70),
+            SizedBox(height: 90),
             _isTakenOrNot(),
           ],
         ),
@@ -203,7 +204,7 @@ class _AddFoundState extends State<AddFound> {
     return Column(
       children: <Widget>[
         Container(
-          height: 300,
+          height: 350,
           width: 400,
           color: Color.fromRGBO(220, 250, 250, 0.7),
           child: Scrollbar(
@@ -227,14 +228,14 @@ class _AddFoundState extends State<AddFound> {
             height: 90,
             width: 400,
             padding: EdgeInsets.only(bottom: 30),
-            margin: EdgeInsets.only(top: 5),
+            margin: EdgeInsets.only(top: 15),
             color: Color.fromRGBO(220, 250, 250, 0.7),
             child: _specificLocationFormField()),
       ],
     );
   }
 
-  void _pickImageFromGallery(ImageSource source) {
+  void _cameraPhoto(ImageSource source) {
     setState(() {
       _futureImageFile = ImagePicker.pickImage(source: source);
     });
@@ -287,7 +288,7 @@ class _AddFoundState extends State<AddFound> {
             color: Colors.blue,
             label: Text("הוספת תמונה"),
             onPressed: () {
-              _pickImageFromGallery(ImageSource.gallery);
+              _cameraPhoto(ImageSource.camera);
               setState(() {
                 _image = _showImage();
               });
@@ -377,6 +378,8 @@ class _AddFoundState extends State<AddFound> {
       width: 320,
       margin: EdgeInsets.only(top: 30),
       child: TextFormField(
+          minLines: 2,
+          maxLines: 2,
           controller: _descriptionController,
           textInputAction: TextInputAction.done,
           focusNode: _descriptionFocus,
