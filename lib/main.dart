@@ -1,6 +1,7 @@
-import 'package:bar_iland_app/pages/add_lost.dart';
 import 'package:bar_iland_app/pages/important_links.dart';
 import 'package:bar_iland_app/managers/lost_found_manager.dart';
+import 'package:bar_iland_app/pages/add_lost.dart';
+import 'package:bar_iland_app/pages/add_found.dart';
 import 'package:bar_iland_app/pages/services.dart';
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
@@ -94,6 +95,7 @@ class _MyAppState extends State<MyApp> {
           '/קולרים': (BuildContext context) => Services(model, "קולרים"),
           '/lostFound': (BuildContext context) => LostFoundManager(model),
           '/addLost': (BuildContext context) => AddLost(model),
+                    '/addFound': (BuildContext context) => AddFound(model),
           '/coursesInformation': (BuildContext context) => CoursesInformation(),
           '/busesShuttlesmanager': (BuildContext context) => BusesShuttlesManager(model),
           '/shuttleTimetable': (BuildContext context) => ShuttleTimetable()
