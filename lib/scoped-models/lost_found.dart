@@ -17,6 +17,10 @@ class LostFoundModel extends Model {
     return lostItems;
   }
 
+  List<LostFound> get FoundItems {
+    return foundItems;
+  }
+
   List<String> get LostFoundTypes {
     return _lostFoundTypes;
   }
@@ -56,7 +60,8 @@ class LostFoundModel extends Model {
         .get(_lostFoundURL + '/lostFoundTypes.json')
         .then<Null>((http.Response response) {
       final List<String> fetchedLostFoundTypes = [];
-      final Map<String, dynamic> lostFoundTypesData = json.decode(response.body);
+      final Map<String, dynamic> lostFoundTypesData =
+          json.decode(response.body);
       if (lostFoundTypesData == null) {
         isLostFoundLoading = false;
         notifyListeners();
@@ -90,7 +95,7 @@ class LostFoundModel extends Model {
       Map<String, dynamic> locationsTypeData = json.decode(response.body);
       locationsTypeData
           .forEach((String locationType, dynamic locationsTypeData) {
-        if (locationType != "squares") {
+        if (locationType != "squares" && locationType != "shuttleStations") {
           BarIlanLocation location;
           locationsTypeData.forEach((String id, dynamic locationData) {
             location = BarIlanLocation(
@@ -128,47 +133,74 @@ class LostFoundModel extends Model {
     });
   }
 
-   Future<Null> fetchLostItems() {
+  Future<Null> fetchLostItems() {
     isLostFoundLoading = true;
     notifyListeners();
     return http
         .get(_lostFoundURL + '/lost.json')
         .then<Null>((http.Response response) {
-      final List<LostFound> fetchedLosts = [];
-      Map<String, dynamic> lostsData = json.decode(response.body);
-      lostsData
-          .forEach((String lostId, dynamic lostData) {
-            List<String> optLocations = [];
-            (lostData['optionalLocations']).forEach((location){
-              optLocations.add(location);
-            });           
-            Lost lost = Lost(
-                id: lostId,
-                type: "lost",
-                subtype: lostData['subtype'],
-                name: lostData['name'],
-                phoneNumber: lostData['phoneNumber'],
-                description: lostData['description'],
-                reportDate: lostData['reportDate'],
-                imageUrl: lostData['imageUrl'],
-                optionalLocations: optLocations);
-            fetchedLosts.add(lost);
-          });    
-      lostItems = fetchedLosts.reversed.toList();
+      final List<LostFound> fetchedLostItems = [];
+      Map<String, dynamic> lostItemsData = json.decode(response.body);
+      lostItemsData.forEach((String lostId, dynamic lostData) {
+        List<String> optLocations = [];
+        (lostData['optionalLocations']).forEach((location) {
+          optLocations.add(location);
+        });
+        Lost lost = Lost(
+            id: lostId,
+            type: "lost",
+            subtype: lostData['subtype'],
+            name: lostData['name'],
+            phoneNumber: lostData['phoneNumber'],
+            description: lostData['description'],
+            reportDate: lostData['reportDate'],
+            imageUrl: lostData['imageUrl'],
+            optionalLocations: optLocations);
+        fetchedLostItems.add(lost);
+      });
+      lostItems = fetchedLostItems.reversed.toList();
+      isLostFoundLoading = false;
+      notifyListeners();
+    });
+  }
+
+  Future<Null> fetchFoundItems() {
+    isLostFoundLoading = true;
+    notifyListeners();
+    return http
+        .get(_lostFoundURL + '/found.json')
+        .then<Null>((http.Response response) {
+      final List<LostFound> fetchedFoundItems = [];
+      Map<String, dynamic> foundItemsData = json.decode(response.body);
+      foundItemsData.forEach((String foundId, dynamic foundData) {
+        Found lost = Found(
+          id: foundId,
+          type: "found",
+          subtype: foundData['subtype'],
+          name: foundData['name'],
+          phoneNumber: foundData['phoneNumber'],
+          description: foundData['description'],
+          reportDate: foundData['reportDate'],
+          imageUrl: foundData['imageUrl'],
+          area: foundData['area'],
+          specificLocation: foundData['specificLocation']
+        );
+        fetchedFoundItems.add(lost);
+      });
+      foundItems = fetchedFoundItems.reversed.toList();
       isLostFoundLoading = false;
       notifyListeners();
     });
   }
 
   Future<bool> addLost(
-    String type,
-    String subtype,
-    String name,
-    String phoneNumber,
-    String description,
-    List<String> optionalLocations,
-    String imageUrl
-  ) async {
+      String type,
+      String subtype,
+      String name,
+      String phoneNumber,
+      String description,
+      List<String> optionalLocations,
+      String imageUrl) async {
     isLostFoundLoading = true;
     notifyListeners();
     if (optionalLocations.length == 0) {
@@ -183,6 +215,43 @@ class LostFoundModel extends Model {
       'phoneNumber': phoneNumber,
       'description': description,
       'optionalLocations': optionalLocations,
+      'reportDate': currentDate,
+      'imageUrl': imageUrl
+    };
+    final http.Response response = await http.post(
+        'https://bar-iland-app.firebaseio.com/lostFound/${type}.json',
+        body: json.encode(lostData));
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      isLostFoundLoading = false;
+      notifyListeners();
+      return false;
+    }
+    isLostFoundLoading = false;
+    notifyListeners();
+    return true;
+  }
+
+   Future<bool> addFound(
+      String type,
+      String subtype,
+      String name,
+      String phoneNumber,
+      String description,
+      String area,
+      String specificLocation,
+      String imageUrl) async {
+    isLostFoundLoading = true;
+    notifyListeners();
+    DateTime today = new DateTime.now();
+    String currentDate =
+        "${today.day.toString()}/${today.month.toString().padLeft(2, '0')}/${today.year.toString().padLeft(2, '0')}";
+    final Map<String, dynamic> lostData = {
+      'subtype': subtype,
+      'name': name,
+      'phoneNumber': phoneNumber,
+      'description': description,
+      'area': area,
+      'specificLocation': specificLocation,
       'reportDate': currentDate,
       'imageUrl': imageUrl
     };
