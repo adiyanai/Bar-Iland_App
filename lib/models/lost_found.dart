@@ -83,7 +83,6 @@ class Lost extends LostFound {
 
 class Found extends LostFound {
   final String area;
-  final bool isInArea;
   final String specificLocation;
 
   Found({
@@ -96,7 +95,6 @@ class Found extends LostFound {
     @required reportDate,
     @required imageUrl,
     @required this.area,
-    @required this.isInArea,
     @required this.specificLocation,
   }) : super(
           id: id,
@@ -111,10 +109,6 @@ class Found extends LostFound {
 
   String get Area {
     return area;
-  }
-
-  bool get IsInArea {
-    return isInArea;
   }
 
   String get SpecificLocation {
