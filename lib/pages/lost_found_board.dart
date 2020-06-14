@@ -394,22 +394,23 @@ class _LostFoundBoardState extends State<LostFoundBoard> {
                           content: Scrollbar(
                             isAlwaysShown: true,
                             controller: _lostTypesScrollController,
-                             child: SizedBox(
-      height: 300,
-                            child: ListView(
-                              controller: _lostTypesScrollController,
-                              children: widget.model.LostFoundTypes.map((type) {
-                                return FlatButton(
-                                  child: Text(type),
-                                  onPressed: () {
-                                    setState(() {
-                                      _filterButtonAction(type);
-                                      Navigator.pop(context);
-                                    });
-                                  },
-                                );
-                              }).toList(),
-                            )),
+                            child: SizedBox(
+                                height: 300,
+                                child: ListView(
+                                  controller: _lostTypesScrollController,
+                                  children:
+                                      widget.model.LostFoundTypes.map((type) {
+                                    return FlatButton(
+                                      child: Text(type),
+                                      onPressed: () {
+                                        setState(() {
+                                          _filterButtonAction(type);
+                                          Navigator.pop(context);
+                                        });
+                                      },
+                                    );
+                                  }).toList(),
+                                )),
                           ),
                           actions: <Widget>[
                             FlatButton(
@@ -437,12 +438,12 @@ class _LostFoundBoardState extends State<LostFoundBoard> {
         color: Colors.blue,
         label: Text("דיווח על " + _lostOrFoundItem),
         onPressed: () {
-            if (_lostOrFoundItem == "אבידה") {
-              Navigator.pushNamed(context, '/addLost');
-              // found item
-            } else {
-              Navigator.pushNamed(context, '/addFound');
-            }
+          if (_lostOrFoundItem == "אבידה") {
+            Navigator.pushNamed(context, '/addLost');
+            // found item
+          } else {
+            Navigator.pushNamed(context, '/addFound');
+          }
         },
       ),
     ]);
