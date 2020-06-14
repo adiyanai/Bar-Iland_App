@@ -47,7 +47,7 @@ class _AddFoundState extends State<AddFound> {
   Future<File> _futureImageFile;
   File _imageFile;
   String _imageUrl = "";
-  Widget _image = Container();
+  Widget _image = Container(child: Center(child: Text("צלמ/י את המציאה על מנת להקל על המאבד למצוא אותה.")));
   bool _isAddFoundLoading = false;
 
   
@@ -260,7 +260,7 @@ class _AddFoundState extends State<AddFound> {
                       label: Text("הסרת התמונה"),
                       onPressed: () {
                         setState(() {
-                          _image = Container();
+                          _image = Container(child: Center(child: Text("צלמ/י את המציאה על מנת להקל על המאבד למצוא אותה.")));
                         });
                       },
                     ),
@@ -271,7 +271,7 @@ class _AddFoundState extends State<AddFound> {
               ],
             );
           } else
-            return Container();
+            return Container(child: Center(child: Text("צלמ/י את המציאה על מנת להקל על המאבד למצוא אותה.")));
         });
   }
 
@@ -283,7 +283,7 @@ class _AddFoundState extends State<AddFound> {
       child: Stack(
         children: <Widget>[
           RaisedButton.icon(
-            icon: Icon(Icons.add_photo_alternate),
+            icon: Icon(Icons.add_a_photo),
             textColor: Colors.white,
             color: Colors.blue,
             label: Text("הוספת תמונה"),
