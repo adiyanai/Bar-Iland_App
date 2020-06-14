@@ -7,30 +7,38 @@ import 'package:scoped_model/scoped_model.dart';
 import 'package:bar_iland_app/scoped-models/main.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class LostBoard extends StatefulWidget {
+class LostFoundBoard extends StatefulWidget {
   final MainModel model;
-  LostBoard(this.model);
+  final String lostOrFoundItems;
+  LostFoundBoard(this.model, this.lostOrFoundItems);
 
   @override
   State<StatefulWidget> createState() {
-    return _LostBoardState();
+    return _LostFoundBoardState();
   }
 }
 
-class _LostBoardState extends State<LostBoard> {
+class _LostFoundBoardState extends State<LostFoundBoard> {
+  String _lostOrFoundItems = "";
+  String _lostOrFoundItem = "";
   ScrollController _lostScrollController = ScrollController();
   ScrollController _lostTypesScrollController = ScrollController();
   Icon _filterButtonIcon = Icon(MaterialCommunityIcons.filter);
   String _filterButtonText = "סינון";
   List<Widget> _displayedLostItems = List<Widget>();
   bool _filteredView = false;
-  String _lostTypeFilter = "";
+  String _typeFilter = "";
   bool _isScrollerAlwaysShown = true;
 
   @override
   void initState() {
     super.initState();
-    widget.model.fetchLostItems();
+    _lostOrFoundItems = widget.lostOrFoundItems;
+    if (_lostOrFoundItems == "אבידות") {
+      _lostOrFoundItem = "אבידה";
+    } else {
+      _lostOrFoundItem = "מציאה";
+    }
   }
 
   @override
@@ -39,7 +47,7 @@ class _LostBoardState extends State<LostBoard> {
         builder: (BuildContext context, Widget child, MainModel model) {
       Widget content;
       if (model.isLostFoundLoading) {
-         content = Container(
+        content = Container(
             decoration: BoxDecoration(
               image: DecorationImage(
                 image: AssetImage('assets/lost_found.jpg'),
@@ -50,18 +58,30 @@ class _LostBoardState extends State<LostBoard> {
                 ),
               ),
             ),
-        child: Center(child: CircularProgressIndicator()));
+            child: Center(child: CircularProgressIndicator()));
       } else if (!model.isLostFoundLoading) {
-        _displayedLostItems = _filterLostItems().map((lost) {
-          Lost specificLost = lost;
-          Map<String, Widget> fieldsToWidgets =
-              _mapFieldsToWidgets(specificLost);
-          return Column(
-              children: fieldsToWidgets.keys
-                  .map((key) => Container(
-                      margin: EdgeInsets.only(bottom: 10),
-                      child: fieldsToWidgets[key]))
-                  .toList());
+        _displayedLostItems = _filterItems().map((item) {
+          if (item.Type == "lost") {
+            Lost specificLost = item;
+            Map<String, Widget> fieldsToWidgets =
+                _mapLostFieldsToWidgets(specificLost);
+            return Column(
+                children: fieldsToWidgets.keys
+                    .map((key) => Container(
+                        margin: EdgeInsets.only(bottom: 10),
+                        child: fieldsToWidgets[key]))
+                    .toList());
+          } else {
+            Found specificFound = item;
+            Map<String, Widget> fieldsToWidgets =
+                _mapFoundFieldsToWidgets(specificFound);
+            return Column(
+                children: fieldsToWidgets.keys
+                    .map((key) => Container(
+                        margin: EdgeInsets.only(bottom: 10),
+                        child: fieldsToWidgets[key]))
+                    .toList());
+          }
         }).toList();
         if (_displayedLostItems.length == 0 && _filteredView) {
           _displayedLostItems = <Widget>[
@@ -70,10 +90,10 @@ class _LostBoardState extends State<LostBoard> {
               height: 200,
               child: Center(
                 child: Text(
-                  "לא נמצאו אבידות מסוג: " +
-                      _lostTypeFilter +
+                  "לא נמצאו ${_lostOrFoundItems} מסוג: " +
+                      _typeFilter +
                       ".\n" +
-                      "לידיעתך, לוח האבידות מתעדכן באופן שוטף.\n"
+                      "לידיעתך, לוח ה${_lostOrFoundItems} מתעדכן באופן שוטף.\n"
                           "מומלץ לעקוב אחר שינויים מעת לעת.",
                   style: TextStyle(fontSize: 16),
                 ),
@@ -87,8 +107,8 @@ class _LostBoardState extends State<LostBoard> {
               height: 200,
               child: Center(
                 child: Text(
-                  "לא פורסמו לאחרונה אבידות בלוח.\n" +
-                      "לידיעתך, לוח האבידות מתעדכן באופן שוטף.\n"
+                  "לא פורסמו לאחרונה ${_lostOrFoundItems} בלוח.\n" +
+                      "לידיעתך, לוח ה${_lostOrFoundItems} מתעדכן באופן שוטף.\n"
                           "מומלץ לעקוב אחר שינויים מעת לעת.",
                   style: TextStyle(fontSize: 16),
                 ),
@@ -160,24 +180,39 @@ class _LostBoardState extends State<LostBoard> {
     });
   }
 
-  List<LostFound> _filterLostItems() {
-    if (!_filteredView) {
-      return widget.model.LostItems;
+  List<LostFound> _filterItems() {
+    if (_lostOrFoundItems == "אבידות") {
+      if (!_filteredView) {
+        return widget.model.LostItems;
+      } else {
+        List<LostFound> filteredItemsToDisplay = [];
+        widget.model.LostItems.forEach((lost) {
+          if (lost.Subtype == _typeFilter) {
+            filteredItemsToDisplay.add(lost);
+          }
+        });
+        return filteredItemsToDisplay;
+      }
+      // found items
     } else {
-      List<LostFound> filteredLostItemsToDisplay = [];
-      widget.model.LostItems.forEach((lost) {
-        if (lost.Subtype == _lostTypeFilter) {
-          filteredLostItemsToDisplay.add(lost);
-        }
-      });
-      return filteredLostItemsToDisplay;
+      if (!_filteredView) {
+        return widget.model.FoundItems;
+      } else {
+        List<LostFound> filteredItemsToDisplay = [];
+        widget.model.FoundItems.forEach((found) {
+          if (found.Subtype == _typeFilter) {
+            filteredItemsToDisplay.add(found);
+          }
+        });
+        return filteredItemsToDisplay;
+      }
     }
   }
 
-  Map<String, Widget> _mapFieldsToWidgets(Lost specificLost) {
+  Map<String, Widget> _mapLostFieldsToWidgets(Lost specificLost) {
     Map<String, Icon> mapToIcons = {
       "סוג האבידה": Icon(Icons.search),
-      "תיאור": Icon(MaterialCommunityIcons.file_document_edit_outline),
+      "תיאור": Icon(MaterialCommunityIcons.information_outline),
       "תאריך דיווח": Icon(MaterialCommunityIcons.calendar_today),
       "שם": Icon(Icons.person),
       "טלפון": Icon(Icons.phone),
@@ -252,6 +287,83 @@ class _LostBoardState extends State<LostBoard> {
     return fieldsToWidgets;
   }
 
+  Map<String, Widget> _mapFoundFieldsToWidgets(Found specificFound) {
+    Map<String, Icon> mapToIcons = {
+      "סוג האבידה": Icon(Icons.search),
+      "תיאור": Icon(MaterialCommunityIcons.information_outline),
+      "תאריך דיווח": Icon(MaterialCommunityIcons.calendar_today),
+      "שם": Icon(Icons.person),
+      "טלפון": Icon(Icons.phone),
+      "מיקום": Icon(Icons.location_on),
+      "תמונה": Icon(MaterialCommunityIcons.camera),
+    };
+
+    Map<String, Widget> fieldsToWidgets = Map<String, Widget>();
+    fieldsToWidgets["סוג האבידה"] = Row(children: [
+      mapToIcons["סוג האבידה"],
+      Text(
+        specificFound.Subtype,
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+        ),
+      )
+    ]);
+    if (specificFound.Description != "") {
+      fieldsToWidgets["תיאור"] =
+          Row(children: [mapToIcons["תיאור"], Text(specificFound.Description)]);
+    }
+    fieldsToWidgets["תאריך דיווח"] = Row(
+        children: [mapToIcons["תאריך דיווח"], Text(specificFound.ReportDate)]);
+    String location = specificFound.Area;
+    if (specificFound.SpecificLocation != "") {
+      location += (', ' + specificFound.SpecificLocation);
+    }
+    fieldsToWidgets["מיקום"] = Column(
+      children: <Widget>[
+        Row(children: [mapToIcons["מיקום"], Text(location)]),
+      ],
+    );
+    if (specificFound.Name != "") {
+      fieldsToWidgets["שם"] =
+          Row(children: [mapToIcons["שם"], Text(specificFound.Name)]);
+    }
+    if (specificFound.PhoneNumber != "") {
+      fieldsToWidgets["טלפון"] = Row(children: [
+        mapToIcons["טלפון"],
+        GestureDetector(
+          onTap: () {
+            _launchCaller(specificFound.PhoneNumber);
+          },
+          child: Text(
+            specificFound.PhoneNumber,
+            style: TextStyle(
+                color: Colors.blue, decoration: TextDecoration.underline),
+          ),
+        )
+      ]);
+    }
+
+    if (specificFound.ImageUrl != "") {
+      fieldsToWidgets["תמונה"] = Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          mapToIcons["תמונה"],
+          SizedBox(width: 15),
+          Container(
+            margin: EdgeInsets.only(right: 20),
+            width: 250,
+            height: 250,
+            child: Image.network(
+              specificFound.ImageUrl,
+              fit: BoxFit.contain,
+            ),
+          )
+        ],
+      );
+    }
+    return fieldsToWidgets;
+  }
+
   _launchCaller(String phoneNumber) async {
     String url = "tel:$phoneNumber";
     if (await canLaunch(url)) {
@@ -276,8 +388,9 @@ class _LostBoardState extends State<LostBoard> {
                   builder: (_) => new Directionality(
                         textDirection: TextDirection.rtl,
                         child: AlertDialog(
-                          title:
-                              new Center(child: Text("סינון לפי סוג האבידה")),
+                          title: new Center(
+                              child:
+                                  Text("סינון לפי סוג ה" + _lostOrFoundItem)),
                           content: Scrollbar(
                             isAlwaysShown: true,
                             controller: _lostTypesScrollController,
@@ -320,9 +433,14 @@ class _LostBoardState extends State<LostBoard> {
         icon: Icon(Icons.add),
         textColor: Colors.white,
         color: Colors.blue,
-        label: Text("הוספת אבידה"),
+        label: Text("דיווח על " + _lostOrFoundItem),
         onPressed: () {
-          Navigator.pushReplacementNamed(context, '/addLost');
+            if (_lostOrFoundItem == "אבידה") {
+              Navigator.pushNamed(context, '/addLost');
+              // found item
+            } else {
+              Navigator.pushNamed(context, '/addFound');
+            }
         },
       ),
     ]);
@@ -332,7 +450,7 @@ class _LostBoardState extends State<LostBoard> {
     _filterButtonText = "סינון";
     _filterButtonIcon = Icon(MaterialCommunityIcons.filter);
     _filteredView = false;
-    _lostTypeFilter = "";
+    _typeFilter = "";
     _isScrollerAlwaysShown = true;
   }
 
@@ -340,6 +458,6 @@ class _LostBoardState extends State<LostBoard> {
     _filterButtonText = "ביטול הסינון";
     _filterButtonIcon = Icon(MaterialCommunityIcons.filter_remove);
     _filteredView = true;
-    _lostTypeFilter = type;
+    _typeFilter = type;
   }
 }
