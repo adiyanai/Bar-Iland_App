@@ -6,7 +6,6 @@ import 'package:scoped_model/scoped_model.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:grouped_buttons/grouped_buttons.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 import '../scoped-models/main.dart';
@@ -17,14 +16,14 @@ class AddLost extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    return AddLostState();
+    return _AddLostState();
   }
 }
 
-class AddLostState extends State<AddLost> {
+class _AddLostState extends State<AddLost> {
   ScrollController _typesScrollController = ScrollController();
   ScrollController _locationsScrollController = ScrollController();
-  String _pageTitle = "מהו סוג האבידה?";
+  String _pageTitle = "סוג האבידה";
   Color _nextButtonColor = Colors.grey;
   String _nextButtonText = "הבא";
   bool _isNextNotPressable = true;
@@ -44,7 +43,8 @@ class AddLostState extends State<AddLost> {
   Future<File> _futureImageFile;
   File _imageFile;
   String _imageUrl = "";
-  Widget _image = Container();
+  Widget _image = Container(
+      child: Center(child: Text("אם ברשותך תמונה של האבידה, צרפ/י אותה כאן.")));
   bool _isAddLostLoading = false;
 
   @override
@@ -57,7 +57,7 @@ class AddLostState extends State<AddLost> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        resizeToAvoidBottomInset: false,
+        resizeToAvoidBottomInset: true,
         appBar: AppBar(
           leading: Container(),
           centerTitle: true,
@@ -67,7 +67,7 @@ class AddLostState extends State<AddLost> {
         ),
         body: ScopedModelDescendant<MainModel>(
           builder: (BuildContext context, Widget child, MainModel model) {
-            return Container(
+            return SingleChildScrollView(child: Container(
               height: MediaQuery.of(context).size.height,
               width: MediaQuery.of(context).size.width,
               decoration: BoxDecoration(
@@ -91,7 +91,7 @@ class AddLostState extends State<AddLost> {
                       )
                     : _buildPageContent(),
               ),
-            );
+            ));
           },
         ),
       ),
@@ -113,16 +113,16 @@ class AddLostState extends State<AddLost> {
 
   Widget _currentPageContent() {
     switch (_pageTitle) {
-      case "מהו סוג האבידה?":
+      case "סוג האבידה":
         return _lostTypeContent();
         break;
-      case "פרטים נוספים:":
+      case "פרטים נוספים":
         return _moreDetailsContent();
         break;
-      case "תמונה להמחשה":
+      case "תמונה":
         return _addingPictureContent();
         break;
-      case "היכן ייתכן שהאבידה נמצאת?":
+      case "מיקומים משוערים":
         return _possibleLocationsContent();
         break;
       default:
@@ -238,7 +238,10 @@ class AddLostState extends State<AddLost> {
                       label: Text("הסרת התמונה"),
                       onPressed: () {
                         setState(() {
-                          _image = Container();
+                          _image = Container(
+                              child: Center(
+                                  child: Text(
+                                      "אם ברשותך תמונה של האבידה, צרפ/י אותה כאן.")));
                         });
                       },
                     ),
@@ -249,7 +252,9 @@ class AddLostState extends State<AddLost> {
               ],
             );
           } else
-            return Container();
+            return Container(
+                child: Center(
+                    child: Text("אם ברשותך תמונה של האבידה, צרפ/י אותה כאן.")));
         });
   }
 
@@ -364,7 +369,7 @@ class AddLostState extends State<AddLost> {
           ],
           decoration: new InputDecoration(
             hintText: "תיאור האבידה וסימנים ייחודיים (לא חובה)",
-            icon: new Icon(MaterialCommunityIcons.file_document_edit_outline),
+            icon: new Icon(MaterialCommunityIcons.information_outline),
           ),
           onChanged: (value) {
             _description = value;
@@ -391,18 +396,18 @@ class AddLostState extends State<AddLost> {
             onPressed: () {
               setState(() {
                 switch (_pageTitle) {
-                  case "פרטים נוספים:":
+                  case "פרטים נוספים":
                     _isNextNotPressable = false;
-                    _pageTitle = "מהו סוג האבידה?";
+                    _pageTitle = "סוג האבידה";
                     _nextButtonView(_pageTitle);
                     _isPreviousButtonVisible = false;
                     break;
-                  case "היכן ייתכן שהאבידה נמצאת?":
-                    _pageTitle = "תמונה להמחשה";
+                  case "מיקומים משוערים":
+                    _pageTitle = "תמונה";
                     _nextButtonView(_pageTitle);
                     break;
-                  case "תמונה להמחשה":
-                    _pageTitle = "פרטים נוספים:";
+                  case "תמונה":
+                    _pageTitle = "פרטים נוספים";
                     _nextButtonView(_pageTitle);
                     break;
                 }
@@ -417,7 +422,7 @@ class AddLostState extends State<AddLost> {
           ),
           color: Colors.blue,
           onPressed: () {
-            Navigator.pushReplacementNamed(context, '/lostFound');
+            Navigator.pop(context);
           },
         ),
         IgnorePointer(
@@ -431,22 +436,22 @@ class AddLostState extends State<AddLost> {
             onPressed: () {
               setState(() {
                 switch (_pageTitle) {
-                  case "מהו סוג האבידה?":
-                    _pageTitle = "פרטים נוספים:";
+                  case "סוג האבידה":
+                    _pageTitle = "פרטים נוספים";
                     _nextButtonView(_pageTitle);
                     _isPreviousButtonVisible = true;
                     break;
-                  case "פרטים נוספים:":
+                  case "פרטים נוספים":
                     if (_formKey.currentState.validate()) {
-                      _pageTitle = "תמונה להמחשה";
+                      _pageTitle = "תמונה";
                     }
                     _nextButtonView(_pageTitle);
                     break;
-                  case "תמונה להמחשה":
-                    _pageTitle = "היכן ייתכן שהאבידה נמצאת?";
+                  case "תמונה":
+                    _pageTitle = "מיקומים משוערים";
                     _nextButtonView(_pageTitle);
                     break;
-                  case "היכן ייתכן שהאבידה נמצאת?":
+                  case "מיקומים משוערים":
                     _addLostToDatabase();
                 }
               });
@@ -469,8 +474,9 @@ class AddLostState extends State<AddLost> {
       _imageUrl = ImageUrl.toString();
     }
     widget.model.addLost("lost", _selectedType, _name, _phoneNumber,
-      _description, _selOptionalLostLocations, _imageUrl);
-                          Navigator.popAndPushNamed(context, '/lostFound');
+        _description, _selOptionalLostLocations, _imageUrl);
+    widget.model.fetchLostItems();
+    Navigator.pop(context);
     _isAddLostLoading = false;
   }
 
@@ -516,7 +522,7 @@ class AddLostState extends State<AddLost> {
 
   void _nextButtonView(String pageTitle) {
     switch (pageTitle) {
-      case "מהו סוג האבידה?":
+      case "סוג האבידה":
         _nextButtonText = "הבא";
         if (_selectedType != "") {
           _nextButtonColor = Colors.blue;
@@ -526,7 +532,7 @@ class AddLostState extends State<AddLost> {
           _isNextNotPressable = true;
         }
         break;
-      case "פרטים נוספים:":
+      case "פרטים נוספים":
         _nextButtonText = "הבא";
         if (_name.length >= 1 && _phoneNumber.length >= 1) {
           _nextButtonColor = Colors.blue;
@@ -536,11 +542,11 @@ class AddLostState extends State<AddLost> {
           _isNextNotPressable = true;
         }
         break;
-      case "תמונה להמחשה":
+      case "תמונה":
         _nextButtonText = "הבא";
         _nextButtonColor = Colors.blue;
         break;
-      case "היכן ייתכן שהאבידה נמצאת?":
+      case "מיקומים משוערים":
         _nextButtonText = "סיום";
         _nextButtonColor = Colors.blue;
     }
