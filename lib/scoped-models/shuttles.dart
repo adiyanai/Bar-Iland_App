@@ -4,7 +4,7 @@ import 'dart:convert';
 import '../models/shuttle_station.dart';
 
 class ShuttlesModel extends Model {
-  final databaseURL =
+  final shuttleStationsDatabaseURL =
       'https://bar-iland-app.firebaseio.com/locations/shuttleStations.json';
   List<ShuttleStation> _shuttleStations = [];
   bool _isShuttleStationsLoading = false;
@@ -20,7 +20,7 @@ class ShuttlesModel extends Model {
   Future<Null> fetchShuttleStations() {
     _isShuttleStationsLoading = true;
     notifyListeners();
-    return http.get(databaseURL).then<Null>((http.Response response) {
+    return http.get(shuttleStationsDatabaseURL).then<Null>((http.Response response) {
       final List<ShuttleStation> fetchedStations = [];
       final Map<String, dynamic> stationsData = json.decode(response.body);
       stationsData.forEach((String stationId, dynamic stationData) {
