@@ -5,8 +5,8 @@ import '../models/bus.dart';
 import '../models/station.dart';
 
 class BusesModel extends Model {
-  final busesDatabaseURL = 'https://bar-iland-app.firebaseio.com/buses.json';
-  final stationsDatabaseURL =
+  final _busesDatabaseURL = 'https://bar-iland-app.firebaseio.com/buses.json';
+  final _stationsDatabaseURL =
       'https://bar-iland-app.firebaseio.com/stations.json';
   List<Bus> _buses = [];
   List<Station> _stations = [];
@@ -37,7 +37,7 @@ class BusesModel extends Model {
   Future<Null> fetchBuses() {
     _isBusesLoading = true;
     notifyListeners();
-    return http.get(busesDatabaseURL).then<Null>((http.Response response) {
+    return http.get(_busesDatabaseURL).then<Null>((http.Response response) {
       final List<String> busesLocations = [];
       final List<Bus> fetchedBuses = [];
       final Map<String, dynamic> busesData = json.decode(response.body);
@@ -79,7 +79,7 @@ class BusesModel extends Model {
   Future<Null> fetchStations() {
     _isStationsLoading = true;
     notifyListeners();
-    return http.get(stationsDatabaseURL).then<Null>((http.Response response) {
+    return http.get(_stationsDatabaseURL).then<Null>((http.Response response) {
       final List<Station> fetchedStations = [];
       final Map<String, dynamic> stationsData = json.decode(response.body);
       stationsData.forEach((String stationId, dynamic stationData) {
