@@ -6,7 +6,7 @@ import '../models/event_location.dart';
 import './main.dart';
 
 class EventsModel extends Model {
-  final databaseURL = 'https://bar-iland-app.firebaseio.com/events';
+  final _databaseURL = 'https://bar-iland-app.firebaseio.com/events';
   List<Event> _events = [];
   List<String> _eventTypes = [];
   List<EventLocation> _eventsLocations = [];
@@ -77,7 +77,7 @@ class EventsModel extends Model {
 
     try {
       final http.Response response = await http.post(
-          databaseURL + '/eventsData.json' + '?auth=${model.user.Token}',
+          _databaseURL + '/eventsData.json' + '?auth=${model.user.Token}',
           body: json.encode(eventData));
 
       if (response.statusCode != 200 && response.statusCode != 201) {
@@ -112,7 +112,7 @@ class EventsModel extends Model {
     _selEventId = null;
     notifyListeners();
     return http
-        .delete(databaseURL + '/eventsData.json' + '/${deletedEventId}.json')
+        .delete(_databaseURL + '/eventsData.json' + '/${deletedEventId}.json')
         .then((http.Response response) {
       _isEventsLoading = false;
       notifyListeners();
@@ -128,7 +128,7 @@ class EventsModel extends Model {
     _isEventsLoading = true;
     notifyListeners();
     return http
-        .get(databaseURL + '/eventsData.json')
+        .get(_databaseURL + '/eventsData.json')
         .then<Null>((http.Response response) {
       final List<Event> fetchedEventsList = [];
       final Map<String, dynamic> eventsData = json.decode(response.body);
@@ -162,7 +162,7 @@ class EventsModel extends Model {
     _isEventTypeLoading = true;
     notifyListeners();
     return http
-        .get(databaseURL + '/eventTypes.json')
+        .get(_databaseURL + '/eventTypes.json')
         .then<Null>((http.Response response) {
       final List<String> fetchedEventTypeList = [];
       final Map<String, dynamic> eventTypesData = json.decode(response.body);
