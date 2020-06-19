@@ -47,10 +47,10 @@ class _AddFoundState extends State<AddFound> {
   Future<File> _futureImageFile;
   File _imageFile;
   String _imageUrl = "";
-  Widget _image = Container(child: Center(child: Text("צלמ/י את המציאה על מנת להקל על המאבד למצוא אותה.")));
+  Widget _image = Container(
+      child: Center(
+          child: Text("צלמ/י את המציאה על מנת להקל על המאבד למצוא אותה.")));
   bool _isAddFoundLoading = false;
-
-  
 
   @override
   void initState() {
@@ -72,7 +72,8 @@ class _AddFoundState extends State<AddFound> {
         ),
         body: ScopedModelDescendant<MainModel>(
           builder: (BuildContext context, Widget child, MainModel model) {
-            return SingleChildScrollView(child: Container(
+            return SingleChildScrollView(
+                child: Container(
               height: MediaQuery.of(context).size.height,
               width: MediaQuery.of(context).size.width,
               decoration: BoxDecoration(
@@ -90,7 +91,7 @@ class _AddFoundState extends State<AddFound> {
                 onTap: () {
                   FocusScope.of(context).requestFocus(FocusNode());
                 },
-                child: widget.model.isLostFoundLoading || _isAddFoundLoading
+                child: widget.model.isFoundLoading || _isAddFoundLoading
                     ? Center(
                         child: CircularProgressIndicator(),
                       )
@@ -260,7 +261,12 @@ class _AddFoundState extends State<AddFound> {
                       label: Text("הסרת התמונה"),
                       onPressed: () {
                         setState(() {
-                          _image = Container(child: Center(child: Text("צלמ/י את המציאה על מנת להקל על המאבד למצוא אותה.")));
+                          _image = Container(
+                            child: Center(
+                              child: Text(
+                                  "צלמ/י את המציאה על מנת להקל על המאבד למצוא אותה."),
+                            ),
+                          );
                         });
                       },
                     ),
@@ -271,7 +277,11 @@ class _AddFoundState extends State<AddFound> {
               ],
             );
           } else
-            return Container(child: Center(child: Text("צלמ/י את המציאה על מנת להקל על המאבד למצוא אותה.")));
+            return Container(
+              child: Center(
+                child: Text("צלמ/י את המציאה על מנת להקל על המאבד למצוא אותה."),
+              ),
+            );
         });
   }
 
@@ -565,7 +575,6 @@ class _AddFoundState extends State<AddFound> {
     }
     widget.model.addFound("found", _selectedType, _name, _phoneNumber,
         _description, _selectedArea, _specificLocation, _imageUrl);
-    widget.model.fetchFoundItems();
     Navigator.pop(context);
     _isAddFoundLoading = false;
   }
