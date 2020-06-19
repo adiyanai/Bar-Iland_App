@@ -1,7 +1,9 @@
+import 'package:bar_iland_app/models/bar_ilan_location.dart';
 import 'package:bar_iland_app/models/lost_found.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
+import 'package:location/location.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 import 'package:bar_iland_app/scoped-models/main.dart';
@@ -46,7 +48,7 @@ class _LostFoundBoardState extends State<LostFoundBoard> {
     return ScopedModelDescendant<MainModel>(
         builder: (BuildContext context, Widget child, MainModel model) {
       Widget content;
-      if (model.isLostFoundLoading) {
+      if (model.isLostLoading || model.isFoundLoading) {
         content = Container(
             decoration: BoxDecoration(
               image: DecorationImage(
@@ -59,7 +61,7 @@ class _LostFoundBoardState extends State<LostFoundBoard> {
               ),
             ),
             child: Center(child: CircularProgressIndicator()));
-      } else if (!model.isLostFoundLoading) {
+      } else if (!model.isLostLoading && !model.isFoundLoading) {
         _displayedLostItems = _filterItems().map((item) {
           if (item.Type == "lost") {
             Lost specificLost = item;
@@ -186,7 +188,7 @@ class _LostFoundBoardState extends State<LostFoundBoard> {
         return widget.model.LostItems;
       } else {
         List<LostFound> filteredItemsToDisplay = [];
-        widget.model.LostItems.forEach((lost) {
+        widget.model.lostItems.forEach((lost) {
           if (lost.Subtype == _typeFilter) {
             filteredItemsToDisplay.add(lost);
           }
@@ -196,10 +198,10 @@ class _LostFoundBoardState extends State<LostFoundBoard> {
       // found items
     } else {
       if (!_filteredView) {
-        return widget.model.FoundItems;
+        return widget.model.foundItems;
       } else {
         List<LostFound> filteredItemsToDisplay = [];
-        widget.model.FoundItems.forEach((found) {
+        widget.model.foundItems.forEach((found) {
           if (found.Subtype == _typeFilter) {
             filteredItemsToDisplay.add(found);
           }
@@ -316,11 +318,50 @@ class _LostFoundBoardState extends State<LostFoundBoard> {
         children: [mapToIcons["תאריך דיווח"], Text(specificFound.ReportDate)]);
     String location = specificFound.Area;
     if (specificFound.SpecificLocation != "") {
-      location += (', ' + specificFound.SpecificLocation);
+      location += ('\n' + specificFound.SpecificLocation);
+    }
+    Widget navigationButton = Container();
+    if (specificFound.Area != "נלקח עם המוצא/ת") {
+      String locationNumber = location.split(" - ")[0];
+      navigationButton = Container(
+        width: 10,
+        height: 30,
+        child: IconButton(
+          icon: Icon(
+            Icons.near_me,
+            color: Colors.blue,
+          ),
+          onPressed: () async {
+            // get the data of the location
+            BarIlanLocation locationData = widget.model.lostFoundLocations
+                .firstWhere(
+                    (BarIlanLocation item) => (locationNumber == item.Number));
+            widget.model.getCurrentLocation();
+            if (widget.model.userLocation != null) {
+              LocationData userLocation = widget.model.userLocation;
+              String url = 'https://www.google.com/maps/dir/?api=1&origin=' +
+                  userLocation.latitude.toString() +
+                  ',' +
+                  userLocation.longitude.toString() +
+                  '&destination=' +
+                  locationData.Lat.toString() +
+                  ',' +
+                  locationData.Lon.toString() +
+                  '&travelmode=walking';
+              _launchURL(url);
+            }
+          },
+        ),
+      );
     }
     fieldsToWidgets["מיקום"] = Column(
       children: <Widget>[
-        Row(children: [mapToIcons["מיקום"], Text(location)]),
+        Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          mapToIcons["מיקום"],
+          Text(location),
+          SizedBox(width: 30),
+          navigationButton
+        ]),
       ],
     );
     if (specificFound.Name != "") {
@@ -364,8 +405,16 @@ class _LostFoundBoardState extends State<LostFoundBoard> {
     return fieldsToWidgets;
   }
 
-  _launchCaller(String phoneNumber) async {
+  void _launchCaller(String phoneNumber) async {
     String url = "tel:$phoneNumber";
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
+  void _launchURL(String url) async {
     if (await canLaunch(url)) {
       await launch(url);
     } else {
@@ -396,6 +445,7 @@ class _LostFoundBoardState extends State<LostFoundBoard> {
                             controller: _lostTypesScrollController,
                             child: SizedBox(
                                 height: 300,
+                                width: 100,
                                 child: ListView(
                                   controller: _lostTypesScrollController,
                                   children:
@@ -438,12 +488,14 @@ class _LostFoundBoardState extends State<LostFoundBoard> {
         color: Colors.blue,
         label: Text("דיווח על " + _lostOrFoundItem),
         onPressed: () {
-          if (_lostOrFoundItem == "אבידה") {
-            Navigator.pushNamed(context, '/addLost');
-            // found item
-          } else {
-            Navigator.pushNamed(context, '/addFound');
-          }
+          setState(() {
+            if (_lostOrFoundItem == "אבידה") {
+              Navigator.pushNamed(context, '/addLost');
+              // found item
+            } else {
+              Navigator.pushNamed(context, '/addFound');
+            }
+          });
         },
       ),
     ]);
