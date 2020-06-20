@@ -67,7 +67,8 @@ class _AddLostState extends State<AddLost> {
         ),
         body: ScopedModelDescendant<MainModel>(
           builder: (BuildContext context, Widget child, MainModel model) {
-            return SingleChildScrollView(child: Container(
+            return SingleChildScrollView(
+                child: Container(
               height: MediaQuery.of(context).size.height,
               width: MediaQuery.of(context).size.width,
               decoration: BoxDecoration(
@@ -85,7 +86,7 @@ class _AddLostState extends State<AddLost> {
                 onTap: () {
                   FocusScope.of(context).requestFocus(FocusNode());
                 },
-                child: widget.model.isLostFoundLoading || _isAddLostLoading
+                child: widget.model.isLostLoading || _isAddLostLoading
                     ? Center(
                         child: CircularProgressIndicator(),
                       )
@@ -253,8 +254,10 @@ class _AddLostState extends State<AddLost> {
             );
           } else
             return Container(
-                child: Center(
-                    child: Text("אם ברשותך תמונה של האבידה, צרפ/י אותה כאן.")));
+              child: Center(
+                child: Text("אם ברשותך תמונה של האבידה, צרפ/י אותה כאן."),
+              ),
+            );
         });
   }
 
@@ -361,6 +364,8 @@ class _AddLostState extends State<AddLost> {
       width: 320,
       margin: EdgeInsets.only(top: 30),
       child: TextFormField(
+          minLines: 2,
+          maxLines: 2,
           controller: _descriptionController,
           textInputAction: TextInputAction.done,
           focusNode: _descriptionFocus,
@@ -475,9 +480,8 @@ class _AddLostState extends State<AddLost> {
     }
     widget.model.addLost("lost", _selectedType, _name, _phoneNumber,
         _description, _selOptionalLostLocations, _imageUrl);
-    widget.model.fetchLostItems();
-    Navigator.pop(context);
     _isAddLostLoading = false;
+    Navigator.pop(context);
   }
 
   Widget _note() {

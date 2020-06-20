@@ -43,12 +43,13 @@ class _AddFoundState extends State<AddFound> {
   FocusNode _phoneNumberFocus = FocusNode();
   FocusNode _descriptionFocus = FocusNode();
   FocusNode _specificLocationFocus = FocusNode();
-
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   Future<File> _futureImageFile;
   File _imageFile;
   String _imageUrl = "";
-  Widget _image = Container();
+  Widget _image = Container(
+      child: Center(
+          child: Text("צלמ/י את המציאה על מנת להקל על המאבד למצוא אותה.")));
   bool _isAddFoundLoading = false;
 
   @override
@@ -71,7 +72,8 @@ class _AddFoundState extends State<AddFound> {
         ),
         body: ScopedModelDescendant<MainModel>(
           builder: (BuildContext context, Widget child, MainModel model) {
-            return SingleChildScrollView(child: Container(
+            return SingleChildScrollView(
+                child: Container(
               height: MediaQuery.of(context).size.height,
               width: MediaQuery.of(context).size.width,
               decoration: BoxDecoration(
@@ -89,7 +91,7 @@ class _AddFoundState extends State<AddFound> {
                 onTap: () {
                   FocusScope.of(context).requestFocus(FocusNode());
                 },
-                child: widget.model.isLostFoundLoading || _isAddFoundLoading
+                child: widget.model.isFoundLoading || _isAddFoundLoading
                     ? Center(
                         child: CircularProgressIndicator(),
                       )
@@ -105,7 +107,7 @@ class _AddFoundState extends State<AddFound> {
   Widget _buildPageContent() {
     return Stack(children: [
       Container(
-          height: 500,
+          height: 550,
           padding: EdgeInsets.fromLTRB(0, 20, 0, 60),
           child: _currentPageContent()),
       Container(
@@ -170,7 +172,7 @@ class _AddFoundState extends State<AddFound> {
           children: <Widget>[
             SizedBox(height: 20),
             _descriptionFormField(),
-            SizedBox(height: 70),
+            SizedBox(height: 90),
             _isTakenOrNot(),
           ],
         ),
@@ -203,7 +205,7 @@ class _AddFoundState extends State<AddFound> {
     return Column(
       children: <Widget>[
         Container(
-          height: 300,
+          height: 350,
           width: 400,
           color: Color.fromRGBO(220, 250, 250, 0.7),
           child: Scrollbar(
@@ -227,14 +229,14 @@ class _AddFoundState extends State<AddFound> {
             height: 90,
             width: 400,
             padding: EdgeInsets.only(bottom: 30),
-            margin: EdgeInsets.only(top: 5),
+            margin: EdgeInsets.only(top: 15),
             color: Color.fromRGBO(220, 250, 250, 0.7),
             child: _specificLocationFormField()),
       ],
     );
   }
 
-  void _pickImageFromGallery(ImageSource source) {
+  void _cameraPhoto(ImageSource source) {
     setState(() {
       _futureImageFile = ImagePicker.pickImage(source: source);
     });
@@ -259,7 +261,12 @@ class _AddFoundState extends State<AddFound> {
                       label: Text("הסרת התמונה"),
                       onPressed: () {
                         setState(() {
-                          _image = Container();
+                          _image = Container(
+                            child: Center(
+                              child: Text(
+                                  "צלמ/י את המציאה על מנת להקל על המאבד למצוא אותה."),
+                            ),
+                          );
                         });
                       },
                     ),
@@ -270,7 +277,11 @@ class _AddFoundState extends State<AddFound> {
               ],
             );
           } else
-            return Container();
+            return Container(
+              child: Center(
+                child: Text("צלמ/י את המציאה על מנת להקל על המאבד למצוא אותה."),
+              ),
+            );
         });
   }
 
@@ -282,12 +293,12 @@ class _AddFoundState extends State<AddFound> {
       child: Stack(
         children: <Widget>[
           RaisedButton.icon(
-            icon: Icon(Icons.add_photo_alternate),
+            icon: Icon(Icons.add_a_photo),
             textColor: Colors.white,
             color: Colors.blue,
             label: Text("הוספת תמונה"),
             onPressed: () {
-              _pickImageFromGallery(ImageSource.gallery);
+              _cameraPhoto(ImageSource.camera);
               setState(() {
                 _image = _showImage();
               });
@@ -377,6 +388,8 @@ class _AddFoundState extends State<AddFound> {
       width: 320,
       margin: EdgeInsets.only(top: 30),
       child: TextFormField(
+          minLines: 2,
+          maxLines: 2,
           controller: _descriptionController,
           textInputAction: TextInputAction.done,
           focusNode: _descriptionFocus,
@@ -562,7 +575,6 @@ class _AddFoundState extends State<AddFound> {
     }
     widget.model.addFound("found", _selectedType, _name, _phoneNumber,
         _description, _selectedArea, _specificLocation, _imageUrl);
-    widget.model.fetchFoundItems();
     Navigator.pop(context);
     _isAddFoundLoading = false;
   }

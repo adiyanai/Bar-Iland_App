@@ -1,19 +1,18 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_vector_icons/flutter_vector_icons.dart';
+import 'package:scoped_model/scoped_model.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:autocomplete_textfield/autocomplete_textfield.dart';
+import 'package:latlong/latlong.dart';
+import 'package:location/location.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+
+import 'package:bar_iland_app/models/service.dart';
+import 'package:bar_iland_app/scoped-models/main.dart';
 import 'package:bar_iland_app/models/connection.dart';
 import 'package:bar_iland_app/models/bar_ilan_location.dart';
 import 'package:bar_iland_app/utilities/services_icons.dart';
 import 'package:bar_iland_app/widgets/services_widgets.dart';
-
-import 'package:flutter/material.dart';
-import 'package:flutter_vector_icons/flutter_vector_icons.dart';
-import 'package:latlong/latlong.dart';
-import 'package:location/location.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'package:scoped_model/scoped_model.dart';
-import 'package:url_launcher/url_launcher.dart';
-
-import '../models/service.dart';
-import '../scoped-models/main.dart';
 
 class Services extends StatefulWidget {
   final MainModel model;
@@ -31,12 +30,13 @@ class _ServicesState extends State<Services> {
   ConnectionMode _connectionMode;
   Future<List<Service>> _servicesList;
   Widget _displayedServicesByArea = Column();
-  ListView _servicesListView;
+  Widget _servicesListView;
   Map<String, Icon> _mapServicesToIcons;
   AutoCompleteTextField<String> _textField;
   Widget _title = Container();
   ScrollController _scrollController;
-  GlobalKey<AutoCompleteTextFieldState<String>> _key = new GlobalKey();
+  ScrollController _servicesButtonsScrollController = ScrollController();
+  GlobalKey<AutoCompleteTextFieldState<String>> _textFieldKey = new GlobalKey();
   final FocusNode _focusNode = FocusNode();
   String _selectedArea = "";
   bool _isNotPressable = true;
@@ -64,92 +64,22 @@ class _ServicesState extends State<Services> {
         Widget content;
         if (!model.isServicesLoading) {
           switch (_servicesView) {
+            // build services by area page
             case "לפי מיקום":
               content = _buildServicesByAreaPage(model.services);
               break;
+            // build the main page of services by type
             case "לפי סוג שירות":
               content = _buildServicesByTypePage();
               break;
+            // build the page of the specific service
             default:
-              content = WillPopScope(
-                onWillPop: () {
-                  widget.model.SelectedServiceIndex = 0;
-                  Navigator.pop(context);
-                  _servicesView = "לפי סוג שירות";
-                  return Future.value(true);
-                },
-                child: Directionality(
-                  textDirection: TextDirection.rtl,
-                  child: Scaffold(
-                    appBar: AppBar(
-                      centerTitle: true,
-                      title: Text(
-                        _servicesView,
-                      ),
-                    ),
-                    body: Stack(children: [
-                      Container(
-                        child: _buildSpecificServiceTypePage(
-                            _servicesView, model.services),
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Color.fromRGBO(200, 240, 245, 1),
-                          border: Border.all(
-                              width: 2,
-                              color: Color.fromRGBO(220, 250, 250, 0.9)),
-                        ),
-                        margin: EdgeInsets.only(top: 100),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: 170,
-                              child: RaisedButton.icon(
-                                icon: Icon(Icons.location_on),
-                                textColor: Colors.white,
-                                color: Colors.blue,
-                                label: Text(_sortingButtonText),
-                                onPressed: () {
-                                  setState(() {
-                                    if (_sortingButtonText ==
-                                        "מיון מהקרוב לרחוק") {
-                                      widget.model.getCurrentLocation();
-                                      if (widget.model.userLocation != null) {
-                                        _sortingOrder = "Geographic";
-                                        _sortingButtonText = "מיון בסדר עולה";
-                                      }
-                                    } else {
-                                      _sortingOrder = "Ascending";
-                                      _sortingButtonText = "מיון מהקרוב לרחוק";
-                                    }
-                                  });
-                                },
-                              ),
-                            ),
-                            /*
-                            Container(
-                              width: 150,
-                              child: RaisedButton.icon(
-                                icon: Icon(Icons.add),
-                                textColor: Colors.white,
-                                color: Colors.blue,
-                                label: Text("הוספת שירות"),
-                                onPressed: () {},
-                              ),
-                            )
-                            */
-                          ],
-                        ),
-                      ),
-                    ]),
-                  ),
-                ),
-              );
+              content = _buildSpecificServiceByTypePage();
               break;
           }
         } else if (model.isServicesLoading) {
           switch (_servicesView) {
+            // build services by location loading page
             case "לפי מיקום":
               content = Container(
                   decoration: new BoxDecoration(
@@ -162,6 +92,7 @@ class _ServicesState extends State<Services> {
                   ),
                   child: Center(child: CircularProgressIndicator()));
               break;
+            // build services by type loading page
             default:
               content = Container(
                   decoration: BoxDecoration(
@@ -183,14 +114,16 @@ class _ServicesState extends State<Services> {
     );
   }
 
+  // sort the services by geographical proximity to the current location of the user
   List<Service> _sortByGeographicalProximity(List<Service> servicesList) {
     _userLocation = widget.model.userLocation;
     servicesList.sort((service1, service2) {
+      // find the locations of the services in the list of all services locations
       BarIlanLocation location1Data = _allServicesLocations
           .firstWhere((BarIlanLocation item) => (service1.Area == item.Number));
       BarIlanLocation location2Data = _allServicesLocations
           .firstWhere((BarIlanLocation item) => (service2.Area == item.Number));
-
+      // sort the services by geographical proximity, using calculateDistance function
       return (calculateDistance(_userLocation.latitude, _userLocation.longitude,
               location1Data.Lat, location1Data.Lon))
           .compareTo((calculateDistance(_userLocation.latitude,
@@ -199,11 +132,13 @@ class _ServicesState extends State<Services> {
     return servicesList;
   }
 
+  // calculate the distance between two coordinates by latitude and longitude
   double calculateDistance(lat1, lon1, lat2, lon2) {
     final Distance distance = new Distance();
     return distance(new LatLng(lat1, lon1), new LatLng(lat2, lon2));
   }
 
+  // build the button of a specific service in the main page of services by type
   Widget serviceTypeButton(String text, Icon icon) {
     return SizedBox.fromSize(
       size: Size(95, 95),
@@ -230,6 +165,7 @@ class _ServicesState extends State<Services> {
     );
   }
 
+  // build the main page of services by type
   Widget _buildServicesByTypePage() {
     return Directionality(
       textDirection: TextDirection.rtl,
@@ -244,11 +180,13 @@ class _ServicesState extends State<Services> {
             ),
           ),
         ),
-        child: GestureDetector(
-          onTap: () {
-            FocusScope.of(context).requestFocus(FocusNode());
-          },
+
+        // build all the buttons of the specific services by type
+        child: Scrollbar(
+          isAlwaysShown: true,
+          controller: _servicesButtonsScrollController,
           child: ListView(
+            controller: _servicesButtonsScrollController,
             children: <Widget>[
               SizedBox(height: 35),
               Row(
@@ -331,18 +269,100 @@ class _ServicesState extends State<Services> {
     );
   }
 
+  // build the page of the specific service
+  Widget _buildSpecificServiceByTypePage() {
+    return WillPopScope(
+      onWillPop: () {
+        widget.model.SelectedServiceIndex = 0;
+        Navigator.pop(context);
+        _servicesView = "לפי סוג שירות";
+        return Future.value(true);
+      },
+      child: Directionality(
+        textDirection: TextDirection.rtl,
+        child: Scaffold(
+          appBar: AppBar(
+            centerTitle: true,
+            title: Text(
+              _servicesView,
+            ),
+          ),
+          body: Stack(children: [
+            Container(
+              child: _buildSpecificServiceTypePage(
+                  _servicesView, widget.model.services),
+            ),
+            Container(
+              decoration: BoxDecoration(
+                color: Color.fromRGBO(200, 240, 245, 1),
+                border: Border.all(
+                    width: 2, color: Color.fromRGBO(220, 250, 250, 0.9)),
+              ),
+              margin: EdgeInsets.only(top: 100),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 170,
+                    // services sorting button
+                    child: RaisedButton.icon(
+                      icon: Icon(Icons.location_on),
+                      textColor: Colors.white,
+                      color: Colors.blue,
+                      label: Text(_sortingButtonText),
+                      onPressed: () {
+                        setState(() {
+                          if (_sortingButtonText == "מיון מהקרוב לרחוק") {
+                            widget.model.getCurrentLocation();
+                            if (widget.model.userLocation != null) {
+                              _sortingOrder = "Geographic";
+                              _sortingButtonText = "מיון בסדר עולה";
+                            }
+                          } else {
+                            _sortingOrder = "Ascending";
+                            _sortingButtonText = "מיון מהקרוב לרחוק";
+                          }
+                        });
+                      },
+                    ),
+                  ),
+                  /*
+                  Container(
+                    width: 150,
+                    child: RaisedButton.icon(
+                      icon: Icon(Icons.add),
+                      textColor: Colors.white,
+                      color: Colors.blue,
+                      label: Text("הוספת שירות"),
+                      onPressed: () {},
+                    ),
+                  )
+                  */
+                ],
+              ),
+            ),
+          ]),
+        ),
+      ),
+    );
+  }
+
+  // build services by area page
   Widget _buildServicesByAreaPage(List<Service> services) {
-    //FocusScope.of(context).autofocus(_focusNode);
     _scrollController = ScrollController(
         initialScrollOffset: (widget.model.SelectedServiceIndex - 1) * 80.0);
-    _servicesListView = ListView(
+    _servicesListView = Scrollbar(
+      isAlwaysShown: false,
       controller: _scrollController,
-      children: <Widget>[
-        _displayedServicesByArea = _showServicesByArea(
-          (_selectedArea.split(" - "))[0],
-          services,
-        )
-      ],
+      child: ListView(
+        controller: _scrollController,
+        children: <Widget>[
+          _displayedServicesByArea = _showServicesByArea(
+            (_selectedArea.split(" - "))[0],
+            services,
+          )
+        ],
+      ),
     );
     return Stack(
       children: <Widget>[
@@ -365,6 +385,7 @@ class _ServicesState extends State<Services> {
     );
   }
 
+  // display all the services in the specific area
   Widget _showServicesByArea(String area, List<Service> services) {
     List<Service> servicesInArea = [];
     for (int i = 0; i < services.length; i++) {
@@ -375,6 +396,7 @@ class _ServicesState extends State<Services> {
     if (!_isSearchPressed) {
       return Column();
     }
+    // if there are no services in the specific area, show a message that no services found
     if (servicesInArea.length == 0) {
       return Center(
         child: Container(
@@ -396,6 +418,7 @@ class _ServicesState extends State<Services> {
     return _createServicesList(servicesInArea, "ServicesByArea");
   }
 
+  // sort the services by ascending order of their areas
   void _sortInAscendingOrder(List<Service> servicesList) {
     servicesList.sort((service1, service2) {
       List<String> location1SplitNumber = service1.Area.split(" ");
@@ -416,6 +439,7 @@ class _ServicesState extends State<Services> {
     });
   }
 
+  // build a navigation button for services by type
   Widget _buildNavigationButton(
       String servicesBy, String selServiceLocationNumber) {
     SizedBox navigationButton = SizedBox();
@@ -453,7 +477,9 @@ class _ServicesState extends State<Services> {
     return navigationButton;
   }
 
+  // create a list of all the services - depending on the view of the services (by type or by area)
   Widget _createServicesList(List<Service> servicesList, String servicesBy) {
+    // sort the services in the desired way (relevant to services by type)
     if (_sortingOrder == "Ascending") {
       _sortInAscendingOrder(servicesList);
     } else if (_sortingOrder == "Geographic") {
@@ -469,6 +495,7 @@ class _ServicesState extends State<Services> {
         int currExpansionTileIndex = expansionTileIndex;
         selServiceLocationNumber = service.Area;
         String serviceLocation = "";
+        // if the service is not is the area but near it
         if (!service.IsInArea) {
           serviceLocation += "בסמוך ל";
         }
@@ -476,11 +503,14 @@ class _ServicesState extends State<Services> {
         if (service.SpecificLocation != "") {
           serviceLocation += ", " + service.SpecificLocation;
         }
+        // fixing an issue in Hebrew UI
         serviceLocation = serviceLocation.replaceAll("קומה -1", "קומה 1-");
         String serviceTitle;
+        // if the service is a business, show it's name instead of it's type
         if (service.Type == "businesses") {
           BusinessService business = service;
           serviceTitle = business.Name;
+          // if the service is an academic service, show it's name instead of it's type
         } else if (service.Type == "academicServices") {
           AcademicService academicService = service;
           serviceTitle = academicService.Name;
@@ -495,6 +525,7 @@ class _ServicesState extends State<Services> {
           ),
           child: ExpansionTile(
             initiallyExpanded: _isTileExpanded(currExpansionTileIndex),
+            // if it's the last tile and there are more than 4 tiles, scroll down
             onExpansionChanged: (expanded) {
               if (expanded &&
                   servicesList.length > 4 &&
@@ -551,6 +582,7 @@ class _ServicesState extends State<Services> {
     );
   }
 
+  // if the given tile index is equal to the selected service index, then the tile is expanded
   bool _isTileExpanded(int tileIndex) {
     if (widget.model.SelectedServiceIndex == tileIndex) {
       return true;
@@ -559,6 +591,7 @@ class _ServicesState extends State<Services> {
     }
   }
 
+  // build the content of the expansion tile of the service depending on the service type
   List<Widget> expansionTileContent(
       Service service, int currExpansionTileIndex) {
     switch (service.Type) {
@@ -612,6 +645,7 @@ class _ServicesState extends State<Services> {
     }
   }
 
+  // build the content of machines service expansion tile
   List<Widget> machinesContent(Service service, int currExpansionTileIndex) {
     Widget milkInfo;
     if (service.Subtype == "מקרר") {
@@ -625,6 +659,7 @@ class _ServicesState extends State<Services> {
     ];
   }
 
+  // build the UI of milk for refrigerators
   Widget _milkUI(MachineService service, int currExpansionTileIndex) {
     RefrigeratorService refrigerator = service;
     Widget milkInfo;
@@ -722,6 +757,7 @@ class _ServicesState extends State<Services> {
     );
   }
 
+  // milk availability report for registered users
   void _registeredUserMilkReport(RefrigeratorService refrigerator,
       bool updatedMilkAvailability, int currExpansionTileIndex) {
     String alertText = "";
@@ -763,6 +799,7 @@ class _ServicesState extends State<Services> {
     );
   }
 
+  // milk availability report for guest users (that actually cannot report)
   void _guestUserMilkReport() {
     showDialog(
         context: context,
@@ -785,6 +822,7 @@ class _ServicesState extends State<Services> {
         });
   }
 
+  // availability UI for machines service
   Widget _availabilityUI(MachineService service, int currExpansionTileIndex) {
     Widget availabilityInfo;
     Widget availabilityIcon;
@@ -860,6 +898,7 @@ class _ServicesState extends State<Services> {
     );
   }
 
+  // machines availability report for registered users
   void _registeredUserAvailabilityReport(
       MachineService service, int currExpansionTileIndex) {
     String alertText = "";
@@ -918,6 +957,7 @@ class _ServicesState extends State<Services> {
     });
   }
 
+  // refrigerators availability report for registered users
   void _registeredUserRefrigeratorReport(MachineService service,
       bool updatedAvailability, currExpansionTileIndex) {
     if (updatedAvailability == true) {
@@ -967,6 +1007,7 @@ class _ServicesState extends State<Services> {
     }
   }
 
+  // machines availability report for guest users (that actually cannot report)
   void _guestUserAvailabilityReport() {
     showDialog(
         context: context,
@@ -989,6 +1030,7 @@ class _ServicesState extends State<Services> {
         });
   }
 
+  // location search for services by area
   Widget _locationSearch() {
     return Container(
       decoration: BoxDecoration(
@@ -1030,6 +1072,7 @@ class _ServicesState extends State<Services> {
     );
   }
 
+  // build AutoCompleteTextField for services by area
   Widget _buildAutoCompleteTextField() {
     List<String> suggestions = [];
     _allServicesLocations.forEach((location) {
@@ -1038,7 +1081,7 @@ class _ServicesState extends State<Services> {
     return Container(
       width: 240,
       child: _textField = AutoCompleteTextField<String>(
-        key: _key,
+        key: _textFieldKey,
         clearOnSubmit: false,
         focusNode: _focusNode,
         suggestions: suggestions,
@@ -1066,7 +1109,6 @@ class _ServicesState extends State<Services> {
         },
         itemSubmitted: (area) {
           setState(() {
-            //FocusScope.of(context).requestFocus(new FocusNode());
             _isSearchPressed = false;
             _title = Container();
             _selectedArea = area;
@@ -1108,8 +1150,8 @@ class _ServicesState extends State<Services> {
     );
   }
 
+  // show all the relevant services in the given location
   void _searchPress() {
-    //widget.model.addMachineService();
     FocusScope.of(context).requestFocus(new FocusNode());
     _title = Container(
       width: 600,
@@ -1186,6 +1228,7 @@ class _ServicesState extends State<Services> {
     _searchButtonColor = Colors.grey;
   }
 
+  // backgroud images for the specific services by type
   Map<String, AssetImage> _mapServicesToImages() {
     Map<String, AssetImage> servicesToImages = {
       "בתי קפה ומסעדות": AssetImage("assets/resturants_and_coffee_shops.jpg"),
@@ -1211,6 +1254,7 @@ class _ServicesState extends State<Services> {
     return servicesToImages;
   }
 
+  // build a specific service by type page
   Widget _buildSpecificServiceTypePage(
       String serviceType, List<Service> services) {
     Map<String, AssetImage> servicesToImages = _mapServicesToImages();
@@ -1237,6 +1281,7 @@ class _ServicesState extends State<Services> {
     );
   }
 
+  // display all the services with the specified type
   Widget _showServicesByType(
       String specificServiceType, List<Service> services) {
     List<Service> servicesByType = [];
@@ -1326,12 +1371,19 @@ class _ServicesState extends State<Services> {
     }
     _scrollController = ScrollController(
         initialScrollOffset: (widget.model.SelectedServiceIndex - 1) * 100.0);
-    return ListView(
+    return Scrollbar(
+      isAlwaysShown: true,
       controller: _scrollController,
-      children: <Widget>[_createServicesList(servicesByType, "ServicesByType")],
+      child: ListView(
+        controller: _scrollController,
+        children: <Widget>[
+          _createServicesList(servicesByType, "ServicesByType")
+        ],
+      ),
     );
   }
 
+  // launch the specified URL if it can be handled by some app installed on the device
   void _launchURL(String url) async {
     if (await canLaunch(url)) {
       await launch(url);

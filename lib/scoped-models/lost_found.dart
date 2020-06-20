@@ -11,7 +11,8 @@ class LostFoundModel extends Model {
   List<LostFound> foundItems = [];
   List<String> _lostFoundTypes = [];
   List<BarIlanLocation> lostFoundLocations = [];
-  bool isLostFoundLoading = false;
+  bool isLostLoading = false;
+  bool isFoundLoading = false;
 
   List<LostFound> get LostItems {
     return lostItems;
@@ -30,7 +31,8 @@ class LostFoundModel extends Model {
   }
 
   Future<bool> addLostFoundType({String lostFoundType = "אביזרי מחשב"}) async {
-    isLostFoundLoading = true;
+    isLostLoading = true;
+    isFoundLoading = true;
     notifyListeners();
     final Map<String, dynamic> lostFoundTypeData = {
       'lostFoundType': lostFoundType
@@ -39,22 +41,27 @@ class LostFoundModel extends Model {
       final http.Response response = await http.post(
           _lostFoundURL + '/lostFoundTypes.json',
           body: json.encode(lostFoundTypeData));
-      if (response.statusCode != 200 && response.statusCode != 201) {
-        isLostFoundLoading = false;
+      if (response.statusCode != 2008 && response.statusCode != 201) {
+        isLostLoading = false;
+        isFoundLoading = true;
+
         notifyListeners();
         return false;
       }
       notifyListeners();
       return true;
     } catch (error) {
-      isLostFoundLoading = false;
+      isLostLoading = false;
+      isFoundLoading = true;
+
       notifyListeners();
       return false;
     }
   }
 
   Future<Null> fetchLostFoundTypes() {
-    isLostFoundLoading = true;
+    isLostLoading = true;
+    isFoundLoading = true;
     notifyListeners();
     return http
         .get(_lostFoundURL + '/lostFoundTypes.json')
@@ -63,7 +70,8 @@ class LostFoundModel extends Model {
       final Map<String, dynamic> lostFoundTypesData =
           json.decode(response.body);
       if (lostFoundTypesData == null) {
-        isLostFoundLoading = false;
+        isLostLoading = false;
+        isFoundLoading = false;
         notifyListeners();
         return;
       }
@@ -76,17 +84,20 @@ class LostFoundModel extends Model {
       });
       _lostFoundTypes = fetchedLostFoundTypes;
       _lostFoundTypes.add('אחר');
-      isLostFoundLoading = false;
+      isLostLoading = false;
+      isFoundLoading = false;
       notifyListeners();
     }).catchError((error) {
-      isLostFoundLoading = false;
+      isLostLoading = false;
+      isFoundLoading = false;
       notifyListeners();
       return;
     });
   }
 
   Future<Null> fetchLostFoundLocations() {
-    isLostFoundLoading = true;
+    isLostLoading = true;
+    isFoundLoading = true;
     notifyListeners();
     return http
         .get('https://bar-iland-app.firebaseio.com/locations.json')
@@ -128,13 +139,14 @@ class LostFoundModel extends Model {
         }
       });
       lostFoundLocations = fetchedLocations;
-      isLostFoundLoading = false;
+      isLostLoading = false;
+      isFoundLoading = false;
       notifyListeners();
     });
   }
 
   Future<Null> fetchLostItems() {
-    isLostFoundLoading = true;
+    isLostLoading = true;
     notifyListeners();
     return http
         .get(_lostFoundURL + '/lost.json')
@@ -159,13 +171,13 @@ class LostFoundModel extends Model {
         fetchedLostItems.add(lost);
       });
       lostItems = fetchedLostItems.reversed.toList();
-      isLostFoundLoading = false;
+      isLostLoading = false;
       notifyListeners();
     });
   }
 
   Future<Null> fetchFoundItems() {
-    isLostFoundLoading = true;
+    isFoundLoading = true;
     notifyListeners();
     return http
         .get(_lostFoundURL + '/found.json')
@@ -174,21 +186,20 @@ class LostFoundModel extends Model {
       Map<String, dynamic> foundItemsData = json.decode(response.body);
       foundItemsData.forEach((String foundId, dynamic foundData) {
         Found lost = Found(
-          id: foundId,
-          type: "found",
-          subtype: foundData['subtype'],
-          name: foundData['name'],
-          phoneNumber: foundData['phoneNumber'],
-          description: foundData['description'],
-          reportDate: foundData['reportDate'],
-          imageUrl: foundData['imageUrl'],
-          area: foundData['area'],
-          specificLocation: foundData['specificLocation']
-        );
+            id: foundId,
+            type: "found",
+            subtype: foundData['subtype'],
+            name: foundData['name'],
+            phoneNumber: foundData['phoneNumber'],
+            description: foundData['description'],
+            reportDate: foundData['reportDate'],
+            imageUrl: foundData['imageUrl'],
+            area: foundData['area'],
+            specificLocation: foundData['specificLocation']);
         fetchedFoundItems.add(lost);
       });
       foundItems = fetchedFoundItems.reversed.toList();
-      isLostFoundLoading = false;
+      isFoundLoading = false;
       notifyListeners();
     });
   }
@@ -201,7 +212,7 @@ class LostFoundModel extends Model {
       String description,
       List<String> optionalLocations,
       String imageUrl) async {
-    isLostFoundLoading = true;
+    isLostLoading = true;
     notifyListeners();
     if (optionalLocations.length == 0) {
       optionalLocations.add("");
@@ -222,16 +233,17 @@ class LostFoundModel extends Model {
         'https://bar-iland-app.firebaseio.com/lostFound/${type}.json',
         body: json.encode(lostData));
     if (response.statusCode != 200 && response.statusCode != 201) {
-      isLostFoundLoading = false;
+      isLostLoading = false;
       notifyListeners();
       return false;
     }
-    isLostFoundLoading = false;
+    isLostLoading = false;
     notifyListeners();
+    fetchLostItems();
     return true;
   }
 
-   Future<bool> addFound(
+  Future<bool> addFound(
       String type,
       String subtype,
       String name,
@@ -240,7 +252,7 @@ class LostFoundModel extends Model {
       String area,
       String specificLocation,
       String imageUrl) async {
-    isLostFoundLoading = true;
+    isFoundLoading = true;
     notifyListeners();
     DateTime today = new DateTime.now();
     String currentDate =
@@ -259,12 +271,13 @@ class LostFoundModel extends Model {
         'https://bar-iland-app.firebaseio.com/lostFound/${type}.json',
         body: json.encode(lostData));
     if (response.statusCode != 200 && response.statusCode != 201) {
-      isLostFoundLoading = false;
+      isFoundLoading = false;
       notifyListeners();
       return false;
     }
-    isLostFoundLoading = false;
+    isFoundLoading = false;
     notifyListeners();
+    fetchFoundItems();
     return true;
   }
 }
