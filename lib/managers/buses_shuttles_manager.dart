@@ -1,3 +1,4 @@
+import 'package:bar_iland_app/pages/parkings.dart';
 import 'package:bar_iland_app/scoped-models/main.dart';
 import 'package:flutter/material.dart';
 import '../pages/buses_by_city.dart';
@@ -47,7 +48,7 @@ class BusesShuttlesManager extends StatelessWidget {
               Shuttles(model),
               Container(),
               BusesByCity(model),
-              Container(),
+              Parkings(model),
             ],
           ),
         ),
