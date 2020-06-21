@@ -2,13 +2,65 @@ import 'package:bar_iland_app/models/event.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:scoped_model/scoped_model.dart';
-import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import '../scoped-models/main.dart';
 import '../models/connection.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flutter_emoji/flutter_emoji.dart';
 
+
+class EmojiText extends StatelessWidget {
+
+  const EmojiText({
+    Key key,
+    @required this.text,
+  }) : assert(text != null),
+       super(key: key);
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return RichText(
+      text: _buildText(this.text),
+    );
+  }
+
+  TextSpan _buildText(String text) {
+    final children = <TextSpan>[]; 
+    final runes = text.runes;
+
+    for (int i = 0; i < runes.length; /* empty */ ) {
+      int current = runes.elementAt(i);
+
+      // we assume that everything that is not
+      // in Extended-ASCII set is an emoji...
+      final isEmoji = current > 255;
+      final shouldBreak = isEmoji
+        ? (x) => x <= 255 
+        : (x) => x > 255;
+
+      final chunk = <int>[];
+      while (! shouldBreak(current)) {
+        chunk.add(current);
+        if (++i >= runes.length) break;
+        current = runes.elementAt(i);
+      }
+
+      children.add(
+        TextSpan(
+          text: String.fromCharCodes(chunk),
+          style: TextStyle(
+            fontFamily: isEmoji ? 'EmojiOne' : null,
+          ),
+        ),
+      );
+    }
+
+    return TextSpan(children: children);
+  } 
+} 
 
 class HomePage extends StatelessWidget {
   final MainModel _model;
@@ -297,7 +349,6 @@ String mapEventTypeToTitle(Event event){
       ),
       child: Container(
         child: CarouselSlider.builder(
-          //control:SwiperControl(),
           itemCount: todays_events.length,
           itemBuilder: (BuildContext context, int index) {
             return _buildAnnouncementBoard(context, todays_events[index]);
@@ -308,19 +359,8 @@ String mapEventTypeToTitle(Event event){
           viewportFraction: 0.8,
           aspectRatio: 2.0,
           initialPage: 2,
-        
         ),
-          // loop: false,
-          // pagination: SwiperPagination(
-          //   alignment: Alignment.bottomCenter,
-          //   margin: EdgeInsets.all(24),
-          // ),
         ),
-        // decoration: BoxDecoration(
-        //   color: Colors.lightBlue[100],
-        //   borderRadius: BorderRadius.circular(20),
-        //   border: Border.all(color: Colors.blue, width: 4.0),
-        //   ),
       ),
     );
     }
@@ -380,6 +420,7 @@ String mapEventTypeToTitle(Event event){
 
   Widget _build(BuildContext context) {
     events = getEventsOfCurrentDay(eventsData);
+    Emoji emojiCoffee;
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
@@ -675,16 +716,37 @@ String mapEventTypeToTitle(Event event){
                                         ),
                                         title: Center(
                                           heightFactor: 7,
-                                          child: Text(
-                                            'אין אירועים',
-                                            style: TextStyle(
-                                              fontSize: 18,
-                                              height: 0,
-                                              color: Colors.deepPurple[700],
+                                          child: Column(
+                                            children: <Widget>[
+                                              Container(
+                                              child:RichText(
+                                              text: TextSpan( 
+                                                text: "אז מה מחכה לנו השבוע? 😎",
+                                                style: TextStyle(
+                                                fontSize: 18,
+                                                height: 0,
+                                                color: Colors.deepPurple[700],
+                                               ),  
+                                              ),
                                             ),
                                           ),
+                                          SizedBox(height: 40,),
+                                          Container(
+                                              child:RichText(
+                                              text: TextSpan(
+                                                text: "התעדכנו בלוח האירועים 📅",
+                                                style: TextStyle(
+                                                fontSize: 18,
+                                                height: 0,
+                                                color: Colors.deepPurple[700],
+                                               ),  
+                                              ),
+                                            ),
+                                          ),
+                                          ]
+                                        )                                            
                                         ),
-                                      ),
+                                       ),
                                       ),
                                   ]),
                               ),
