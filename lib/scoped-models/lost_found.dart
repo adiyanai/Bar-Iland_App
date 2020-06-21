@@ -41,7 +41,7 @@ class LostFoundModel extends Model {
       final http.Response response = await http.post(
           _lostFoundURL + '/lostFoundTypes.json',
           body: json.encode(lostFoundTypeData));
-      if (response.statusCode != 2008 && response.statusCode != 201) {
+      if (response.statusCode != 200 && response.statusCode != 201) {
         isLostLoading = false;
         isFoundLoading = true;
 
