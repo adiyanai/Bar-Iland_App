@@ -78,6 +78,7 @@ class UserModel extends Model {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.setString('token', responseData['idToken']);
       prefs.setString('userEmail', email);
+      prefs.setString('userPassword', password);
       prefs.setString('userId', responseData['localId']);
       prefs.setString('expiryTime', expiryTime.toIso8601String());
     } else if (responseData['error']['message'] == 'EMAIL_NOT_FOUND') {
@@ -99,9 +100,16 @@ class UserModel extends Model {
     if (token != null) {
       final DateTime now = DateTime.now();
       final parsedExpiryTime = DateTime.parse(expiryTimeString);
+      // if the time has expired authenticate again
       if (parsedExpiryTime.isBefore(now)) {
-        _authenticatedUser = null;
-        notifyListeners();
+        final String userEmail = prefs.getString('userEmail');
+        final String userPassword = prefs.getString('userPassword');
+        final Map<String, dynamic> successInformation =
+            await authenticate(userEmail, userPassword, AuthMode.Login);
+        if (!successInformation['success']) {
+          _authenticatedUser = null;
+          notifyListeners();
+        }
         return;
       }
       _connectionMode = ConnectionMode.RegisteredUser;
@@ -122,11 +130,13 @@ class UserModel extends Model {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.remove('token');
     prefs.remove('userEmail');
+    prefs.remove('userPassword');
     prefs.remove('userId');
   }
 
   void setAuthTimeout(int time) {
-    _authTimer = Timer(Duration(seconds: time), logout);
+    // if the time has expired autoAuthenticate again
+    _authTimer = Timer(Duration(seconds: time), autoAuthenticate);
   }
 
   Future<Map<String, dynamic>> resetPassword(String email) async {
@@ -149,8 +159,7 @@ class UserModel extends Model {
     if (responseData.containsKey('email')) {
       hasError = false;
       message = 'Reset password succeeded!';
-    }
-    else if (responseData['error']['message'] == 'EMAIL_NOT_FOUND') {
+    } else if (responseData['error']['message'] == 'EMAIL_NOT_FOUND') {
       message = 'דוא"ל לא קיים';
     }
     _isUserLoading = false;
