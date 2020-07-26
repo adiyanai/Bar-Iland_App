@@ -9,14 +9,12 @@ import '../models/connection.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_emoji/flutter_emoji.dart';
 
-
 class EmojiText extends StatelessWidget {
-
   const EmojiText({
     Key key,
     @required this.text,
-  }) : assert(text != null),
-       super(key: key);
+  })  : assert(text != null),
+        super(key: key);
 
   final String text;
 
@@ -28,21 +26,19 @@ class EmojiText extends StatelessWidget {
   }
 
   TextSpan _buildText(String text) {
-    final children = <TextSpan>[]; 
+    final children = <TextSpan>[];
     final runes = text.runes;
 
-    for (int i = 0; i < runes.length; /* empty */ ) {
+    for (int i = 0; i < runes.length; /* empty */) {
       int current = runes.elementAt(i);
 
       // we assume that everything that is not
       // in Extended-ASCII set is an emoji...
       final isEmoji = current > 255;
-      final shouldBreak = isEmoji
-        ? (x) => x <= 255 
-        : (x) => x > 255;
+      final shouldBreak = isEmoji ? (x) => x <= 255 : (x) => x > 255;
 
       final chunk = <int>[];
-      while (! shouldBreak(current)) {
+      while (!shouldBreak(current)) {
         chunk.add(current);
         if (++i >= runes.length) break;
         current = runes.elementAt(i);
@@ -59,8 +55,8 @@ class EmojiText extends StatelessWidget {
     }
 
     return TextSpan(children: children);
-  } 
-} 
+  }
+}
 
 class HomePage extends StatelessWidget {
   final MainModel _model;
@@ -93,43 +89,34 @@ class HomePage extends StatelessWidget {
     return eventsToIcons;
   }
 
-String mapEventTypeToTitle(Event event){
-  String eventTitle;
-    if(event.EventType == 'קפה ומאפה'){
-    eventTitle =  'Keep calm and drink coffee';
-    }
-    else if (event.EventType == 'מסיבה' || event.EventType == 'הפאב החברתי'){
-    eventTitle = "!Let's party";
-    }
-     else if (event.EventType == 'הופעה' || event.EventType == 'Live בקמפוס'){
+  String mapEventTypeToTitle(Event event) {
+    String eventTitle;
+    if (event.EventType == 'קפה ומאפה') {
+      eventTitle = 'Keep calm and drink coffee';
+    } else if (event.EventType == 'מסיבה' || event.EventType == 'הפאב החברתי') {
+      eventTitle = "!Let's party";
+    } else if (event.EventType == 'הופעה' || event.EventType == 'Live בקמפוס') {
       eventTitle = '!The show must go on';
-    }
-     else if (event.EventType == 'הרצאה/כנס' || event.EventType == 'טקס'){
+    } else if (event.EventType == 'הרצאה/כנס' || event.EventType == 'טקס') {
       eventTitle = 'אירועי היום';
-    }
-     else if (event.EventType == 'ספורט'){
+    } else if (event.EventType == 'ספורט') {
       eventTitle = '!Support the sport';
-    }
-     else if (event.EventType == 'מדרשה'){
+    } else if (event.EventType == 'מדרשה') {
       eventTitle = 'רק בגלל הרוח';
-    }
-     else if (event.EventType == 'הפססקר'){
+    } else if (event.EventType == 'הפססקר') {
       eventTitle = 'מי שמצביע - משפיע!';
-    }
-     else if (event.EventType == 'TimeOut'){
+    } else if (event.EventType == 'TimeOut') {
       eventTitle = 'צריכים פסק זמן מהלימודים?';
-    }
-     else if (event.EventType == 'קבלת שבת' || event.EventType == 'שבת בקמפוס'){
+    } else if (event.EventType == 'קבלת שבת' ||
+        event.EventType == 'שבת בקמפוס') {
       eventTitle = '"פני שבת נקבלה.."';
-    }
-    else if (event.EventType == 'סטנדאפ'){
+    } else if (event.EventType == 'סטנדאפ') {
       eventTitle = 'Life is tough so laugh hard';
-    }
-    else if (event.EventType == 'אחר'){
+    } else if (event.EventType == 'אחר') {
       eventTitle = 'היה לך יום גרוע? בו לאירוע!';
     }
-  return eventTitle;
-}
+    return eventTitle;
+  }
 
   Future<List<Event>> initEvents() async {
     await _model.fetchEvents();
@@ -150,7 +137,6 @@ String mapEventTypeToTitle(Event event){
     });
     return todays_events;
   }
-
 
   Widget _buildAnnouncementBoard(BuildContext context, Event event) {
     double _screenWidth = MediaQuery.of(context).size.width;
@@ -277,24 +263,6 @@ String mapEventTypeToTitle(Event event){
           AppBar(
             automaticallyImplyLeading: false,
           ),
-          ListTile(
-            leading: Icon(Icons.school),
-            title: Text('סטודנט'),
-            onTap: () {},
-          ),
-          Divider(),
-          ListTile(
-            leading: Icon(Icons.person),
-            title: Text('אורח'),
-            onTap: () {},
-          ),
-          Divider(),
-          //Expanded(
-          //  child: Align(
-          //    alignment: Alignment.bottomCenter,
-          //    child: _buildLogoutListTile(),
-          //  ),
-          //),
           _buildLogoutListTile(),
         ],
       ),
@@ -308,9 +276,13 @@ String mapEventTypeToTitle(Event event){
           leading: Icon(
             Icons.exit_to_app,
           ),
-          title: Text(
-            'התנתק',
-          ),
+          title: (model.connectionMode == ConnectionMode.RegisteredUser)
+              ? Text(
+                  'התנתק',
+                )
+              : Text(
+                  'יציאה',
+                ),
           onTap: () {
             if (model.connectionMode == ConnectionMode.RegisteredUser) {
               model.logout();
@@ -338,61 +310,60 @@ String mapEventTypeToTitle(Event event){
   }
 
   Container _buildEventsBoard(List<Event> todays_events) {
-    if(todays_events.length > 1){
+    if (todays_events.length > 1) {
       return Container(
-      margin: EdgeInsets.only(bottom:1),
-      width: 30,
-      height: 180,
-      alignment: AlignmentDirectional.center,
-      padding: EdgeInsets.only(
-        bottom: 5,
-      ),
-      child: Container(
-        child: CarouselSlider.builder(
-          itemCount: todays_events.length,
-          itemBuilder: (BuildContext context, int index) {
-            return _buildAnnouncementBoard(context, todays_events[index]);
-          },
-          options: CarouselOptions(
-          autoPlay: true,
-          enlargeCenterPage: true,
-          viewportFraction: 0.8,
-          aspectRatio: 2.0,
-          initialPage: 2,
+        margin: EdgeInsets.only(bottom: 1),
+        width: 30,
+        height: 180,
+        alignment: AlignmentDirectional.center,
+        padding: EdgeInsets.only(
+          bottom: 5,
         ),
+        child: Container(
+          child: CarouselSlider.builder(
+            itemCount: todays_events.length,
+            itemBuilder: (BuildContext context, int index) {
+              return _buildAnnouncementBoard(context, todays_events[index]);
+            },
+            options: CarouselOptions(
+              autoPlay: true,
+              enlargeCenterPage: true,
+              viewportFraction: 0.8,
+              aspectRatio: 2.0,
+              initialPage: 2,
+            ),
+          ),
         ),
-      ),
-    );
+      );
+    } else {
+      return Container(
+        margin: EdgeInsets.only(bottom: 1),
+        width: 30,
+        height: 180,
+        alignment: AlignmentDirectional.center,
+        padding: EdgeInsets.only(
+          bottom: 5,
+        ),
+        child: Container(
+          child: CarouselSlider.builder(
+            itemCount: todays_events.length,
+            itemBuilder: (BuildContext context, int index) {
+              return _buildAnnouncementBoard(context, todays_events[index]);
+            },
+            options: CarouselOptions(
+              enableInfiniteScroll: false,
+              reverse: false,
+              autoPlay: false,
+              viewportFraction: 0.8,
+              aspectRatio: 2.0,
+              initialPage: 2,
+            ),
+          ),
+        ),
+      );
     }
-    else{
-      return Container(
-      margin: EdgeInsets.only(bottom:1),
-      width: 30,
-      height: 180,
-      alignment: AlignmentDirectional.center,
-      padding: EdgeInsets.only(
-        bottom: 5,
-      ),
-      child: Container(
-        child: CarouselSlider.builder(
-          itemCount: todays_events.length,
-          itemBuilder: (BuildContext context, int index) {
-            return _buildAnnouncementBoard(context, todays_events[index]);
-          },
-          options: CarouselOptions(
-          enableInfiniteScroll:false,
-          reverse: false,
-          autoPlay: false,
-          viewportFraction: 0.8,
-          aspectRatio: 2.0,
-          initialPage: 2,
-        
-        ),
-        ),
-      ),
-    );
   }
-}
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
@@ -420,7 +391,6 @@ String mapEventTypeToTitle(Event event){
 
   Widget _build(BuildContext context) {
     events = getEventsOfCurrentDay(eventsData);
-    Emoji emojiCoffee;
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
@@ -453,233 +423,229 @@ String mapEventTypeToTitle(Event event){
             ),
           ),
         ),
-        body: Stack(
-          children: <Widget>[
-            _buildBackgroungImage(),
-            Container(
-              child: GestureDetector(
-                onTap: () {
-                  FocusScope.of(context).requestFocus(FocusNode());
-                },
-                child: ListView(
-                  children: <Widget>[
-                    SizedBox(
-                      height: 12,
-                    ),
-                    Image.asset(
-                      'assets/Bar_Iland_line.png',
-                      height: 100,
-                      width: 30,
-                      color: Colors.black,
-                    ),
-                    SizedBox(
-                      height: 16,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        SizedBox.fromSize(
-                          size: Size(90, 90), // button width and height
-                          child: ClipOval(
-                            child: Material(
-                              color: Colors.lightBlue[200], // button color
-                              child: InkWell(
-                                splashColor: Colors.cyanAccent, // splash color
-                                onTap: () {
-                                  Navigator.pushNamed(
-                                      context, '/serviceManager');
-                                }, // button pressed
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    Icon(
-                                      Icons.business,
-                                    ), // icon
-                                    Text(
-                                      'שירותי האוניברסיטה',
-                                      style: TextStyle(
-                                        fontSize: 13,
-                                      ),
-                                      textAlign: TextAlign.center,
-                                    ), // text
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox.fromSize(
-                          size: Size(90, 90), // button width and height
-                          child: ClipOval(
-                            child: Material(
-                              color: Colors.lightBlue[200], // button color
-                              child: InkWell(
-                                splashColor: Colors.cyanAccent, // splash color
-                                onTap: () {
-                                  Navigator.pushNamed(
-                                      context, '/eventsCalendar');
-                                }, // button pressed
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    Icon(
-                                      Icons.event,
-                                    ), // icon
-                                    Text(
-                                      'אירועים ',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                      ),
-                                      textAlign: TextAlign.center,
-                                    ), // text
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox.fromSize(
-                          size: Size(90, 90), // button width and height
-                          child: ClipOval(
-                            child: Material(
-                              color: Colors.lightBlue[200], // button color
-                              child: InkWell(
-                                splashColor: Colors.cyanAccent, // splash color
-                                onTap: () {
-                                  Navigator.pushNamed(
-                                      context, '/coursesInformation');
-                                }, // button pressed
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    Icon(
-                                      Icons.info_outline,
-                                    ), // icon
-                                    Text(
-                                      "מידע על",
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                      ),
-                                      textAlign: TextAlign.center,
-                                    ), // text
-                                    Text(
-                                      "קורסים",
-                                      style: TextStyle(fontSize: 14),
-                                      textAlign: TextAlign.center,
+        body: Stack(children: <Widget>[
+          _buildBackgroungImage(),
+          Container(
+            child: GestureDetector(
+              onTap: () {
+                FocusScope.of(context).requestFocus(FocusNode());
+              },
+              child: ListView(
+                children: <Widget>[
+                  SizedBox(
+                    height: 12,
+                  ),
+                  Image.asset(
+                    'assets/Bar_Iland_line.png',
+                    height: 100,
+                    width: 30,
+                    color: Colors.black,
+                  ),
+                  SizedBox(
+                    height: 16,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      SizedBox.fromSize(
+                        size: Size(90, 90), // button width and height
+                        child: ClipOval(
+                          child: Material(
+                            color: Colors.lightBlue[200], // button color
+                            child: InkWell(
+                              splashColor: Colors.cyanAccent, // splash color
+                              onTap: () {
+                                Navigator.pushNamed(context, '/serviceManager');
+                              }, // button pressed
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Icon(
+                                    Icons.business,
+                                  ), // icon
+                                  Text(
+                                    'שירותי האוניברסיטה',
+                                    style: TextStyle(
+                                      fontSize: 13,
                                     ),
-                                  ],
-                                ),
+                                    textAlign: TextAlign.center,
+                                  ), // text
+                                ],
                               ),
                             ),
                           ),
                         ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 15,
-                    ),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        SizedBox.fromSize(
-                          size: Size(90, 90), // button width and height
-                          child: ClipOval(
-                            child: Material(
-                              color: Colors.lightBlue[200], // button color
-                              child: InkWell(
-                                splashColor: Colors.cyanAccent, // splash color
-                                onTap: () {
-                                  Navigator.pushNamed(
-                                      context, '/busesShuttlesmanager');
-                                }, // button pressed
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    Icon(
-                                      Icons.directions_bus,
-                                    ), // icon
-                                    Text(
-                                      'תחבורה ושאטלים',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                      ),
-                                      textAlign: TextAlign.center,
+                      ),
+                      SizedBox.fromSize(
+                        size: Size(90, 90), // button width and height
+                        child: ClipOval(
+                          child: Material(
+                            color: Colors.lightBlue[200], // button color
+                            child: InkWell(
+                              splashColor: Colors.cyanAccent, // splash color
+                              onTap: () {
+                                Navigator.pushNamed(context, '/eventsCalendar');
+                              }, // button pressed
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Icon(
+                                    Icons.event,
+                                  ), // icon
+                                  Text(
+                                    'אירועים ',
+                                    style: TextStyle(
+                                      fontSize: 14,
                                     ),
-                                  ],
-                                ),
+                                    textAlign: TextAlign.center,
+                                  ), // text
+                                ],
                               ),
                             ),
                           ),
                         ),
-                        SizedBox.fromSize(
-                          size: Size(90, 90), // button width and height
-                          child: ClipOval(
-                            child: Material(
-                              color: Colors.lightBlue[200], // button color
-                              child: InkWell(
-                                splashColor: Colors.cyanAccent, // splash color
-                                onTap: () {
-                                  Navigator.pushNamed(
-                                      context, '/importantLinks');
-                                }, // button pressed
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    Icon(
-                                      Icons.link,
-                                    ), // icon
-                                    Text(
-                                      'קישורים חשובים',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                      ),
-                                      textAlign: TextAlign.center,
-                                    ), // text
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox.fromSize(
-                          size: Size(90, 90), // button width and height
-                          child: ClipOval(
-                            child: Material(
-                              color: Colors.lightBlue[200], // button color
-                              child: InkWell(
-                                splashColor: Colors.cyanAccent, // splash color
-                                onTap: () {
-                                  Navigator.pushNamed(context, '/lostFound');
-                                },
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    Icon(
-                                      Icons.find_in_page,
-                                    ), // icon
-                                    Text(
-                                      'אבידות ומציאות ',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                      ),
-                                      textAlign: TextAlign.center,
+                      ),
+                      SizedBox.fromSize(
+                        size: Size(90, 90), // button width and height
+                        child: ClipOval(
+                          child: Material(
+                            color: Colors.lightBlue[200], // button color
+                            child: InkWell(
+                              splashColor: Colors.cyanAccent, // splash color
+                              onTap: () {
+                                Navigator.pushNamed(
+                                    context, '/coursesInformation');
+                              }, // button pressed
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Icon(
+                                    Icons.info_outline,
+                                  ), // icon
+                                  Text(
+                                    "מידע על",
+                                    style: TextStyle(
+                                      fontSize: 14,
                                     ),
-                                  ],
-                                ),
+                                    textAlign: TextAlign.center,
+                                  ), // text
+                                  Text(
+                                    "קורסים",
+                                    style: TextStyle(fontSize: 14),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
                               ),
                             ),
                           ),
                         ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    events.isNotEmpty
-                        ? _buildEventsBoard(events)
-                        : Container(
-                          margin: EdgeInsets.only(bottom:1),
+                      ),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 15,
+                  ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      SizedBox.fromSize(
+                        size: Size(90, 90), // button width and height
+                        child: ClipOval(
+                          child: Material(
+                            color: Colors.lightBlue[200], // button color
+                            child: InkWell(
+                              splashColor: Colors.cyanAccent, // splash color
+                              onTap: () {
+                                Navigator.pushNamed(
+                                    context, '/busesShuttlesmanager');
+                              }, // button pressed
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Icon(
+                                    Icons.directions_bus,
+                                  ), // icon
+                                  Text(
+                                    'תחבורה ושאטלים',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox.fromSize(
+                        size: Size(90, 90), // button width and height
+                        child: ClipOval(
+                          child: Material(
+                            color: Colors.lightBlue[200], // button color
+                            child: InkWell(
+                              splashColor: Colors.cyanAccent, // splash color
+                              onTap: () {
+                                Navigator.pushNamed(context, '/importantLinks');
+                              }, // button pressed
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Icon(
+                                    Icons.link,
+                                  ), // icon
+                                  Text(
+                                    'קישורים חשובים',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ), // text
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox.fromSize(
+                        size: Size(90, 90), // button width and height
+                        child: ClipOval(
+                          child: Material(
+                            color: Colors.lightBlue[200], // button color
+                            child: InkWell(
+                              splashColor: Colors.cyanAccent, // splash color
+                              onTap: () {
+                                Navigator.pushNamed(context, '/lostFound');
+                              },
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Icon(
+                                    Icons.find_in_page,
+                                  ), // icon
+                                  Text(
+                                    'אבידות ומציאות ',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  events.isNotEmpty
+                      ? _buildEventsBoard(events)
+                      : Container(
+                          margin: EdgeInsets.only(bottom: 1),
                           width: 30,
                           height: 180,
                           alignment: AlignmentDirectional.center,
@@ -689,101 +655,105 @@ String mapEventTypeToTitle(Event event){
                           child: Container(
                             child: SingleChildScrollView(
                               child: Container(
-                                child: Column(
-                                  children: <Widget>[
-                                    Container(
-                                      margin: EdgeInsets.symmetric(
-                                        vertical: 5,
-                                        horizontal: 5,
+                                child: Column(children: <Widget>[
+                                  Container(
+                                    margin: EdgeInsets.symmetric(
+                                      vertical: 5,
+                                      horizontal: 5,
+                                    ),
+                                    height: 150,
+                                    width: 270,
+                                    padding: EdgeInsets.only(
+                                      right: 5,
+                                      bottom: 5,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white38,
+                                      border: Border.all(
+                                        color: Colors.black26,
+                                        width: 0.5,
                                       ),
-                                      height: 150,
-                                      width: 270,
-                                      padding: EdgeInsets.only(
-                                        right: 5,
-                                        bottom: 5,
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(15)),
+                                    ),
+                                    child: ListTile(
+                                      contentPadding: EdgeInsets.only(
+                                        top: 45,
                                       ),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white38,
-                                        border: Border.all(
-                                          color: Colors.black26,
-                                          width: 0.5,
-                                        ),
-                                        borderRadius: BorderRadius.all(Radius.circular(15)),
-                                      ),
-                                      child: ListTile(
-                                        contentPadding: EdgeInsets.only(
-                                          top: 45,
-                                        ),
-                                        title: Center(
+                                      title: Center(
                                           heightFactor: 7,
-                                          child: Column(
-                                            children: <Widget>[
-                                              Container(
-                                              child:RichText(
-                                              text: TextSpan( 
-                                                text: "אז מה מחכה לנו השבוע? 😎",
-                                                style: TextStyle(
-                                                fontSize: 18,
-                                                height: 0,
-                                                color: Colors.deepPurple[700],
-                                               ),  
+                                          child: Column(children: <Widget>[
+                                            Container(
+                                              child: RichText(
+                                                text: TextSpan(
+                                                  text:
+                                                      "אז מה מחכה לנו השבוע? 😎",
+                                                  style: TextStyle(
+                                                    fontSize: 18,
+                                                    height: 0,
+                                                    color:
+                                                        Colors.deepPurple[700],
+                                                  ),
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                          SizedBox(height: 40,),
-                                          Container(
-                                              child:RichText(
-                                              text: TextSpan(
-                                                text: "התעדכנו בלוח האירועים 📅",
-                                                style: TextStyle(
-                                                fontSize: 18,
-                                                height: 0,
-                                                color: Colors.deepPurple[700],
-                                               ),  
+                                            SizedBox(
+                                              height: 40,
+                                            ),
+                                            Container(
+                                              child: RichText(
+                                                text: TextSpan(
+                                                  text:
+                                                      "התעדכנו בלוח האירועים 📅",
+                                                  style: TextStyle(
+                                                    fontSize: 18,
+                                                    height: 0,
+                                                    color:
+                                                        Colors.deepPurple[700],
+                                                  ),
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                          ]
-                                        )                                            
-                                        ),
-                                       ),
-                                      ),
-                                  ]),
+                                          ])),
+                                    ),
+                                  ),
+                                ]),
                               ),
-                              ),
-                              ),
-                              ), 
-                      Container(
-                      alignment: Alignment.bottomRight,
-                      margin: EdgeInsets.only(
-                        bottom: 20,
-                        right: 10,
+                            ),
+                          ),
+                        ),
+                  Container(
+                    alignment: Alignment.bottomRight,
+                    margin: EdgeInsets.only(
+                      bottom: 20,
+                      right: 10,
+                    ),
+                    child: RaisedButton(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(7),
+                          bottom: Radius.circular(7),
+                        ),
                       ),
-                      child: RaisedButton(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.vertical(
-                            top: Radius.circular(7),
-                            bottom: Radius.circular(7),
-                          ),
+                      color: Colors.lightBlue[200], // button color
+                      splashColor: Colors.cyanAccent, // splash color
+                      onPressed: () =>
+                          Navigator.pushNamed(context, '/campusMap'),
+                      child: Text(
+                        'מפת הקמפוס',
+                        style: TextStyle(
+                          fontSize: 14,
                         ),
-                        color: Colors.lightBlue[200], // button color
-                        splashColor: Colors.cyanAccent, // splash color
-                        onPressed: () =>
-                            Navigator.pushNamed(context, '/campusMap'),
-                        child: Text(
-                          'מפת הקמפוס',
-                          style: TextStyle(
-                            fontSize: 14,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                ),
-              )],
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  )
+                ],
+              ),
             ),
-          ),
-        )]
-        ),
-       ),
+          )
+        ]),
+      ),
     );
   }
 }
