@@ -167,6 +167,7 @@ class _ServicesState extends State<Services> {
 
   // build the main page of services by type
   Widget _buildServicesByTypePage() {
+    FocusScope.of(context).requestFocus(FocusNode());
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Container(
