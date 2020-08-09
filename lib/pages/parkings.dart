@@ -28,6 +28,7 @@ class _ParkingsState extends State<Parkings> {
 
   @override
   Widget build(BuildContext context) {
+    FocusScope.of(context).requestFocus(new FocusNode());
     return ScopedModelDescendant<MainModel>(
         builder: (BuildContext context, Widget child, MainModel model) {
       Widget content;
