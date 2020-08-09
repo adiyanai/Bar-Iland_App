@@ -1119,16 +1119,22 @@ class _ServicesState extends State<Services> {
           });
         },
         textChanged: (area) {
-          _isSearchPressed = false;
-          _title = Container();
-          _selectedArea = area;
-          widget.model.SelectedServiceIndex = 0;
-          if (widget.model.ServicesAreas.contains(_selectedArea)) {
+          BarIlanLocation locationData = null;
+          setState(() {
+            _isSearchPressed = false;
+            _title = Container();
+            _selectedArea = area;
+            widget.model.SelectedServiceIndex = 0;
+          });
+          try {
+            locationData = widget.model.AllServicesLocations.firstWhere(
+                (BarIlanLocation item) => (_selectedArea == item.Number));
             setState(() {
               _isNotPressable = false;
               _searchButtonColor = Colors.blue;
             });
-          } else {
+          // if no such location is exist
+          } catch (err) {
             setState(() {
               _isNotPressable = true;
               _searchButtonColor = Colors.grey;
