@@ -319,13 +319,13 @@ class ServicesModel extends ConnectedServicesModel {
   }
 
   Future<bool> addAcademicService({
-    String subtype = "מזכירות",
-    String name = "משרדי אגודת הסטודנטים",
-    String activityTime = "א'-ה': 17:00-09:00",
-    String phoneNumber = "03-5343666",
-    String mail = "pniyot@bis.org.il",
-    String website = "https://www.bis.org.il/",
-    String area = "בניין 107",
+    String subtype = "ספריה",
+    String name = "ספריית כלכלה ומנהל עסקים",
+    String activityTime = "א'-ה': 19:45-09:00",
+    String phoneNumber = "03-5318975",
+    String mail = "gr.libecmb@biu.ac.il",
+    String website = "https://econ.biu.ac.il/node/3962",
+    String area = "בניין 504",
     bool isInArea = true,
     String specificLocation = "",
   }) async {
