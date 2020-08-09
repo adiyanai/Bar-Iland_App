@@ -489,7 +489,7 @@ class _ServicesState extends State<Services> {
     int expansionTileIndex = 0;
     String selServiceLocationNumber = "";
     return Container(
-      margin: EdgeInsets.fromLTRB(0, 40, 0, 20),
+      margin: EdgeInsets.fromLTRB(0, 40, 0, 0),
       child: Column(
           children: servicesList.map((service) {
         expansionTileIndex += 1;
@@ -540,7 +540,6 @@ class _ServicesState extends State<Services> {
               }
             },
             title: Container(
-              padding: EdgeInsets.fromLTRB(0, 0, 0, 10),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
@@ -1087,10 +1086,9 @@ class _ServicesState extends State<Services> {
         focusNode: _focusNode,
         suggestions: suggestions,
         suggestionsAmount: 12,
-        style: TextStyle(color: Colors.black, fontSize: 18.0),
+        style: TextStyle(color: Colors.black, fontSize: 15.0),
         decoration: InputDecoration(
-          contentPadding: EdgeInsets.fromLTRB(0, 0, 10, 0),
-          hintText: 'חיפוש מיקום באוניברסיטה',
+          hintText: 'חיפוש בניין/ מבנה/ שער באוניברסיטה',
         ),
         itemFilter: (area, query) {
           List<String> splitArea = area.split(" ");

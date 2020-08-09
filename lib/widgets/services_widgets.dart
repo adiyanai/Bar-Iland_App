@@ -82,8 +82,9 @@ List<Widget> businessesContent(Service service) {
   BusinessService business = service;
   Map<String, Widget> businessInfo = Map<String, Widget>();
   if (business.ActivityTime != "") {
-    businessInfo["שעות פעילות"] = Container(
-        padding: EdgeInsets.fromLTRB(0, 0, 0, 20),
+    businessInfo["שעות פעילות"] =  
+    Container(
+      padding: EdgeInsets.fromLTRB(0, 0, 0, 20),
         child: Text(business.ActivityTime));
   }
   if (business.PhoneNumber != "") {
@@ -108,8 +109,8 @@ List<Widget> businessesContent(Service service) {
   }
   return (businessInfo.keys).map((infoType) {
     return Container(
-      width: 320,
-      padding: EdgeInsets.fromLTRB(40, 5, 0, 0),
+      width: 330,
+      padding: EdgeInsets.fromLTRB(30, 0, 0, 0),
       child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
         mapToIcons()[infoType],
         Expanded(child: businessInfo[infoType])
@@ -122,7 +123,7 @@ List<Widget> welfareContent(Service service) {
   WelfareService welfareRoom = service;
   return welfareRoom.Contains.map((containedService) {
     return Container(
-      padding: EdgeInsets.fromLTRB(0, 0, 18, 0),
+      padding: EdgeInsets.fromLTRB(0, 0, 16, 0),
       child: Row(children: [
         mapToIcons()[containedService],
         Text(
@@ -194,7 +195,7 @@ List<Widget> academicServicesContent(Service service) {
 
   return (academicServiceInfo.keys).map((infoType) {
     return Container(
-      width: 320,
+      width: 330,
       padding: EdgeInsets.fromLTRB(40, 5, 0, 0),
       child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
         mapToIcons()[infoType],
