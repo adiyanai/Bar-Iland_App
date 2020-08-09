@@ -48,8 +48,14 @@ class _AddFoundState extends State<AddFound> {
   File _imageFile;
   String _imageUrl = "";
   Widget _image = Container(
-      child: Center(
-          child: Text("צלמ/י את המציאה על מנת להקל על המאבד למצוא אותה.")));
+    padding: EdgeInsets.only(right: 15),
+    child: Center(
+      child: Text(
+        "צלמ/י את המציאה על מנת להקל על המאבד/ת למצוא אותה.",
+        style: TextStyle(fontSize: 16),
+      ),
+    ),
+  );
   bool _isAddFoundLoading = false;
 
   @override
@@ -74,7 +80,7 @@ class _AddFoundState extends State<AddFound> {
           builder: (BuildContext context, Widget child, MainModel model) {
             return SingleChildScrollView(
                 child: Container(
-              height: MediaQuery.of(context).size.height,
+              height: MediaQuery.of(context).size.height - 80,
               width: MediaQuery.of(context).size.width,
               decoration: BoxDecoration(
                 image: DecorationImage(
@@ -107,11 +113,11 @@ class _AddFoundState extends State<AddFound> {
   Widget _buildPageContent() {
     return Stack(children: [
       Container(
-          height: 550,
+          height: MediaQuery.of(context).size.height - 130,
           padding: EdgeInsets.fromLTRB(0, 20, 0, 60),
           child: _currentPageContent()),
       Container(
-        padding: EdgeInsets.only(top: 500),
+        padding: EdgeInsets.only(top: MediaQuery.of(context).size.height - 150),
         child: _navigationButtons(),
       ),
     ]);
@@ -205,7 +211,7 @@ class _AddFoundState extends State<AddFound> {
     return Column(
       children: <Widget>[
         Container(
-          height: 350,
+          height: MediaQuery.of(context).size.height - 310,
           width: 400,
           color: Color.fromRGBO(220, 250, 250, 0.7),
           child: Scrollbar(
@@ -226,7 +232,7 @@ class _AddFoundState extends State<AddFound> {
           ),
         ),
         Container(
-            height: 90,
+            height: MediaQuery.of(context).size.height - 555,
             width: 400,
             padding: EdgeInsets.only(bottom: 30),
             margin: EdgeInsets.only(top: 15),
@@ -262,9 +268,12 @@ class _AddFoundState extends State<AddFound> {
                       onPressed: () {
                         setState(() {
                           _image = Container(
+                            padding: EdgeInsets.only(right: 15),
                             child: Center(
                               child: Text(
-                                  "צלמ/י את המציאה על מנת להקל על המאבד למצוא אותה."),
+                                "צלמ/י את המציאה על מנת להקל על המאבד/ת למצוא אותה.",
+                                style: TextStyle(fontSize: 16),
+                              ),
                             ),
                           );
                         });
@@ -273,13 +282,19 @@ class _AddFoundState extends State<AddFound> {
                   ],
                 ),
                 Image.file(snapshot.data,
-                    fit: BoxFit.contain, height: 400, width: 400)
+                    fit: BoxFit.contain,
+                    height: MediaQuery.of(context).size.height - 300,
+                    width: 400)
               ],
             );
           } else
             return Container(
+              padding: EdgeInsets.only(right: 15),
               child: Center(
-                child: Text("צלמ/י את המציאה על מנת להקל על המאבד למצוא אותה."),
+                child: Text(
+                  "צלמ/י את המציאה על מנת להקל על המאבד/ת למצוא אותה.",
+                  style: TextStyle(fontSize: 16),
+                ),
               ),
             );
         });
@@ -296,7 +311,7 @@ class _AddFoundState extends State<AddFound> {
             icon: Icon(Icons.add_a_photo),
             textColor: Colors.white,
             color: Colors.blue,
-            label: Text("הוספת תמונה"),
+            label: Text("צילום תמונה"),
             onPressed: () {
               _cameraPhoto(ImageSource.camera);
               setState(() {
@@ -421,7 +436,7 @@ class _AddFoundState extends State<AddFound> {
             LengthLimitingTextInputFormatter(30),
           ],
           decoration: new InputDecoration(
-            hintText: "מיקום מדויק (לא חובה)",
+            hintText: "מיקום מדויק, לדוגמה: כיתה 101 (לא חובה)",
             icon: new Icon(Icons.location_on),
           ),
           onChanged: (value) {
@@ -436,13 +451,14 @@ class _AddFoundState extends State<AddFound> {
   Widget _isTakenOrNot() {
     return Column(children: [
       Container(
-          padding: EdgeInsets.fromLTRB(50, 0, 0, 0),
+          padding: EdgeInsets.fromLTRB(50, 0, 0, 10),
           child: Text("מה בכוונתך לעשות עם המציאה?",
-              style: TextStyle(fontSize: 18))),
+              style: TextStyle(fontSize: 19))),
       SizedBox(height: 10),
       RadioButtonGroup(
         picked: _takenOrNot,
         padding: EdgeInsets.only(right: 0),
+        labelStyle: TextStyle(fontSize: 16),
         labels: ["לקחת אותה איתי", "להשאיר אותה במקומה"],
         onSelected: (String selected) => {
           setState(() {

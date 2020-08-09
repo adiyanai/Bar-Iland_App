@@ -92,7 +92,7 @@ class _LostFoundBoardState extends State<LostFoundBoard> {
               height: 200,
               child: Center(
                 child: Text(
-                  "לא נמצאו ${_lostOrFoundItems} מסוג: " +
+                  "לא נמצאו דיווחים על ${_lostOrFoundItems} מסוג: " +
                       _typeFilter +
                       ".\n" +
                       "לידיעתך, לוח ה${_lostOrFoundItems} מתעדכן באופן שוטף.\n"

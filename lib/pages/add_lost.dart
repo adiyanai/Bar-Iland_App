@@ -44,7 +44,11 @@ class _AddLostState extends State<AddLost> {
   File _imageFile;
   String _imageUrl = "";
   Widget _image = Container(
-      child: Center(child: Text("אם ברשותך תמונה של האבידה, צרפ/י אותה כאן.")));
+    child: Center(
+      child: Text("אם ברשותך תמונה של האבידה, צרפ/י אותה כאן.",
+          style: TextStyle(fontSize: 16)),
+    ),
+  );
   bool _isAddLostLoading = false;
 
   @override
@@ -69,7 +73,7 @@ class _AddLostState extends State<AddLost> {
           builder: (BuildContext context, Widget child, MainModel model) {
             return SingleChildScrollView(
                 child: Container(
-              height: MediaQuery.of(context).size.height,
+              height: MediaQuery.of(context).size.height - 80,
               width: MediaQuery.of(context).size.width,
               decoration: BoxDecoration(
                 image: DecorationImage(
@@ -102,11 +106,11 @@ class _AddLostState extends State<AddLost> {
   Widget _buildPageContent() {
     return Stack(children: [
       Container(
-          height: 550,
+          height: MediaQuery.of(context).size.height - 130,
           padding: EdgeInsets.fromLTRB(0, 20, 0, 60),
           child: _currentPageContent()),
       Container(
-        padding: EdgeInsets.only(top: 500),
+        padding: EdgeInsets.only(top: MediaQuery.of(context).size.height - 150),
         child: _navigationButtons(),
       ),
     ]);
@@ -240,22 +244,28 @@ class _AddLostState extends State<AddLost> {
                       onPressed: () {
                         setState(() {
                           _image = Container(
-                              child: Center(
-                                  child: Text(
-                                      "אם ברשותך תמונה של האבידה, צרפ/י אותה כאן.")));
+                            child: Center(
+                              child: Text(
+                                  "אם ברשותך תמונה של האבידה, צרפ/י אותה כאן.",
+                                  style: TextStyle(fontSize: 16)),
+                            ),
+                          );
                         });
                       },
                     ),
                   ],
                 ),
                 Image.file(snapshot.data,
-                    fit: BoxFit.contain, height: 400, width: 400)
+                    fit: BoxFit.contain,
+                    height: MediaQuery.of(context).size.height - 300,
+                    width: 400)
               ],
             );
           } else
             return Container(
               child: Center(
-                child: Text("אם ברשותך תמונה של האבידה, צרפ/י אותה כאן."),
+                child: Text("אם ברשותך תמונה של האבידה, צרפ/י אותה כאן.",
+                    style: TextStyle(fontSize: 16)),
               ),
             );
         });
