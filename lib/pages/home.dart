@@ -113,7 +113,7 @@ class HomePage extends StatelessWidget {
     } else if (event.EventType == 'סטנדאפ') {
       eventTitle = 'Life is tough so laugh hard';
     } else if (event.EventType == 'אירוע כללי') {
-      eventTitle = 'היה לך יום גרוע? בו לאירוע!';
+      eventTitle = 'היה לך יום גרוע? בוא/י לאירוע!';
     }
     return eventTitle;
   }
