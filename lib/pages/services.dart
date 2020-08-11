@@ -35,6 +35,7 @@ class _ServicesState extends State<Services> {
   AutoCompleteTextField<String> _textField;
   Widget _title = Container();
   ScrollController _scrollController;
+
   ScrollController _servicesButtonsScrollController = ScrollController();
   GlobalKey<AutoCompleteTextFieldState<String>> _textFieldKey = new GlobalKey();
   final FocusNode _focusNode = FocusNode();
@@ -351,7 +352,7 @@ class _ServicesState extends State<Services> {
   // build services by area page
   Widget _buildServicesByAreaPage(List<Service> services) {
     _scrollController = ScrollController(
-        initialScrollOffset: (widget.model.SelectedServiceIndex - 1) * 80.0);
+        initialScrollOffset: (widget.model.SelectedServiceIndex - 1) * 60.0);
     _servicesListView = Scrollbar(
       isAlwaysShown: false,
       controller: _scrollController,
@@ -1131,7 +1132,7 @@ class _ServicesState extends State<Services> {
               _isNotPressable = false;
               _searchButtonColor = Colors.blue;
             });
-          // if no such location is exist
+            // if no such location is exist
           } catch (err) {
             setState(() {
               _isNotPressable = true;
