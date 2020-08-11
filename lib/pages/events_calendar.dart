@@ -78,7 +78,7 @@ class _EventsCalendarState extends State<EventsCalendar> {
       "קפה ומאפה": Icon(MaterialCommunityIcons.coffee),
       "קבלת שבת": Icon(MaterialCommunityIcons.candle),
       "Live בקמפוס": Icon(MdiIcons.microphoneVariant),
-      "אחר": Icon(MaterialCommunityIcons.dots_horizontal),
+      "אירוע כללי": Icon(Icons.calendar_today),
       "מסיבה": Icon(MdiIcons.balloon),
       "טקס": Icon(MdiIcons.microphoneVariant)
     };
@@ -179,8 +179,8 @@ class _EventsCalendarState extends State<EventsCalendar> {
           ),
           child: ListTile(
             leading: _eventTypesToIcons[event.EventType],
-            // just if the event.EventType is not 'אחר' we can nevigate to this location
-            trailing: event.EventType != 'אחר'
+            // just if the event.EventType is not 'אירוע כללי' we can nevigate to this location
+            trailing: event.EventType != 'אירוע כללי'
                 ? SizedBox(
                     width: 35,
                     child: IconButton(
@@ -210,7 +210,7 @@ class _EventsCalendarState extends State<EventsCalendar> {
                       },
                     ),
                   )
-                : Container(),
+                : SizedBox(),
             title: Text(
               event.EventType,
               style: TextStyle(
