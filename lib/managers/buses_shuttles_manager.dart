@@ -14,7 +14,7 @@ class BusesShuttlesManager extends StatelessWidget {
     model.fetchStations();
     model.fetchShuttleStations();
     return DefaultTabController(
-      length: 4,
+      length: 3,
       child: Directionality(
         textDirection: TextDirection.rtl,
         child: Scaffold(
@@ -28,10 +28,10 @@ class BusesShuttlesManager extends StatelessWidget {
                   icon: Icon(Icons.directions_railway),
                   text: 'שאטלים',
                 ),
-                Tab(
+                /*Tab(
                   icon: Icon(Icons.directions_bus),
                   text: 'תחנות',
-                ),
+                ),*/
                 Tab(
                   icon: Icon(Icons.location_city),
                   text: 'קו לפי עיר',
@@ -46,7 +46,7 @@ class BusesShuttlesManager extends StatelessWidget {
           body: TabBarView(
             children: <Widget>[
               Shuttles(model),
-              Container(),
+              /*Container(),*/
               BusesByCity(model),
               Parkings(model),
             ],
