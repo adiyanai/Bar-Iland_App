@@ -89,7 +89,7 @@ class _BusesByCityState extends State<BusesByCity> {
     }
   }
 
-  _createBusesList(List<Bus> busesList) {
+  Widget _createBusesList(List<Bus> busesList) {
     Map<String, List<Bus>> stationBusesMap = _createStationBusesMap(busesList);
 
     return Container(
@@ -254,7 +254,7 @@ class _BusesByCityState extends State<BusesByCity> {
     );
   }
 
-  _showBusesByCity(String city, List<Bus> buses) {
+  Widget _showBusesByCity(String city, List<Bus> buses) {
     if (city == "") {
       return Column();
     }
@@ -403,7 +403,7 @@ class _BusesByCityState extends State<BusesByCity> {
     _searchButtonColor = Colors.grey;
   }
 
-  _busesByCitySearch() {
+  Widget _busesByCitySearch() {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.all(Radius.circular(50.0)),

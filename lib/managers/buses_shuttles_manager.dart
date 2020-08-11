@@ -23,6 +23,8 @@ class BusesShuttlesManager extends StatelessWidget {
             centerTitle: true,
             title: Text('תחבורה ושאטלים'),
             bottom: TabBar(
+              onTap: (value) =>
+                  FocusScope.of(context).requestFocus(new FocusNode()),
               tabs: <Widget>[
                 Tab(
                   icon: Icon(Icons.directions_railway),

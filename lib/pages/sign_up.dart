@@ -172,7 +172,7 @@ class _SignUpState extends State<SignUp> {
                               child: RaisedButton(
                                 color: Theme.of(context).primaryColor,
                                 child: Text(
-                                  'סיים הרשמה',
+                                  'סיום הרשמה',
                                   style: TextStyle(fontSize: 20.0),
                                 ),
                                 textColor: Colors.white,
