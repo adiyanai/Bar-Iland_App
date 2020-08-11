@@ -1,6 +1,7 @@
 import 'package:bar_iland_app/pages/parkings.dart';
 import 'package:bar_iland_app/scoped-models/main.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import '../pages/buses_by_city.dart';
 import '../pages/shuttles.dart';
 
@@ -23,11 +24,9 @@ class BusesShuttlesManager extends StatelessWidget {
             centerTitle: true,
             title: Text('תחבורה ושאטלים'),
             bottom: TabBar(
-              onTap: (value) =>
-                  FocusScope.of(context).requestFocus(new FocusNode()),
               tabs: <Widget>[
                 Tab(
-                  icon: Icon(Icons.directions_railway),
+                  icon: Icon(Icons.airport_shuttle),
                   text: 'שאטלים',
                 ),
                 /*Tab(
@@ -35,11 +34,11 @@ class BusesShuttlesManager extends StatelessWidget {
                   text: 'תחנות',
                 ),*/
                 Tab(
-                  icon: Icon(Icons.location_city),
-                  text: 'קו לפי עיר',
+                  icon: Icon(Icons.directions_bus),
+                  text: 'תחבורה',
                 ),
                 Tab(
-                  icon: Icon(Icons.directions_car),
+                  icon: Icon(FontAwesome5Solid.parking),
                   text: 'חניות',
                 ),
               ],
