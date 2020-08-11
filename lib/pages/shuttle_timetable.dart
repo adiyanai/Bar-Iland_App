@@ -10,7 +10,7 @@ class ShuttleTimetable extends StatelessWidget {
         appBar: AppBar(
           centerTitle: true,
           title: Text(
-            'לוח זמנים',
+            'שאטלים - לו"ז יומי',
           ),
         ),
         body: Container(
