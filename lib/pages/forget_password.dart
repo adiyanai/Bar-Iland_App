@@ -123,7 +123,7 @@ class _ForgetPasswordState extends State<ForgetPassword> {
                               child: RaisedButton(
                                 color: Theme.of(context).primaryColor,
                                 child: Text(
-                                  'שחזר',
+                                  'שחזור',
                                   style: TextStyle(fontSize: 20.0),
                                 ),
                                 textColor: Colors.white,
