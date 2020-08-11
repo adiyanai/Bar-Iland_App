@@ -640,7 +640,7 @@ class HomePage extends StatelessWidget {
                     ],
                   ),
                   SizedBox(
-                    height: 10,
+                    height: 8,
                   ),
                   events.isNotEmpty
                       ? _buildEventsBoard(events)
@@ -725,7 +725,6 @@ class HomePage extends StatelessWidget {
                   Container(
                     alignment: Alignment.bottomRight,
                     margin: EdgeInsets.only(
-                      bottom: 20,
                       right: 10,
                     ),
                     child: RaisedButton(
