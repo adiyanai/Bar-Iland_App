@@ -1,6 +1,7 @@
 import 'package:bar_iland_app/pages/parkings.dart';
 import 'package:bar_iland_app/scoped-models/main.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import '../pages/buses_by_city.dart';
 import '../pages/shuttles.dart';
 
@@ -14,7 +15,7 @@ class BusesShuttlesManager extends StatelessWidget {
     model.fetchStations();
     model.fetchShuttleStations();
     return DefaultTabController(
-      length: 4,
+      length: 3,
       child: Directionality(
         textDirection: TextDirection.rtl,
         child: Scaffold(
@@ -25,19 +26,19 @@ class BusesShuttlesManager extends StatelessWidget {
             bottom: TabBar(
               tabs: <Widget>[
                 Tab(
-                  icon: Icon(Icons.directions_railway),
+                  icon: Icon(Icons.airport_shuttle),
                   text: 'שאטלים',
                 ),
-                Tab(
+                /*Tab(
                   icon: Icon(Icons.directions_bus),
                   text: 'תחנות',
+                ),*/
+                Tab(
+                  icon: Icon(Icons.directions_bus),
+                  text: 'תחבורה',
                 ),
                 Tab(
-                  icon: Icon(Icons.location_city),
-                  text: 'קו לפי עיר',
-                ),
-                Tab(
-                  icon: Icon(Icons.directions_car),
+                  icon: Icon(FontAwesome5Solid.parking),
                   text: 'חניות',
                 ),
               ],
@@ -46,7 +47,7 @@ class BusesShuttlesManager extends StatelessWidget {
           body: TabBarView(
             children: <Widget>[
               Shuttles(model),
-              Container(),
+              /*Container(),*/
               BusesByCity(model),
               Parkings(model),
             ],

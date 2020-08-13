@@ -39,22 +39,12 @@ class _ShuttlesState extends State<Shuttles> {
     }
   }
 
-  RaisedButton _createNavigationButton() {
-    return RaisedButton(
-      color: _canPress ? Colors.blue : Colors.grey[400],
-      child: Row(
-        children: <Widget>[
-          Text(
-            'ניווט',
-            style: TextStyle(
-              color: _canPress ? Colors.white : Colors.black,
-            ),
-          ),
-          Icon(
-            Icons.near_me,
-            color: _canPress ? Colors.white : Colors.black,
-          ),
-        ],
+  IconButton _createNavigationButton() {
+    return IconButton(
+      padding: EdgeInsets.all(5),
+      icon: Icon(
+        Icons.near_me,
+        color: _canPress ? Colors.white : Colors.black,
       ),
       onPressed: () async {
         if (_canPress) {
@@ -95,7 +85,7 @@ class _ShuttlesState extends State<Shuttles> {
       key: _textFieldKey,
       keyboardType: TextInputType.number,
       decoration: InputDecoration(
-        hintText: 'הכנס מס\' תחנה...',
+        hintText: 'הכנס/י מס\' תחנה',
         border: OutlineInputBorder(
           borderSide: BorderSide(
             color: Colors.blue,
@@ -154,67 +144,86 @@ class _ShuttlesState extends State<Shuttles> {
               ? Center(
                   child: CircularProgressIndicator(),
                 )
-              : Stack(
-                  children: <Widget>[
-                    // background map image
-                    Positioned(
-                      bottom: 0,
-                      child: Container(
-                        height: height * 0.7,
-                        width: width,
-                        child: PhotoView(
-                          imageProvider: AssetImage('assets/shuttles_map.png'),
-                          minScale: PhotoViewComputedScale.contained,
-                          maxScale: PhotoViewComputedScale.covered * 4.8,
-                          initialScale: PhotoViewComputedScale.contained,
+              : Container(
+                  color: Colors.white,
+                  child: Stack(
+                    children: <Widget>[
+                      // background map image
+                      Positioned(
+                        bottom: 0,
+                        child: Container(
+                          height: height * 0.7,
+                          width: width,
+                          child: PhotoView(
+                            imageProvider:
+                                AssetImage('assets/shuttles_map.png'),
+                            backgroundDecoration:
+                                BoxDecoration(color: Colors.white),
+                            minScale: PhotoViewComputedScale.contained,
+                            maxScale: PhotoViewComputedScale.covered * 4.8,
+                            initialScale: PhotoViewComputedScale.contained,
+                          ),
                         ),
                       ),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Container(
-                          margin: EdgeInsets.all(10),
-                          child: Row(
-                            children: <Widget>[
-                              Container(
-                                height: 45,
-                                width: 150,
-                                // Enter station number TextField
-                                child: _createStationNumberTextField(),
-                              ),
-                              SizedBox(
-                                width: 3,
-                              ),
-                              Container(
-                                height: 35,
-                                width: 82,
-                                // navigation button
-                                child: _createNavigationButton(),
-                              ),
-                            ],
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Container(
+                            margin: EdgeInsets.all(10),
+                            child: Row(
+                              children: <Widget>[
+                                Container(
+                                  height: 45,
+                                  width: 150,
+                                  // Enter station number TextField
+                                  child: _createStationNumberTextField(),
+                                ),
+                                SizedBox(
+                                  width: 3,
+                                ),
+                                Container(
+                                  height: 35,
+                                  width: 50,
+                                  decoration: BoxDecoration(
+                                    color: _canPress
+                                        ? Colors.blue
+                                        : Colors.grey[400],
+                                    borderRadius: BorderRadius.circular(2),
+                                  ),
+                                  // navigation button
+                                  child: _createNavigationButton(),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                        Container(
-                          margin: EdgeInsets.all(10),
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            color: Colors.blue,
-                            borderRadius: BorderRadius.circular(7),
+                          Container(
+                            margin: EdgeInsets.all(10),
+                            width: 105,
+                            height: 35,
+                            // shuttle timetable button
+                            child: RaisedButton.icon(
+                              color: Colors.lightBlue[300],
+                              label: Text(
+                                'לו\"ז יומי',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                ),
+                              ),
+                              icon: Icon(
+                                Icons.departure_board,
+                                color: Colors.white,
+                                size: 24,
+                              ),
+                              onPressed: () {
+                                Navigator.pushNamed(
+                                    context, '/shuttleTimetable');
+                              },
+                            ),
                           ),
-                          // shuttle timetable button
-                          child: IconButton(
-                            icon: Icon(Icons.access_time),
-                            color: Colors.white,
-                            onPressed: () {
-                              Navigator.pushNamed(context, '/shuttleTimetable');
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                        ],
+                      ),
+                    ],
+                  ),
                 );
         },
       ),

@@ -23,8 +23,8 @@ class BusesByCity extends StatefulWidget {
 class _BusesByCityState extends State<BusesByCity> {
   ScrollController _scrollController;
   AutoCompleteTextField<String> _textField;
-  GlobalKey<AutoCompleteTextFieldState<String>> _key = new GlobalKey();
-  final FocusNode _focusNode = FocusNode();
+  GlobalKey<AutoCompleteTextFieldState<String>> _textFieldKey = new GlobalKey();
+  final FocusNode _focusNode = new FocusNode();
   ListView _busesListView;
   bool _isNotPressable = true;
   bool _isSearchPressed;
@@ -89,7 +89,7 @@ class _BusesByCityState extends State<BusesByCity> {
     }
   }
 
-  _createBusesList(List<Bus> busesList) {
+  Widget _createBusesList(List<Bus> busesList) {
     Map<String, List<Bus>> stationBusesMap = _createStationBusesMap(busesList);
 
     return Container(
@@ -204,7 +204,7 @@ class _BusesByCityState extends State<BusesByCity> {
                             Row(
                               children: [
                                 Icon(
-                                  Icons.location_city,
+                                  MaterialCommunityIcons.road_variant,
                                   size: 18,
                                 ),
                                 Text(
@@ -254,7 +254,7 @@ class _BusesByCityState extends State<BusesByCity> {
     );
   }
 
-  _showBusesByCity(String city, List<Bus> buses) {
+  Widget _showBusesByCity(String city, List<Bus> buses) {
     if (city == "") {
       return Column();
     }
@@ -307,7 +307,7 @@ class _BusesByCityState extends State<BusesByCity> {
     return Container(
       width: 240,
       child: _textField = AutoCompleteTextField<String>(
-        key: _key,
+        key: _textFieldKey,
         clearOnSubmit: false,
         focusNode: _focusNode,
         suggestions: suggestions,
@@ -318,7 +318,7 @@ class _BusesByCityState extends State<BusesByCity> {
         ),
         decoration: InputDecoration(
           contentPadding: EdgeInsets.fromLTRB(0, 0, 10, 0),
-          hintText: 'חיפוש קווים לפי עיר',
+          hintText: 'הכנס/י עיר למציאת קווים',
         ),
         itemFilter: (city, query) {
           if (city.startsWith(query) || query == "") {
@@ -374,7 +374,6 @@ class _BusesByCityState extends State<BusesByCity> {
   }
 
   void _searchPress() {
-    FocusScope.of(context).requestFocus(new FocusNode());
     _title = Container(
       width: 600,
       height: 50,
@@ -403,15 +402,19 @@ class _BusesByCityState extends State<BusesByCity> {
     _searchButtonColor = Colors.grey;
   }
 
-  _busesByCitySearch() {
+  Widget _busesByCitySearch() {
     return Container(
       decoration: BoxDecoration(
+        border: Border.all(
+          color: Colors.black,
+          width: 0.5,
+        ),
         borderRadius: BorderRadius.all(Radius.circular(50.0)),
-        color: Color.fromRGBO(255, 255, 255, 0.9),
+        color: Colors.yellow[50],
       ),
       height: 50,
-      width: 350,
-      margin: const EdgeInsets.all(20.0),
+      width: 310,
+      margin: const EdgeInsets.all(40.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,

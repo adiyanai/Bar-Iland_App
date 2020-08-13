@@ -73,7 +73,7 @@ class _SignUpState extends State<SignUp> {
         if (value.isEmpty ||
             !RegExp(r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$")
                 .hasMatch(value)) {
-          return 'הכנס כתובת דוא"ל תקינה';
+          return 'דוא"ל לא תקין';
         }
       },
       onSaved: (String value) {
@@ -172,7 +172,7 @@ class _SignUpState extends State<SignUp> {
                               child: RaisedButton(
                                 color: Theme.of(context).primaryColor,
                                 child: Text(
-                                  'סיים הרשמה',
+                                  'סיום הרשמה',
                                   style: TextStyle(fontSize: 20.0),
                                 ),
                                 textColor: Colors.white,

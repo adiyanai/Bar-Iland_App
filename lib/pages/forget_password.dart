@@ -72,7 +72,7 @@ class _ForgetPasswordState extends State<ForgetPassword> {
         if (value.isEmpty ||
             !RegExp(r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
                 .hasMatch(value)) {
-          return 'הכנס כתובת דוא"ל תקינה';
+          return 'דוא"ל לא תקין';
         }
       },
       onSaved: (String value) {
@@ -123,7 +123,7 @@ class _ForgetPasswordState extends State<ForgetPassword> {
                               child: RaisedButton(
                                 color: Theme.of(context).primaryColor,
                                 child: Text(
-                                  'שחזר',
+                                  'שחזור',
                                   style: TextStyle(fontSize: 20.0),
                                 ),
                                 textColor: Colors.white,

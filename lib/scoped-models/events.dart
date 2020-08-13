@@ -175,7 +175,7 @@ class EventsModel extends Model {
         fetchedEventTypeList.add(eventTypeData['eventType']);
       });
       _eventTypes = fetchedEventTypeList;
-      _eventTypes.add('אחר');
+      _eventTypes.add('אירוע כללי');
       _isEventTypeLoading = false;
       notifyListeners();
       //_selEventId = null;

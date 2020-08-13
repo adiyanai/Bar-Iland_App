@@ -32,13 +32,13 @@ class _EventsCalendarState extends State<EventsCalendar> {
   List<EventLocation> _eventLocations;
   Location _location;
 
-
   @override
   void initState() {
     _location = new Location();
     _connectionMode = widget._model.connectionMode;
     _calendarController = CalendarController();
-    _scrollController = ScrollController(initialScrollOffset: 0,keepScrollOffset: false);
+    _scrollController =
+        ScrollController(initialScrollOffset: 0, keepScrollOffset: false);
     _selectedEvents = [];
     _eventTypesToIcons = _mapEventTypesToIcons();
     _events = {};
@@ -78,7 +78,7 @@ class _EventsCalendarState extends State<EventsCalendar> {
       "קפה ומאפה": Icon(MaterialCommunityIcons.coffee),
       "קבלת שבת": Icon(MaterialCommunityIcons.candle),
       "Live בקמפוס": Icon(MdiIcons.microphoneVariant),
-      "אחר": Icon(MaterialCommunityIcons.dots_horizontal),
+      "אירוע כללי": Icon(Icons.calendar_today),
       "מסיבה": Icon(MdiIcons.balloon),
       "טקס": Icon(MdiIcons.microphoneVariant)
     };
@@ -163,7 +163,7 @@ class _EventsCalendarState extends State<EventsCalendar> {
     }
   }
 
-  Column _buildEventLook(dynamic event) {
+  Column _buildEventLook(dynamic event, bool endList) {
     double _screenWidth = MediaQuery.of(context).size.width;
     return Column(
       children: <Widget>[
@@ -179,8 +179,8 @@ class _EventsCalendarState extends State<EventsCalendar> {
           ),
           child: ListTile(
             leading: _eventTypesToIcons[event.EventType],
-            // just if the event.EventType is not 'אחר' we can nevigate to this location
-            trailing: event.EventType != 'אחר'
+            // just if the event.EventType is not 'אירוע כללי' we can nevigate to this location
+            trailing: event.EventType != 'אירוע כללי'
                 ? SizedBox(
                     width: 35,
                     child: IconButton(
@@ -194,13 +194,23 @@ class _EventsCalendarState extends State<EventsCalendar> {
                             _eventLocations.firstWhere((EventLocation item) =>
                                 (event.Location == item.NumberName));
 
-                        LocationData userLocation = await _location.getLocation();
-                        String url = 'https://www.google.com/maps/dir/?api=1&origin=' + userLocation.latitude.toString() + ',' +  userLocation.longitude.toString() + '&destination=' + eventLocationData.Lat.toString() + ',' + eventLocationData.Lon.toString() + '&travelmode=walking';
+                        LocationData userLocation =
+                            await _location.getLocation();
+                        String url =
+                            'https://www.google.com/maps/dir/?api=1&origin=' +
+                                userLocation.latitude.toString() +
+                                ',' +
+                                userLocation.longitude.toString() +
+                                '&destination=' +
+                                eventLocationData.Lat.toString() +
+                                ',' +
+                                eventLocationData.Lon.toString() +
+                                '&travelmode=walking';
                         _launchURL(url);
                       },
                     ),
                   )
-                : Container(),
+                : SizedBox(),
             title: Text(
               event.EventType,
               style: TextStyle(
@@ -216,10 +226,13 @@ class _EventsCalendarState extends State<EventsCalendar> {
                     : Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          Icon(
-                            Icons.info,
-                            size: 15,
-                            color: Colors.black,
+                          Container(
+                            padding: EdgeInsets.only(top: 3),
+                            child: Icon(
+                              Icons.info,
+                              size: 15,
+                              color: Colors.black,
+                            ),
                           ),
                           SizedBox(width: 3),
                           Container(
@@ -237,13 +250,13 @@ class _EventsCalendarState extends State<EventsCalendar> {
                 SizedBox(
                   height: 4,
                 ),
-                Row(
+                Row(crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Icon(
+                    Container(padding: EdgeInsets.only(top: 3), child: Icon(
                       Icons.location_on,
                       size: 15,
                       color: Colors.black54,
-                    ),
+                    )),
                     SizedBox(width: 3),
                     Container(
                       width: _screenWidth * 0.5,
@@ -270,6 +283,11 @@ class _EventsCalendarState extends State<EventsCalendar> {
             ),
           ),
         ),
+        endList == true
+            ? SizedBox(
+                height: 30,
+              )
+            : Container(),
       ],
     );
   }
@@ -344,8 +362,15 @@ class _EventsCalendarState extends State<EventsCalendar> {
                         padding: EdgeInsets.all(5),
                         controller: _scrollController,
                         itemCount: _selectedEvents.length,
+                        addRepaintBoundaries: true,
                         itemBuilder: (BuildContext context, int index) {
-                          return _buildEventLook(_selectedEvents[index]);
+                          if (index == _selectedEvents.length - 1) {
+                            return _buildEventLook(
+                                _selectedEvents[index], true);
+                          } else {
+                            return _buildEventLook(
+                                _selectedEvents[index], false);
+                          }
                         },
                       ),
                     ),

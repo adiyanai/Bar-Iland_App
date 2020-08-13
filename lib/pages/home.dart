@@ -82,7 +82,7 @@ class HomePage extends StatelessWidget {
       "קפה ומאפה": Icon(MaterialCommunityIcons.coffee, size: 15),
       "קבלת שבת": Icon(MaterialCommunityIcons.candle, size: 15),
       "Live בקמפוס": Icon(MdiIcons.microphoneVariant, size: 15),
-      "אחר": Icon(MaterialCommunityIcons.dots_horizontal, size: 15),
+      "אירוע כללי": Icon(Icons.calendar_today, size: 15),
       "מסיבה": Icon(MdiIcons.balloon, size: 15),
       "טקס": Icon(MdiIcons.microphoneVariant, size: 15)
     };
@@ -112,8 +112,8 @@ class HomePage extends StatelessWidget {
       eventTitle = '"פני שבת נקבלה.."';
     } else if (event.EventType == 'סטנדאפ') {
       eventTitle = 'Life is tough so laugh hard';
-    } else if (event.EventType == 'אחר') {
-      eventTitle = 'היה לך יום גרוע? בו לאירוע!';
+    } else if (event.EventType == 'אירוע כללי') {
+      eventTitle = 'היה לך יום גרוע? בוא/י לאירוע!';
     }
     return eventTitle;
   }
@@ -640,7 +640,7 @@ class HomePage extends StatelessWidget {
                     ],
                   ),
                   SizedBox(
-                    height: 10,
+                    height: 8,
                   ),
                   events.isNotEmpty
                       ? _buildEventsBoard(events)
@@ -725,7 +725,6 @@ class HomePage extends StatelessWidget {
                   Container(
                     alignment: Alignment.bottomRight,
                     margin: EdgeInsets.only(
-                      bottom: 20,
                       right: 10,
                     ),
                     child: RaisedButton(
