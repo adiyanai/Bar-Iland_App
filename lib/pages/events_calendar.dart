@@ -42,11 +42,13 @@ class _EventsCalendarState extends State<EventsCalendar> {
     _selectedEvents = [];
     _eventTypesToIcons = _mapEventTypesToIcons();
     _events = {};
+    // fetch all the necessery data
     initEvents();
     initEventsLocations();
     super.initState();
   }
 
+  // fetch all the events data
   void initEvents() async {
     await widget._model.fetchEvents();
     setState(() {
@@ -55,6 +57,7 @@ class _EventsCalendarState extends State<EventsCalendar> {
     });
   }
 
+  // fetch the events locations  data if not fetched yet
   void initEventsLocations() async {
     if (widget._model.EventsLocations.isEmpty) {
       await widget._model.fetchEventsLocations();
@@ -64,6 +67,7 @@ class _EventsCalendarState extends State<EventsCalendar> {
     });
   }
 
+  // map every event type to an icon
   Map<String, Icon> _mapEventTypesToIcons() {
     Map<String, Icon> eventsToIcons = {
       "סטנדאפ": Icon(IconData(0xe24e, fontFamily: 'MaterialIcons')),
@@ -85,6 +89,7 @@ class _EventsCalendarState extends State<EventsCalendar> {
     return eventsToIcons;
   }
 
+  // convert the events data list to a map
   Map<DateTime, List<dynamic>> fromListToMapEvents(List<Event> eventsData) {
     Map<DateTime, List<dynamic>> eventsMap = {};
     if (!eventsData.isEmpty) {
@@ -100,6 +105,7 @@ class _EventsCalendarState extends State<EventsCalendar> {
     return eventsMap;
   }
 
+  // build the background image
   Container _buildBackgroundImage() {
     return Container(
       decoration: BoxDecoration(
@@ -115,6 +121,7 @@ class _EventsCalendarState extends State<EventsCalendar> {
     );
   }
 
+  // build the table calendar
   TableCalendar _buildTableCalendar() {
     return TableCalendar(
       events: _events,
@@ -145,6 +152,7 @@ class _EventsCalendarState extends State<EventsCalendar> {
           color: Colors.black54,
         ),
       ),
+      // on day selected save his events
       onDaySelected: (DateTime date, List<dynamic> events) {
         setState(() {
           // sort the events by their time
@@ -155,6 +163,7 @@ class _EventsCalendarState extends State<EventsCalendar> {
     );
   }
 
+  // launch url
   void _launchURL(String url) async {
     if (await canLaunch(url)) {
       await launch(url);
@@ -163,6 +172,7 @@ class _EventsCalendarState extends State<EventsCalendar> {
     }
   }
 
+  // build the event look
   Column _buildEventLook(dynamic event, bool endList) {
     double _screenWidth = MediaQuery.of(context).size.width;
     return Column(
@@ -292,6 +302,7 @@ class _EventsCalendarState extends State<EventsCalendar> {
     );
   }
 
+  // registered user - add event
   void _registeredUserAddEvent() {
     Navigator.pushReplacement(
         context,
@@ -300,7 +311,9 @@ class _EventsCalendarState extends State<EventsCalendar> {
                 _calendarController.selectedDay, _eventTypesToIcons)));
   }
 
+  // guest user - add event
   void _guestUserAddEvent() {
+    // show alert dialog
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -336,12 +349,12 @@ class _EventsCalendarState extends State<EventsCalendar> {
         ),
         body: Stack(
           children: <Widget>[
-            // background picture
+            // build the background picture
             _buildBackgroundImage(),
             SingleChildScrollView(
               child: Column(
                 children: [
-                  // calendar
+                  // build the table calendar
                   widget._model.isEventsLoading ||
                           widget._model.isAddEventLoading ||
                           widget._model.isEventsLocationsLoading
@@ -352,7 +365,7 @@ class _EventsCalendarState extends State<EventsCalendar> {
                   SizedBox(
                     height: 15,
                   ),
-                  // events look
+                  // build events look
                   Container(
                     height: 160,
                     child: Scrollbar(
@@ -380,7 +393,7 @@ class _EventsCalendarState extends State<EventsCalendar> {
             ),
           ],
         ),
-        // 'add-event' button
+        // build 'add-event' button
         floatingActionButton: FloatingActionButton(
           child: Icon(
             Icons.add,

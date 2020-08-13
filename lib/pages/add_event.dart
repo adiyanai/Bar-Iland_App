@@ -33,10 +33,12 @@ class AddEventState extends State<AddEvent> {
   @override
   void initState() {
     super.initState();
+    // fetch all the necessery data
     initEventType();
     initEventsLocations();
   }
 
+  // fetch the EventType data if not fetched yet
   void initEventType() async {
     if (widget._model.EventTypes.isEmpty) {
       await widget._model.fetchEventTypes();
@@ -46,6 +48,7 @@ class AddEventState extends State<AddEvent> {
     });
   }
 
+  // fetch the EventsLocations data if not fetched yet
   void initEventsLocations() async {
     if (widget._model.EventsLocations.isEmpty) {
       await widget._model.fetchEventsLocations();
@@ -55,6 +58,7 @@ class AddEventState extends State<AddEvent> {
     });
   }
 
+  // build the backgroung image
   DecorationImage _buildBackgroundImage() {
     return DecorationImage(
       image: AssetImage('assets/people_party.png'),
@@ -66,6 +70,7 @@ class AddEventState extends State<AddEvent> {
     );
   }
 
+  // build the dropdown menu items of the event types
   List<DropdownMenuItem<String>> _buildDropdownMenuItemsEventType() {
     List<DropdownMenuItem<String>> items = List();
     for (String eventType in _eventTypes) {
@@ -76,6 +81,7 @@ class AddEventState extends State<AddEvent> {
             alignment: Alignment.center,
             child: Row(
               children: <Widget>[
+                // take the icon that belongs to this event type
                 widget._eventTypesToIcons[eventType],
                 SizedBox(
                   width: 4,
@@ -95,6 +101,7 @@ class AddEventState extends State<AddEvent> {
     return items;
   }
 
+  // build the dropdown menu items of the event locations
   List<DropdownMenuItem<String>> _buildDropdownMenuItemsEventLocations() {
     List<DropdownMenuItem<String>> items = List();
     for (EventLocation locationData in _eventLocations) {
@@ -130,6 +137,7 @@ class AddEventState extends State<AddEvent> {
     return items;
   }
 
+  // select the time of the event
   Future<Null> _selectTime(BuildContext context) async {
     _selectedTime = await showTimePicker(
       context: context,
@@ -137,6 +145,7 @@ class AddEventState extends State<AddEvent> {
     );
 
     setState(() {
+      // save the time the user picked
       if (_selectedTime != null) {
         _timeText = _selectedTime.toString().substring(10, 15);
         _canSubmit[2] = true;
@@ -147,6 +156,7 @@ class AddEventState extends State<AddEvent> {
     });
   }
 
+  // build the page
   Widget _buildPage() {
     double _screenHeight = MediaQuery.of(context).size.height;
     return SingleChildScrollView(
@@ -155,39 +165,44 @@ class AddEventState extends State<AddEvent> {
         child: Stack(
           fit: StackFit.expand,
           children: <Widget>[
+            // create the 'cancel' and 'ok' buttons
             Positioned.fill(
               top: 550,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  // cancel button
                   RaisedButton(
                     child: Text(
                       'ביטול',
-                      //style: TextStyle(color: Colors.white ,fontSize: 18, fontWeight: FontWeight.bold),
                     ),
-                    //color: Colors.indigo[400],
+                    // when pressed go back to the event calendar
                     onPressed: () {
                       Navigator.pushReplacementNamed(
                           context, '/eventsCalendar');
                     },
                   ),
+                  // ok button
                   RaisedButton(
                     child: Text(
                       'אישור',
-                      //style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
+                    // just when the user fill all the necessery data he can press the ok button
                     color: (_canSubmit[0] && _canSubmit[1] && _canSubmit[2])
                         ? Colors.blue
                         : Colors.grey,
                     onPressed: () {
                       if (_canSubmit[0] && _canSubmit[1] && _canSubmit[2]) {
                         setState(() {
+                          // add the new event
                           widget._model.addEvent(
                               widget._selectedDay,
                               _timeText,
                               _selectedLocation,
                               _selectedEventType,
-                              _descriptionText, widget._model);
+                              _descriptionText,
+                              widget._model);
+                          // go back to the event calendar
                           Navigator.pushReplacementNamed(
                               context, '/eventsCalendar');
                         });
@@ -197,6 +212,7 @@ class AddEventState extends State<AddEvent> {
                 ],
               ),
             ),
+            // create the 'more information' TextField
             Positioned(
               top: 360,
               child: Container(
@@ -232,6 +248,7 @@ class AddEventState extends State<AddEvent> {
                     ),
                     Container(
                       width: 300,
+                      // the 'more information' TextField
                       child: TextField(
                         key: _textFieldKey,
                         keyboardType: TextInputType.multiline,
@@ -252,6 +269,7 @@ class AddEventState extends State<AddEvent> {
                           color: Colors.black54,
                         ),
                         onChanged: (String description) {
+                          // save the 'more information' the user typed
                           _descriptionText = description;
                         },
                       ),
@@ -260,6 +278,7 @@ class AddEventState extends State<AddEvent> {
                 ),
               ),
             ),
+            // create the select time clock
             Positioned(
               top: 240,
               child: Container(
@@ -293,6 +312,7 @@ class AddEventState extends State<AddEvent> {
                               Icons.access_time,
                               color: Colors.white,
                             ),
+                            // select the time of the event
                             onPressed: () => _selectTime(context),
                           ),
                         ),
@@ -300,6 +320,7 @@ class AddEventState extends State<AddEvent> {
                           width: 10,
                         ),
                         Text(
+                          // show the time the user has chosen
                           _timeText,
                           style: TextStyle(
                             color: Colors.black,
@@ -312,6 +333,7 @@ class AddEventState extends State<AddEvent> {
                 ),
               ),
             ),
+            // create dropdown menu items of the event locations
             Positioned(
               top: 120,
               child: SingleChildScrollView(
@@ -333,6 +355,7 @@ class AddEventState extends State<AddEvent> {
                           dialogBox: false,
                           menuConstraints:
                               BoxConstraints.tight(Size.fromHeight(200)),
+                          // create dropdown menu items of the event locations
                           items: _buildDropdownMenuItemsEventLocations(),
                           value: _selectedLocation,
                           closeButton: SizedBox.shrink(),
@@ -340,6 +363,7 @@ class AddEventState extends State<AddEvent> {
                           isExpanded: true,
                           onChanged: (value) {
                             setState(() {
+                              // save the location the user picked
                               _selectedLocation = value;
                               if (_selectedLocation != '') {
                                 _canSubmit[1] = true;
@@ -355,6 +379,7 @@ class AddEventState extends State<AddEvent> {
                 ),
               ),
             ),
+            // create dropdown menu items of the event types
             Positioned(
               top: 0,
               child: SingleChildScrollView(
@@ -376,6 +401,7 @@ class AddEventState extends State<AddEvent> {
                           dialogBox: false,
                           menuConstraints:
                               BoxConstraints.tight(Size.fromHeight(200)),
+                          // create dropdown menu items of the event types
                           items: _buildDropdownMenuItemsEventType(),
                           value: _selectedEventType,
                           closeButton: SizedBox.shrink(),
@@ -383,6 +409,7 @@ class AddEventState extends State<AddEvent> {
                           isExpanded: true,
                           onChanged: (value) {
                             setState(() {
+                              // save the event type the user picked
                               _selectedEventType = value;
                               if (_selectedEventType != '') {
                                 _canSubmit[0] = true;
@@ -420,6 +447,7 @@ class AddEventState extends State<AddEvent> {
         body: ScopedModelDescendant<MainModel>(
           builder: (BuildContext context, Widget child, MainModel model) {
             return Container(
+              // build the background image
               decoration: BoxDecoration(
                 image: _buildBackgroundImage(),
               ),
@@ -428,11 +456,13 @@ class AddEventState extends State<AddEvent> {
                 onTap: () {
                   FocusScope.of(context).requestFocus(FocusNode());
                 },
+                // if all the data fetched show the page, else show CircularProgressIndicator
                 child: widget._model.isEventTypeLoading ||
                         widget._model.isEventsLocationsLoading
                     ? Center(
                         child: CircularProgressIndicator(),
                       )
+                    // build tha page
                     : _buildPage(),
               ),
             );

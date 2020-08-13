@@ -15,13 +15,10 @@ class ShuttleTimetable extends StatelessWidget {
         ),
         body: Container(
           decoration: BoxDecoration(
+            // shuttle timetable
             image: DecorationImage(
               image: AssetImage('assets/shuttle_timetable.png'),
               fit: BoxFit.contain,
-              /*colorFilter: ColorFilter.mode(
-                Colors.black.withOpacity(0.55),
-                BlendMode.dstATop,
-              ),*/
             ),
           ),
         ),

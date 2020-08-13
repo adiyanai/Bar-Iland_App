@@ -11,6 +11,7 @@ class BusesShuttlesManager extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // fetch all the necessery data
     model.fetchBuses();
     model.fetchStations();
     model.fetchShuttleStations();
@@ -23,6 +24,7 @@ class BusesShuttlesManager extends StatelessWidget {
           appBar: AppBar(
             centerTitle: true,
             title: Text('תחבורה ושאטלים'),
+            // create the TabBar (3 Tabs)
             bottom: TabBar(
               tabs: <Widget>[
                 Tab(
@@ -44,6 +46,7 @@ class BusesShuttlesManager extends StatelessWidget {
               ],
             ),
           ),
+          // create the TabBar view (3 Tabs)
           body: TabBarView(
             children: <Widget>[
               Shuttles(model),

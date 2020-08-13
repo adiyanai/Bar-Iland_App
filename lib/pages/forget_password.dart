@@ -13,16 +13,18 @@ class _ForgetPasswordState extends State<ForgetPassword> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   String _email = null;
 
+  // submit form to reset password
   void _submitForm(Function resetPassword) async {
-    print('here!!!!');
     if (!_formKey.currentState.validate()) {
       return;
     }
     _formKey.currentState.save();
+    // reset password
     final Map<String, dynamic> successInformation = await resetPassword(_email);
+    // if the reset successed go to the auth page
     if (successInformation['success']) {
-      print('success!!!');
       Navigator.pop(context);
+    // else show an alert dialog
     } else {
       showDialog(
         context: context,
@@ -47,6 +49,7 @@ class _ForgetPasswordState extends State<ForgetPassword> {
     }
   }
 
+  // build the background image
   DecorationImage _buildBackgroundImage() {
     return DecorationImage(
       image: AssetImage('assets/background.jpg'),
@@ -58,6 +61,7 @@ class _ForgetPasswordState extends State<ForgetPassword> {
     );
   }
 
+  // build email TextField
   Widget _buildEmailTextField() {
     return TextFormField(
       decoration: InputDecoration(
@@ -68,6 +72,7 @@ class _ForgetPasswordState extends State<ForgetPassword> {
       ),
       keyboardType: TextInputType.emailAddress,
       textAlign: TextAlign.right,
+      // check the validity of the email
       validator: (String value) {
         if (value.isEmpty ||
             !RegExp(r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
@@ -75,6 +80,7 @@ class _ForgetPasswordState extends State<ForgetPassword> {
           return 'דוא"ל לא תקין';
         }
       },
+      // save the email the user typed
       onSaved: (String value) {
         _email = value;
       },
@@ -94,6 +100,7 @@ class _ForgetPasswordState extends State<ForgetPassword> {
         ),
         body: Container(
           decoration: BoxDecoration(
+            // build the background image
             image: _buildBackgroundImage(),
           ),
           padding: EdgeInsets.all(10.0),
@@ -110,10 +117,12 @@ class _ForgetPasswordState extends State<ForgetPassword> {
                     height: 200,
                     color: Colors.black.withOpacity(0.80),
                   ),
+                  // build email TextField
                   _buildEmailTextField(),
                   SizedBox(
                     height: 20.0,
                   ),
+                  // reset password button
                   ScopedModelDescendant<MainModel>(
                     builder:
                         (BuildContext context, Widget child, MainModel model) {
@@ -127,6 +136,7 @@ class _ForgetPasswordState extends State<ForgetPassword> {
                                   style: TextStyle(fontSize: 20.0),
                                 ),
                                 textColor: Colors.white,
+                                // when pressed submit form to reset password
                                 onPressed: () {
                                   _submitForm(model.resetPassword);
                                 },
