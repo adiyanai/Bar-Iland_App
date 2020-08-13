@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
 
 class CampusMap extends StatelessWidget {
+  //display the campus map in the home page 
   @override
   Widget build(BuildContext context) {
     return Directionality(
