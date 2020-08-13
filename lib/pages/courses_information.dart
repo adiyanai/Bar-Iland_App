@@ -24,7 +24,7 @@ class CustomPageState extends State<CustomPage> {
   InAppWebViewController webView;
 
   double progress = 0;
-
+  //display courses information from shoham.biu.ac.il site
   @override
   Widget build(BuildContext context) {
     return Directionality(
@@ -75,7 +75,7 @@ class CustomPageState extends State<CustomPage> {
       ])),
     ));
   }
-
+//display a circular progress indicator while loading the page
   Widget _buildProgressBar() {
     if (progress != 1.0) {
       return CircularProgressIndicator();
