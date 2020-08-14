@@ -122,11 +122,11 @@ class AddEventState extends State<AddEvent> {
     }
     items.add(
       DropdownMenuItem(
-        value: 'אירוע כללי',
+        value: 'אחר',
         child: Container(
           alignment: Alignment.center,
           child: Text(
-            'אירוע כללי',
+            'אחר',
             style: TextStyle(
               color: Colors.black54,
             ),
