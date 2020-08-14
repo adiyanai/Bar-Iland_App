@@ -22,7 +22,6 @@ class _ParkingsState extends State<Parkings> {
   @override
   void initState() {
     super.initState();
-    widget.model.fetchParkings();
     _location = new Location();
   }
 

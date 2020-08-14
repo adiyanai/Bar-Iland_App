@@ -15,6 +15,7 @@ class BusesShuttlesManager extends StatelessWidget {
     model.fetchBuses();
     model.fetchStations();
     model.fetchShuttleStations();
+    model.fetchParkings();
     return DefaultTabController(
       length: 3,
       child: Directionality(
