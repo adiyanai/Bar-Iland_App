@@ -38,7 +38,7 @@ class BusesShuttlesManager extends StatelessWidget {
                 ),*/
                 Tab(
                   icon: Icon(Icons.directions_bus),
-                  text: 'תחבורה',
+                  text: 'קווי אוטובוס',
                 ),
                 Tab(
                   icon: Icon(FontAwesome5Solid.parking),
