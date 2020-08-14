@@ -189,8 +189,8 @@ class _EventsCalendarState extends State<EventsCalendar> {
           ),
           child: ListTile(
             leading: _eventTypesToIcons[event.EventType],
-            // just if the event.EventType is not 'אירוע כללי' we can nevigate to this location
-            trailing: event.EventType != 'אירוע כללי'
+            // just if the event.Location is not 'אחר' we can nevigate to this location
+            trailing: event.Location != 'אחר'
                 ? SizedBox(
                     width: 35,
                     child: IconButton(
@@ -266,7 +266,7 @@ class _EventsCalendarState extends State<EventsCalendar> {
                       Icons.location_on,
                       size: 15,
                       color: Colors.black54,
-                    )),
+                    ),),
                     SizedBox(width: 3),
                     Container(
                       width: _screenWidth * 0.5,
