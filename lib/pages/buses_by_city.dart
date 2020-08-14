@@ -305,7 +305,7 @@ class _BusesByCityState extends State<BusesByCity> {
       suggestions.add(city);
     });
     return Container(
-      width: 240,
+      width: 205,
       child: _textField = AutoCompleteTextField<String>(
         key: _textFieldKey,
         clearOnSubmit: false,
