@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 
+// A model that represents service at Bar Ilan University. 
 class Service {
+  // The id of the service at the database.
   final String id;
+  // The type of the service (for example: Academic Service)
   final String type;
+  // The subtype of the service (for example: library is a subtype of Academic Service)
   final String subtype;
+  // The general location (area) of the service (for example: building 304).
   final String area;
+  // Whether the service is inside the area or around it.
   final bool isInArea;
+  // The specific location of the service (for example: floor 1, room 101).
   final String specificLocation;
 
   Service(
@@ -41,8 +48,11 @@ class Service {
   }
 }
 
+// A model that represents a machine service at Bar Ilan University. 
 class MachineService extends Service {
+  // The availability of the machine - whether it is active or not.
   bool availability;
+  // The date of the last report about the availability of the machine.
   String availabilityReportDate;
 
   MachineService(
@@ -79,9 +89,13 @@ class MachineService extends Service {
   }
 }
 
+// A model that represents a refrigerator machine.
 class RefrigeratorService extends MachineService {
+  // Whether the refrigerator contains a milk or not.
   bool milk;
+  // The date of the last report about the availability of the milk.
   String milkReportDate;
+  // The time of the last report about the availability of the milk.
   String milkReportTime;
   RefrigeratorService(
       {@required String id,
@@ -130,8 +144,10 @@ class RefrigeratorService extends MachineService {
   }
 }
 
+// A model that represents welfare service at Bar Ilan University. 
 class WelfareService extends Service {
   @required
+  // What does the welfare service contains.
   List<String> contains;
   WelfareService(
       {@required String id,
@@ -154,10 +170,15 @@ class WelfareService extends Service {
   }
 }
 
+// A model that represents business at Bar Ilan University. 
 class BusinessService extends Service {
+  // The name of the business.
   String name = "";
+  // The activity time of the business.
   String activityTime = "";
+  // The phone number time of the business.
   String phoneNumber = "";
+  // A general information about the business.
   String generalInfo = "";
 
   BusinessService(
@@ -196,11 +217,17 @@ class BusinessService extends Service {
   }
 }
 
+// A model that represents academic service at Bar Ilan University. 
 class AcademicService extends Service {
+  // The name of the academic service.
   String name = "";
+  // The activity time of the academic service.
   String activityTime = "";
+  // The phone number of the academic service.
   String phoneNumber = "";
+  // The mail of the academic service.
   String mail = "";
+  // The website of the academic service.
   String website = "";
 
   AcademicService(
@@ -244,12 +271,19 @@ class AcademicService extends Service {
   }
 }
 
+// A model that represents prayer service at Bar Ilan University. 
 class PrayerService extends Service {
+  // The schedule of Shacharit prayers in winter.
   String shacharitPrayersWinter;
+  // The schedule of Mincha prayers in winter.
   String minchaPrayersWinter;
+  // The schedule of Arvit prayers in winter.
   String arvitPrayersWinter;
+  // The schedule of Shacharit prayers in summer.
   String shacharitPrayersSummer;
+  // The schedule of Mincha prayers in summer.
   String minchaPrayersSummer;
+  // The schedule of Arvit prayers in summer.
   String arvitPrayersSummer;
   PrayerService({
     @required String id,
@@ -297,9 +331,13 @@ class PrayerService extends Service {
   }
 }
 
+// A model that represents computers lab service at Bar Ilan University. 
 class ComputersLabService extends Service {
+  // The activity time of the computers lab.
   String activityTime = "";
+  // The phone number of the computers lab.
   String phoneNumber = "";
+  // The mail of the computers lab.
   String mail = "";
   ComputersLabService(
       {@required String id,
@@ -332,11 +370,17 @@ class ComputersLabService extends Service {
   }
 }
 
+// A model that represents security service at Bar Ilan University. 
 class SecurityService extends Service {
+  // The activity time of the security service at weekdays.
   String weekdaysActivityTime = "";
+  // The activity time of the security service at Fridays.
   String fridaysActivityTime = "";
+  // The activity time of the security service at Saturdays.
   String saturdaysActivityTime = "";
+  // The phone number of the security service.
   String phoneNumber = "";
+  // The emergency phone numbe of the security service.
   String emergencyPhoneNumber = "";
 
   SecurityService({
