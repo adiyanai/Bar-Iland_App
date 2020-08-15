@@ -109,6 +109,8 @@ class UserModel extends Model {
         if (!successInformation['success']) {
           _authenticatedUser = null;
           notifyListeners();
+        } else {
+          _connectionMode = ConnectionMode.RegisteredUser;
         }
         return;
       }
