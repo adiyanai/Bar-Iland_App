@@ -178,7 +178,6 @@ class EventsModel extends Model {
       _eventTypes.add('אירוע כללי');
       _isEventTypeLoading = false;
       notifyListeners();
-      //_selEventId = null;
     }).catchError((error) {
       _isEventTypeLoading = false;
       notifyListeners();
@@ -219,7 +218,6 @@ class EventsModel extends Model {
       _eventsLocations = fetchedEventsLocations;
       _isEventsLocationsLoading = false;
       notifyListeners();
-      //_selEventId = null;
     }).catchError((error) {
       _isEventsLocationsLoading = false;
       notifyListeners();
