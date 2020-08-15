@@ -1,13 +1,22 @@
 import 'package:flutter/material.dart';
 
+// A model that represents a lost item or a found item at Bar Ilan University. 
 class LostFound {
+  // The id of the lost item or the found item at the database.
   final String id;
+  // Whether it is a lost item or a found item.
   final String type;
+  // The type of the lost item or the found item (such as bag, clock, jewel, etc).
   final String subtype;
+  // The name of the reporter.
   final String name;
+  // The phone number of the reporter.
   final String phoneNumber;
+  // The description of the lost item or the found item.
   final String description;
+  // The reporting date.
   final String reportDate;
+  // The URL of the image of the lost item or the found item at the cloud storage.
   final String imageUrl;
 
   LostFound(
@@ -54,6 +63,7 @@ class LostFound {
 }
 
 class Lost extends LostFound {
+  // List of optional locations that the lost item may be in.
   List<String> optionalLocations = [];
   Lost({
     @required id,
@@ -82,7 +92,9 @@ class Lost extends LostFound {
 }
 
 class Found extends LostFound {
+  // The general location (area) of the found item (for example: building 304).
   final String area;
+  // The specific location of the found item (for example: floor 1, room 101).
   final String specificLocation;
 
   Found({

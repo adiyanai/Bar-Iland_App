@@ -1,13 +1,22 @@
 import 'package:flutter/material.dart';
 
+// A model that represents parking at Bar Ilan University or around it. 
 class Parking {
+  // The id of the parking at the database.
   final String id;
+  // The name of the parking, (for example: Wohl parking).
   final String name;
+  // The location of the parking, (for example: Wohl parking).
   final String location;
+  // The closest gate to the parking.
   final String closestGate;
+  // The price of the parking.
   final String price;
-  final String lat;
+  // The lon of the location.
   final String lon;
+  // The lat of the location.
+  final String lat;
+  
   Parking({
     @required this.id,
     @required this.name,
