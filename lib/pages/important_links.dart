@@ -20,7 +20,6 @@ class ImportantLinks extends StatefulWidget {
 
 class _ImportantLinksState extends State<ImportantLinks> {
   Map<String, SplayTreeMap<String, List<Degree>>> _allData = {};
-  ScrollController _scrollController = ScrollController();
   @override
   void initState() {
     super.initState();
@@ -99,14 +98,6 @@ class _ImportantLinksState extends State<ImportantLinks> {
           color: Color.fromRGBO(200, 230, 230, 0.5),
         ),
         child: ExpansionTile(
-          onExpansionChanged: (expanded) {
-            _scrollController
-                .jumpTo(_scrollController.position.maxScrollExtent + 50);
-            _scrollController.animateTo(
-                _scrollController.position.maxScrollExtent + 50,
-                duration: Duration(milliseconds: 1000),
-                curve: Curves.fastLinearToSlowEaseIn);
-          },
           leading: _mapFacultiesTypesToIcons()[faculty_type],
           backgroundColor: Color.fromRGBO(220, 250, 250, 0.1),
           title: Text(
@@ -192,7 +183,6 @@ class _ImportantLinksState extends State<ImportantLinks> {
                     child: CircularProgressIndicator(),
                   )
                 : ListView(
-                    controller: _scrollController,
                     children: _buildFacultiesFolders(_allData),
                   )
           ],
