@@ -46,6 +46,7 @@ class _BusesByCityState extends State<BusesByCity> {
     super.initState();
   }
 
+  // create map that maps from station to the buses that belongs to her
   Map<String, List<Bus>> _createStationBusesMap(List<Bus> busesList) {
     final Map<String, List<Bus>> stationToBuses = {};
     // go over all the buses
@@ -64,6 +65,7 @@ class _BusesByCityState extends State<BusesByCity> {
     return stationToBuses;
   }
 
+  // sort buses by number
   void _sortBusesByNumber(List<Bus> busesList) {
     busesList.sort((bus1, bus2) {
       int numberBus1, numberBus2;
@@ -81,6 +83,7 @@ class _BusesByCityState extends State<BusesByCity> {
     });
   }
 
+  // launch url
   void _launchURL(String url) async {
     if (await canLaunch(url)) {
       await launch(url);
@@ -89,7 +92,9 @@ class _BusesByCityState extends State<BusesByCity> {
     }
   }
 
+  // build the List of all the relevant buses
   Widget _createBusesList(List<Bus> busesList) {
+    // create map that maps from station to the buses that belongs to her
     Map<String, List<Bus>> stationBusesMap = _createStationBusesMap(busesList);
 
     return Container(
@@ -97,6 +102,7 @@ class _BusesByCityState extends State<BusesByCity> {
       child: Column(
         children: (stationBusesMap.keys).map((station) {
           List<Bus> busesInStation = stationBusesMap[station];
+          // sort buses by number
           _sortBusesByNumber(busesInStation);
           Station stationData;
           // find the station data by the station's number
@@ -106,6 +112,7 @@ class _BusesByCityState extends State<BusesByCity> {
               break;
             }
           }
+          // buses UI
           List<Widget> busesUI = [
             SizedBox(
               height: 20,
@@ -156,6 +163,7 @@ class _BusesByCityState extends State<BusesByCity> {
                             ',' +
                             stationData.Lon +
                             '&travelmode=walking';
+                    // launch url to Google Maps
                     _launchURL(url);
                   },
                 ),
@@ -235,6 +243,7 @@ class _BusesByCityState extends State<BusesByCity> {
                                   color: Colors.blue,
                                   decoration: TextDecoration.underline,
                                 ),
+                                // launch url to moovit
                                 recognizer: TapGestureRecognizer()
                                   ..onTap = () {
                                     _launchURL(bus.MoovitUrl);
@@ -254,6 +263,7 @@ class _BusesByCityState extends State<BusesByCity> {
     );
   }
 
+  // build show buses by city
   Widget _showBusesByCity(String city, List<Bus> buses) {
     if (city == "") {
       return Column();
@@ -275,9 +285,11 @@ class _BusesByCityState extends State<BusesByCity> {
         }
       }
     }
+    // if the search button doesn't press
     if (!_isSearchPressed) {
       return Column();
     }
+    // if the city the user picked doesn't has any buses
     if (busesInCity.length == 0) {
       return Center(
         child: Container(
@@ -296,9 +308,11 @@ class _BusesByCityState extends State<BusesByCity> {
         ),
       );
     }
+    // build the List of all the relevant buses
     return _createBusesList(busesInCity);
   }
 
+  // build AutoCompleteTextField for the city pick
   Widget _buildAutoCompleteTextField() {
     List<String> suggestions = [];
     _allCities.forEach((city) {
@@ -373,7 +387,9 @@ class _BusesByCityState extends State<BusesByCity> {
     );
   }
 
+  // when pressed show all the relevant buses for the city the user picked
   void _searchPress() {
+    // change the title to be the city the user picked
     _title = Container(
       width: 600,
       height: 50,
@@ -402,6 +418,7 @@ class _BusesByCityState extends State<BusesByCity> {
     _searchButtonColor = Colors.grey;
   }
 
+  // build the buses by city search option
   Widget _busesByCitySearch() {
     return Container(
       decoration: BoxDecoration(
@@ -419,6 +436,7 @@ class _BusesByCityState extends State<BusesByCity> {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
+          // build AutoCompleteTextField for the city pick
           _buildAutoCompleteTextField(),
           Container(
             width: 45,
@@ -436,6 +454,7 @@ class _BusesByCityState extends State<BusesByCity> {
                       color: Colors.white,
                     ),
                   ),
+                  // when pressed show all the relevant buses for the city the user picked
                   onPressed: () {
                     setState(() {
                       _searchPress();
@@ -448,7 +467,9 @@ class _BusesByCityState extends State<BusesByCity> {
     );
   }
 
+  // start build the page
   Widget _buildBusesByCityPage(List<Bus> buses) {
+    // build the ListView of all the relevant buses if the user picked a city
     _busesListView = ListView(
       controller: _scrollController,
       children: <Widget>[
@@ -461,6 +482,7 @@ class _BusesByCityState extends State<BusesByCity> {
     return Stack(
       children: <Widget>[
         Container(
+          // build background image
           decoration: new BoxDecoration(
             image: new DecorationImage(
               image: new AssetImage("assets/buses.png"),
@@ -471,12 +493,15 @@ class _BusesByCityState extends State<BusesByCity> {
           ),
           padding: EdgeInsets.fromLTRB(0, 148, 0, 0),
           height: 600,
+          // build the buses ListView (empty if the user doesn't pick a city)
           child: Scrollbar(
             controller: _scrollController,
             child: _busesListView,
           ),
         ),
+        // title - the name of the city that picked
         _title,
+        // build the buses by city search option
         _busesByCitySearch(),
       ],
     );
@@ -487,15 +512,18 @@ class _BusesByCityState extends State<BusesByCity> {
     return ScopedModelDescendant<MainModel>(
       builder: (BuildContext context, Widget child, MainModel model) {
         Widget content;
+        // if finished loading all the data build the page
         if (!model.isBusesLoading || !model.isStationsLoading) {
           _allCities = model.busesLocations;
           _allStations = model.allStations;
           content = _buildBusesByCityPage(model.allBuses);
+        // else, show meanwhile a CircularProgressIndicator
         } else if (model.isBusesLoading) {
           content = Center(child: CircularProgressIndicator());
         }
         return content;
       },
     );
+
   }
 }

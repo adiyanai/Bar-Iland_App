@@ -31,6 +31,7 @@ class _ShuttlesState extends State<Shuttles> {
     super.initState();
   }
 
+  // lunch url
   void _launchURL(String url) async {
     if (await canLaunch(url)) {
       await launch(url);
@@ -39,6 +40,7 @@ class _ShuttlesState extends State<Shuttles> {
     }
   }
 
+  // create navigation button
   IconButton _createNavigationButton() {
     return IconButton(
       padding: EdgeInsets.all(5),
@@ -47,6 +49,7 @@ class _ShuttlesState extends State<Shuttles> {
         color: _canPress ? Colors.white : Colors.black,
       ),
       onPressed: () async {
+        // if the user choose a vaild number station nevigate to her location
         if (_canPress) {
           LocationData userLocation = await _location.getLocation();
           List<ShuttleStation> stations = widget.model.allShuttleStations;
@@ -69,12 +72,14 @@ class _ShuttlesState extends State<Shuttles> {
               ',' +
               stationLon +
               '&travelmode=walking';
+          // launch url to Google Maps
           _launchURL(url);
         }
       },
     );
   }
 
+  // create station number TextField
   TextField _createStationNumberTextField() {
     return TextField(
       inputFormatters: <TextInputFormatter>[
@@ -140,6 +145,7 @@ class _ShuttlesState extends State<Shuttles> {
       textDirection: TextDirection.rtl,
       child: ScopedModelDescendant<MainModel>(
         builder: (BuildContext context, Widget child, MainModel model) {
+          // if finished loading all the data build the page
           return model.isShuttleStationsLoading
               ? Center(
                   child: CircularProgressIndicator(),
@@ -148,7 +154,7 @@ class _ShuttlesState extends State<Shuttles> {
                   color: Colors.white,
                   child: Stack(
                     children: <Widget>[
-                      // background map image
+                      // build background map image
                       Positioned(
                         bottom: 0,
                         child: Container(
@@ -175,7 +181,7 @@ class _ShuttlesState extends State<Shuttles> {
                                 Container(
                                   height: 45,
                                   width: 150,
-                                  // Enter station number TextField
+                                  // create station number TextField
                                   child: _createStationNumberTextField(),
                                 ),
                                 SizedBox(
@@ -190,7 +196,7 @@ class _ShuttlesState extends State<Shuttles> {
                                         : Colors.grey[400],
                                     borderRadius: BorderRadius.circular(2),
                                   ),
-                                  // navigation button
+                                  // create navigation button
                                   child: _createNavigationButton(),
                                 ),
                               ],
@@ -214,6 +220,7 @@ class _ShuttlesState extends State<Shuttles> {
                                 color: Colors.white,
                                 size: 24,
                               ),
+                              // when pressed go to the shuttle timetable page
                               onPressed: () {
                                 Navigator.pushNamed(
                                     context, '/shuttleTimetable');
