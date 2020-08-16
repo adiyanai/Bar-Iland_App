@@ -9,7 +9,9 @@ class ServiceManager extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Fetch all the possible locations of the services on Bar Ilan University.
     model.fetchServicesLocations();
+    // Fetch all the services on Bar Ilan University.
     model.fetchServices();
     return DefaultTabController(
       length: 2,

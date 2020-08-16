@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
+// This file contains functions that create widgets for the services page.
+
 Map<String, Icon> mapToIcons() {
   Map<String, Icon> servicesIcons = {
     "חדר רווחה": Icon(ServicesIcons.armchair, size: 20),
@@ -52,6 +54,7 @@ Map<String, Icon> mapToIcons() {
   return servicesIcons;
 }
 
+  // Launch the specified URL if it can be handled by some app installed on the device.
 _launchURL(String url) async {
   if (await canLaunch(url)) {
     await launch(url);
@@ -60,6 +63,7 @@ _launchURL(String url) async {
   }
 }
 
+// Launch the specified caller if it can be handled by some app installed on the device.
 _launchCaller(String phoneNumber) async {
   String url = "tel:$phoneNumber";
   if (await canLaunch(url)) {
@@ -69,6 +73,7 @@ _launchCaller(String phoneNumber) async {
   }
 }
 
+// Launch the specified mail if it can be handled by some app installed on the device.
 _launchMail(String mail) async {
   String url = "mailto:$mail";
   if (await canLaunch(url)) {
@@ -78,6 +83,7 @@ _launchMail(String mail) async {
   }
 }
 
+// Build businesses content. 
 List<Widget> businessesContent(Service service) {
   BusinessService business = service;
   Map<String, Widget> businessInfo = Map<String, Widget>();
@@ -119,6 +125,7 @@ List<Widget> businessesContent(Service service) {
   }).toList();
 }
 
+// Build welfare services content. 
 List<Widget> welfareContent(Service service) {
   WelfareService welfareRoom = service;
   return welfareRoom.Contains.map((containedService) {
@@ -137,6 +144,7 @@ List<Widget> welfareContent(Service service) {
   }).toList();
 }
 
+// Build academic services content. 
 List<Widget> academicServicesContent(Service service) {
   AcademicService academicService = service;
   Map<String, Widget> academicServiceInfo = Map<String, Widget>();
@@ -205,6 +213,7 @@ List<Widget> academicServicesContent(Service service) {
   }).toList();
 }
 
+// Build prayer services content.
 List<Widget> prayerServicesContent(Service service) {
   PrayerService prayerService = service;
   Map<String, Container> prayerServiceInfo = Map<String, Container>();
@@ -239,6 +248,7 @@ List<Widget> prayerServicesContent(Service service) {
   ];
 }
 
+// Build prayers info.
 Map<String, Container> prayersInfo(
     Map<String, Container> prayerServiceInfo,
     String clock,
@@ -298,6 +308,7 @@ Map<String, Container> prayersInfo(
   return prayerServiceInfo;
 }
 
+// Build computers labs content.
 List<Widget> computersLabsContent(service) {
   ComputersLabService computersLab = service;
   Map<String, Widget> computersLabInfo = Map<String, Widget>();
@@ -349,6 +360,7 @@ List<Widget> computersLabsContent(service) {
   ];
 }
 
+// Build security services content.
 List<Widget> securityServicesContent(service) {
   SecurityService securityService = service;
   Map<String, Widget> securityServiceInfo = Map<String, Widget>();

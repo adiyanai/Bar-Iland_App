@@ -4,8 +4,8 @@ import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:location/location.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:scoped_model/scoped_model.dart';
-import 'package:bar_iland_app/scoped-models/main.dart';
 
+// class Parkings is responsible for the view of the parkings page.
 class Parkings extends StatefulWidget {
   final MainModel model;
   Parkings(this.model);
@@ -32,6 +32,7 @@ class _ParkingsState extends State<Parkings> {
       Widget content;
       if (!model.isParkingsLoading) {
         content = Container(
+          // The background of the page.
           decoration: BoxDecoration(
             image: DecorationImage(
               image: AssetImage("assets/parkings.jpg"),
@@ -57,6 +58,7 @@ class _ParkingsState extends State<Parkings> {
                             color: Color.fromRGBO(0, 0, 220, 1),
                           ),
                         ),
+                        // The name of the parking.
                         Text(
                           parking.Name,
                           style: TextStyle(
@@ -64,6 +66,7 @@ class _ParkingsState extends State<Parkings> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
+                        // Navigation button
                         IconButton(
                           icon: Icon(
                             Icons.near_me,
@@ -94,6 +97,7 @@ class _ParkingsState extends State<Parkings> {
                     color: Color.fromRGBO(190, 230, 250, 0.5),
                     child: Column(
                       children: <Widget>[
+                        //The location of the parking.
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
@@ -109,6 +113,7 @@ class _ParkingsState extends State<Parkings> {
                           ],
                         ),
                         SizedBox(height: 10),
+                        // The price of the parking.
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
@@ -124,6 +129,7 @@ class _ParkingsState extends State<Parkings> {
                           ],
                         ),
                         SizedBox(height: 10),
+                        // The closest gate to the parking.
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
@@ -148,6 +154,7 @@ class _ParkingsState extends State<Parkings> {
           ),
         );
       } else {
+        // UI of loading.
         content = Container(
             decoration: new BoxDecoration(
               image: new DecorationImage(
@@ -160,7 +167,8 @@ class _ParkingsState extends State<Parkings> {
       return content;
     });
   }
-
+  
+  // Launch the specified URL if it can be handled by some app installed on the device.
   void _launchURL(String url) async {
     if (await canLaunch(url)) {
       await launch(url);

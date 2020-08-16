@@ -10,6 +10,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 
 import '../scoped-models/main.dart';
 
+// class AddFound is responsible for the view of adding found item page.
 class AddFound extends StatefulWidget {
   final MainModel model;
   AddFound(this.model);
@@ -47,20 +48,26 @@ class _AddFoundState extends State<AddFound> {
   Future<File> _futureImageFile;
   File _imageFile;
   String _imageUrl = "";
-  Widget _image = Container(
-    padding: EdgeInsets.only(right: 15),
-    child: Center(
-      child: Text(
-        "צלמ/י את המציאה על מנת להקל על המאבד/ת למצוא אותה.",
-        style: TextStyle(fontSize: 16),
-      ),
-    ),
-  );
+  Widget _image;
   bool _isAddFoundLoading = false;
 
   @override
   void initState() {
     super.initState();
+    _image = initialImageContainer();
+  }
+
+  // The UI of the initial container of the image.
+  Widget initialImageContainer() {
+    return Container(
+      padding: EdgeInsets.only(right: 15),
+      child: Center(
+        child: Text(
+          "צלמ/י את המציאה על מנת להקל על המאבד/ת למצוא אותה.",
+          style: TextStyle(fontSize: 16),
+        ),
+      ),
+    );
   }
 
   @override
@@ -79,37 +86,40 @@ class _AddFoundState extends State<AddFound> {
         body: ScopedModelDescendant<MainModel>(
           builder: (BuildContext context, Widget child, MainModel model) {
             return SingleChildScrollView(
-                child: Container(
-              height: MediaQuery.of(context).size.height - 80,
-              width: MediaQuery.of(context).size.width,
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage('assets/lost_found.jpg'),
-                  fit: BoxFit.fill,
-                  colorFilter: ColorFilter.mode(
-                    Colors.black.withOpacity(0.7),
-                    BlendMode.dstATop,
+              child: Container(
+                height: MediaQuery.of(context).size.height - 80,
+                width: MediaQuery.of(context).size.width,
+                // The background of the page.
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage('assets/lost_found.jpg'),
+                    fit: BoxFit.fill,
+                    colorFilter: ColorFilter.mode(
+                      Colors.black.withOpacity(0.7),
+                      BlendMode.dstATop,
+                    ),
                   ),
                 ),
+                padding: EdgeInsets.all(10.0),
+                child: GestureDetector(
+                  onTap: () {
+                    FocusScope.of(context).requestFocus(FocusNode());
+                  },
+                  child: widget.model.isFoundLoading || _isAddFoundLoading
+                      ? Center(
+                          child: CircularProgressIndicator(),
+                        )
+                      : _buildPageContent(),
+                ),
               ),
-              padding: EdgeInsets.all(10.0),
-              child: GestureDetector(
-                onTap: () {
-                  FocusScope.of(context).requestFocus(FocusNode());
-                },
-                child: widget.model.isFoundLoading || _isAddFoundLoading
-                    ? Center(
-                        child: CircularProgressIndicator(),
-                      )
-                    : _buildPageContent(),
-              ),
-            ));
+            );
           },
         ),
       ),
     );
   }
-
+  
+  // Build the content of the page.
   Widget _buildPageContent() {
     return Stack(children: [
       Container(
@@ -122,7 +132,8 @@ class _AddFoundState extends State<AddFound> {
       ),
     ]);
   }
-
+  
+  // Build the content of the current page.
   Widget _currentPageContent() {
     switch (_pageTitle) {
       case "סוג המציאה":
@@ -144,7 +155,8 @@ class _AddFoundState extends State<AddFound> {
         return Container();
     }
   }
-
+  
+  // The content of the page that enables the user to report about the type of the found item.
   Widget _foundTypeContent() {
     return Scrollbar(
       isAlwaysShown: true,
@@ -168,6 +180,7 @@ class _AddFoundState extends State<AddFound> {
     );
   }
 
+  // The content of the page that enables the user to write more details about the found item.
   Widget _moreDetailsContent() {
     return Container(
       height: MediaQuery.of(context).size.height / 1.4,
@@ -186,6 +199,7 @@ class _AddFoundState extends State<AddFound> {
     );
   }
 
+  // The content of the page that enables the user to write his contact details.
   Widget _contactDetailsContent() {
     return Container(
       height: MediaQuery.of(context).size.height / 1.4,
@@ -203,6 +217,7 @@ class _AddFoundState extends State<AddFound> {
     );
   }
 
+  // The content of the page that enables the user to report about the location of the found item.
   Widget _locationContent() {
     List<String> lostFoundLocations = [];
     widget.model.LostFoundLocations.forEach((location) {
@@ -242,12 +257,14 @@ class _AddFoundState extends State<AddFound> {
     );
   }
 
+  // This function enables the user to add a photo of the found item.
   void _cameraPhoto(ImageSource source) {
     setState(() {
       _futureImageFile = ImagePicker.pickImage(source: source);
     });
   }
-
+  
+  // Showing the image that the user added.
   Widget _showImage() {
     return FutureBuilder<File>(
         future: _futureImageFile,
@@ -267,15 +284,7 @@ class _AddFoundState extends State<AddFound> {
                       label: Text("הסרת התמונה"),
                       onPressed: () {
                         setState(() {
-                          _image = Container(
-                            padding: EdgeInsets.only(right: 15),
-                            child: Center(
-                              child: Text(
-                                "צלמ/י את המציאה על מנת להקל על המאבד/ת למצוא אותה.",
-                                style: TextStyle(fontSize: 16),
-                              ),
-                            ),
-                          );
+                          _image = initialImageContainer();
                         });
                       },
                     ),
@@ -288,18 +297,11 @@ class _AddFoundState extends State<AddFound> {
               ],
             );
           } else
-            return Container(
-              padding: EdgeInsets.only(right: 15),
-              child: Center(
-                child: Text(
-                  "צלמ/י את המציאה על מנת להקל על המאבד/ת למצוא אותה.",
-                  style: TextStyle(fontSize: 16),
-                ),
-              ),
-            );
+            return initialImageContainer();
         });
   }
 
+  // The content of the page that enables the user to add a photo of the found item.
   Widget _addingPictureContent() {
     return Container(
       height: MediaQuery.of(context).size.height / 1.4,
@@ -324,7 +326,8 @@ class _AddFoundState extends State<AddFound> {
       ),
     );
   }
-
+  
+  // A form field for the name of the reporter.
   Widget _nameFormField() {
     return Container(
       width: 320,
@@ -362,6 +365,7 @@ class _AddFoundState extends State<AddFound> {
     );
   }
 
+  // A form field for the phone number of the reporter.
   Widget _phoneNumberFormField() {
     return Container(
       width: 320,
@@ -397,7 +401,8 @@ class _AddFoundState extends State<AddFound> {
       ),
     );
   }
-
+  
+  // A form field for the description of the found item.
   Widget _descriptionFormField() {
     return Container(
       width: 320,
@@ -423,7 +428,8 @@ class _AddFoundState extends State<AddFound> {
           }),
     );
   }
-
+  
+  // A form field for the specific location of the found item.
   Widget _specificLocationFormField() {
     return Container(
       width: 320,
@@ -447,7 +453,8 @@ class _AddFoundState extends State<AddFound> {
           }),
     );
   }
-
+  
+  // Whether the reporter wants to take the found item with him or not.
   Widget _isTakenOrNot() {
     return Column(children: [
       Container(
@@ -476,7 +483,8 @@ class _AddFoundState extends State<AddFound> {
       )
     ]);
   }
-
+  
+  // Build the navigation buttons between the different reporting pages.
   Widget _navigationButtons() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -574,7 +582,8 @@ class _AddFoundState extends State<AddFound> {
       ],
     );
   }
-
+  
+  // Add the found item to the database.
   void _addFoundToDatabase() async {
     if (_imageFile != null) {
       _isAddFoundLoading = true;
@@ -594,7 +603,8 @@ class _AddFoundState extends State<AddFound> {
     Navigator.pop(context);
     _isAddFoundLoading = false;
   }
-
+  
+  // A note for the user that all the details he writes will be displayed in the application.
   Widget _note() {
     return Container(
       margin: EdgeInsets.fromLTRB(0, 80, 20, 0),
@@ -634,7 +644,8 @@ class _AddFoundState extends State<AddFound> {
       ),
     );
   }
-
+  
+  // Build the UI of the next button.
   void _nextButtonView(String pageTitle) {
     switch (pageTitle) {
       case "סוג המציאה":
@@ -683,6 +694,7 @@ class _AddFoundState extends State<AddFound> {
     }
   }
 
+  // Change the focus to the next field.
   _fieldFocusChange(
       BuildContext context, FocusNode currentFocus, FocusNode nextFocus) {
     currentFocus.unfocus();

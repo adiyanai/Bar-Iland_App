@@ -10,6 +10,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 
 import '../scoped-models/main.dart';
 
+// class AddLost is responsible for the view of adding lost item page.
 class AddLost extends StatefulWidget {
   final MainModel model;
   AddLost(this.model);
@@ -43,17 +44,23 @@ class _AddLostState extends State<AddLost> {
   Future<File> _futureImageFile;
   File _imageFile;
   String _imageUrl = "";
-  Widget _image = Container(
-    child: Center(
-      child: Text("אם ברשותך תמונה של האבידה, צרפ/י אותה כאן.",
-          style: TextStyle(fontSize: 16)),
-    ),
-  );
+  Widget _image;
   bool _isAddLostLoading = false;
 
   @override
   void initState() {
     super.initState();
+    _image = initialImageContainer();
+  }
+
+  // The UI of the initial container of the image.
+  Widget initialImageContainer() {
+    return Container(
+      child: Center(
+        child: Text("אם ברשותך תמונה של האבידה, צרפ/י אותה כאן.",
+            style: TextStyle(fontSize: 16)),
+      ),
+    );
   }
 
   @override
@@ -72,37 +79,40 @@ class _AddLostState extends State<AddLost> {
         body: ScopedModelDescendant<MainModel>(
           builder: (BuildContext context, Widget child, MainModel model) {
             return SingleChildScrollView(
-                child: Container(
-              height: MediaQuery.of(context).size.height - 80,
-              width: MediaQuery.of(context).size.width,
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage('assets/lost_found.jpg'),
-                  fit: BoxFit.fill,
-                  colorFilter: ColorFilter.mode(
-                    Colors.black.withOpacity(0.7),
-                    BlendMode.dstATop,
+              child: Container(
+                height: MediaQuery.of(context).size.height - 80,
+                width: MediaQuery.of(context).size.width,
+                decoration: BoxDecoration(
+                  // The background of the page.
+                  image: DecorationImage(
+                    image: AssetImage('assets/lost_found.jpg'),
+                    fit: BoxFit.fill,
+                    colorFilter: ColorFilter.mode(
+                      Colors.black.withOpacity(0.7),
+                      BlendMode.dstATop,
+                    ),
                   ),
                 ),
+                padding: EdgeInsets.all(10.0),
+                child: GestureDetector(
+                  onTap: () {
+                    FocusScope.of(context).requestFocus(FocusNode());
+                  },
+                  child: widget.model.isLostLoading || _isAddLostLoading
+                      ? Center(
+                          child: CircularProgressIndicator(),
+                        )
+                      : _buildPageContent(),
+                ),
               ),
-              padding: EdgeInsets.all(10.0),
-              child: GestureDetector(
-                onTap: () {
-                  FocusScope.of(context).requestFocus(FocusNode());
-                },
-                child: widget.model.isLostLoading || _isAddLostLoading
-                    ? Center(
-                        child: CircularProgressIndicator(),
-                      )
-                    : _buildPageContent(),
-              ),
-            ));
+            );
           },
         ),
       ),
     );
   }
 
+  // Build the content of the page.
   Widget _buildPageContent() {
     return Stack(children: [
       Container(
@@ -116,6 +126,7 @@ class _AddLostState extends State<AddLost> {
     ]);
   }
 
+  // Build the content of the current page.
   Widget _currentPageContent() {
     switch (_pageTitle) {
       case "סוג האבידה":
@@ -135,6 +146,7 @@ class _AddLostState extends State<AddLost> {
     }
   }
 
+  // The content of the page that enables the user to report about the type of the lost item.
   Widget _lostTypeContent() {
     return Scrollbar(
       isAlwaysShown: true,
@@ -157,7 +169,8 @@ class _AddLostState extends State<AddLost> {
       ]),
     );
   }
-
+  
+  // The content of the page that enables the user to write more details about the found item.
   Widget _moreDetailsContent() {
     return Container(
       height: MediaQuery.of(context).size.height / 1.4,
@@ -175,7 +188,8 @@ class _AddLostState extends State<AddLost> {
       ),
     );
   }
-
+  
+    // The content of the page that enables the user to choose possible locations that the lost item may be in.
   Widget _possibleLocationsContent() {
     List<String> lostFoundLocations = [];
     widget.model.LostFoundLocations.forEach((location) {
@@ -217,13 +231,15 @@ class _AddLostState extends State<AddLost> {
       ),
     );
   }
-
+  
+  // This function enables the user to add a photo of the lost item.
   void _pickImageFromGallery(ImageSource source) {
     setState(() {
       _futureImageFile = ImagePicker.pickImage(source: source);
     });
   }
-
+  
+  // Showing the image that the user added.
   Widget _showImage() {
     return FutureBuilder<File>(
         future: _futureImageFile,
@@ -243,13 +259,7 @@ class _AddLostState extends State<AddLost> {
                       label: Text("הסרת התמונה"),
                       onPressed: () {
                         setState(() {
-                          _image = Container(
-                            child: Center(
-                              child: Text(
-                                  "אם ברשותך תמונה של האבידה, צרפ/י אותה כאן.",
-                                  style: TextStyle(fontSize: 16)),
-                            ),
-                          );
+                          _image = initialImageContainer();
                         });
                       },
                     ),
@@ -262,15 +272,11 @@ class _AddLostState extends State<AddLost> {
               ],
             );
           } else
-            return Container(
-              child: Center(
-                child: Text("אם ברשותך תמונה של האבידה, צרפ/י אותה כאן.",
-                    style: TextStyle(fontSize: 16)),
-              ),
-            );
+            return initialImageContainer();
         });
   }
-
+  
+  // The content of the page that enables the user to add a photo of the lost item.
   Widget _addingPictureContent() {
     return Container(
       height: MediaQuery.of(context).size.height / 1.4,
@@ -295,7 +301,8 @@ class _AddLostState extends State<AddLost> {
       ),
     );
   }
-
+ 
+  // A form field for the name of the reporter.
   Widget _nameFormField() {
     return Container(
       width: 320,
@@ -332,7 +339,8 @@ class _AddLostState extends State<AddLost> {
       ),
     );
   }
-
+  
+  // A form field for the phone number of the reporter.
   Widget _phoneNumberFormField() {
     return Container(
       width: 320,
@@ -368,7 +376,8 @@ class _AddLostState extends State<AddLost> {
       ),
     );
   }
-
+  
+  // A form field for the description of the found item.
   Widget _descriptionFormField() {
     return Container(
       width: 320,
@@ -394,7 +403,8 @@ class _AddLostState extends State<AddLost> {
           }),
     );
   }
-
+  
+  // Build the navigation buttons between the different reporting pages.
   Widget _navigationButtons() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -476,7 +486,8 @@ class _AddLostState extends State<AddLost> {
       ],
     );
   }
-
+  
+  // Add the lost item to the database.
   void _addLostToDatabase() async {
     if (_imageFile != null) {
       _isAddLostLoading = true;
@@ -493,7 +504,8 @@ class _AddLostState extends State<AddLost> {
     _isAddLostLoading = false;
     Navigator.pop(context);
   }
-
+  
+  // A note for the user that all the details he writes will be displayed in the application.
   Widget _note() {
     return Container(
       margin: EdgeInsets.fromLTRB(0, 80, 20, 0),
@@ -533,7 +545,8 @@ class _AddLostState extends State<AddLost> {
       ),
     );
   }
-
+  
+  // Build the UI of the next button.
   void _nextButtonView(String pageTitle) {
     switch (pageTitle) {
       case "סוג האבידה":
@@ -565,7 +578,8 @@ class _AddLostState extends State<AddLost> {
         _nextButtonColor = Colors.blue;
     }
   }
-
+  
+  // Change the focus to the next field. 
   _fieldFocusChange(
       BuildContext context, FocusNode currentFocus, FocusNode nextFocus) {
     currentFocus.unfocus();

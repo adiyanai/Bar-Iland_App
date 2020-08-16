@@ -9,6 +9,7 @@ import 'package:scoped_model/scoped_model.dart';
 import 'package:bar_iland_app/scoped-models/main.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+// class LostFoundBoard is responsible for the view of the lost items board and to the found items board.
 class LostFoundBoard extends StatefulWidget {
   final MainModel model;
   final String lostOrFoundItems;
@@ -181,8 +182,10 @@ class _LostFoundBoardState extends State<LostFoundBoard> {
       return content;
     });
   }
-
+  
+  // Filter the items by a specified type.
   List<LostFound> _filterItems() {
+    // lost items
     if (_lostOrFoundItems == "אבידות") {
       if (!_filteredView) {
         return widget.model.LostItems;
@@ -404,7 +407,8 @@ class _LostFoundBoardState extends State<LostFoundBoard> {
     }
     return fieldsToWidgets;
   }
-
+  
+  // Launch the specified caller if it can be handled by some app installed on the device.
   void _launchCaller(String phoneNumber) async {
     String url = "tel:$phoneNumber";
     if (await canLaunch(url)) {
@@ -413,7 +417,8 @@ class _LostFoundBoardState extends State<LostFoundBoard> {
       throw 'Could not launch $url';
     }
   }
-
+  
+  // Launch the specified URL if it can be handled by some app installed on the device.
   void _launchURL(String url) async {
     if (await canLaunch(url)) {
       await launch(url);
@@ -421,7 +426,8 @@ class _LostFoundBoardState extends State<LostFoundBoard> {
       throw 'Could not launch $url';
     }
   }
-
+  
+  // Build the filter and the unfilter buttons.
   Widget _buildButtons() {
     return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
       RaisedButton.icon(
@@ -500,7 +506,8 @@ class _LostFoundBoardState extends State<LostFoundBoard> {
       ),
     ]);
   }
-
+  
+  // The action of the unfilter button.
   void _unfilterButtonAction() {
     _filterButtonText = "סינון";
     _filterButtonIcon = Icon(MaterialCommunityIcons.filter);
@@ -508,7 +515,8 @@ class _LostFoundBoardState extends State<LostFoundBoard> {
     _typeFilter = "";
     _isScrollerAlwaysShown = true;
   }
-
+  
+  // The action of the filter button.
   void _filterButtonAction(String type) {
     _filterButtonText = "ביטול הסינון";
     _filterButtonIcon = Icon(MaterialCommunityIcons.filter_remove);

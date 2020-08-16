@@ -17,6 +17,8 @@ class ConnectedServicesModel extends Model {
   List<Service> services = [];
   // Whether the data of the services loading from or to the database.
   bool _isServicesLoading = false;
+  // Whether the data of the services locations loading from the database.
+  bool _isServicesLocationsLoading = false;
   // The index of the current selected service.
   int _selectedServiceIndex = 0;
   // The current location of the user.
@@ -56,8 +58,8 @@ class ServicesModel extends ConnectedServicesModel {
   }
 
   // Fetch all the possible locations of the services on Bar Ilan University.
-  Future<Null> fetchServicesLocations() {
-    _isServicesLoading = true;
+  Future<Null> fetchServicesLocations() async {
+    _isServicesLocationsLoading = true;
     notifyListeners();
     return http
         .get('https://bar-iland-app.firebaseio.com/locations.json')
@@ -100,7 +102,7 @@ class ServicesModel extends ConnectedServicesModel {
         }
       });
       allServicesLocations = fetchedLocations;
-      _isServicesLoading = false;
+      _isServicesLocationsLoading = false;
       notifyListeners();
     });
   }
@@ -602,5 +604,9 @@ class ServicesModel extends ConnectedServicesModel {
 class UtilityModel extends ConnectedServicesModel {
   bool get isServicesLoading {
     return _isServicesLoading;
+  }
+
+  bool get isServicesLocationsLoading {
+    return _isServicesLocationsLoading;
   }
 }

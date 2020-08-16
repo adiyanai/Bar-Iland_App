@@ -14,6 +14,7 @@ import 'package:bar_iland_app/models/bar_ilan_location.dart';
 import 'package:bar_iland_app/utilities/services_icons.dart';
 import 'package:bar_iland_app/pages/services_widgets.dart';
 
+// class Services is responsible for the view of the services page.
 class Services extends StatefulWidget {
   final MainModel model;
   final String servicesView;
@@ -63,24 +64,24 @@ class _ServicesState extends State<Services> {
     return ScopedModelDescendant<MainModel>(
       builder: (BuildContext context, Widget child, MainModel model) {
         Widget content;
-        if (!model.isServicesLoading) {
+        if (!model.isServicesLoading && !model.isServicesLocationsLoading) {
           switch (_servicesView) {
-            // build services by area page
+            // Build services by area page.
             case "לפי מיקום":
               content = _buildServicesByAreaPage(model.services);
               break;
-            // build the main page of services by type
+            // Build the main page of services by type.
             case "לפי סוג שירות":
               content = _buildServicesByTypePage();
               break;
-            // build the page of the specific service
+            // Build the page of the specific service.
             default:
               content = _buildSpecificServiceByTypePage();
               break;
           }
         } else if (model.isServicesLoading) {
           switch (_servicesView) {
-            // build services by location loading page
+            // Build services by location loading page.
             case "לפי מיקום":
               content = Container(
                   decoration: new BoxDecoration(
@@ -93,7 +94,7 @@ class _ServicesState extends State<Services> {
                   ),
                   child: Center(child: CircularProgressIndicator()));
               break;
-            // build services by type loading page
+            // Build services by type loading page.
             default:
               content = Container(
                   decoration: BoxDecoration(
@@ -115,16 +116,16 @@ class _ServicesState extends State<Services> {
     );
   }
 
-  // sort the services by geographical proximity to the current location of the user
+  // Sort the services by geographical proximity to the current location of the user.
   List<Service> _sortByGeographicalProximity(List<Service> servicesList) {
     _userLocation = widget.model.userLocation;
     servicesList.sort((service1, service2) {
-      // find the locations of the services in the list of all services locations
+      // Find the locations of the services in the list of all services locations.
       BarIlanLocation location1Data = _allServicesLocations
           .firstWhere((BarIlanLocation item) => (service1.Area == item.Number));
       BarIlanLocation location2Data = _allServicesLocations
           .firstWhere((BarIlanLocation item) => (service2.Area == item.Number));
-      // sort the services by geographical proximity, using calculateDistance function
+      // Sort the services by geographical proximity, using calculateDistance function.
       return (calculateDistance(_userLocation.latitude, _userLocation.longitude,
               location1Data.Lat, location1Data.Lon))
           .compareTo((calculateDistance(_userLocation.latitude,
@@ -133,13 +134,13 @@ class _ServicesState extends State<Services> {
     return servicesList;
   }
 
-  // calculate the distance between two coordinates by latitude and longitude
+  // Calculate the distance between two coordinates by latitude and longitude.
   double calculateDistance(lat1, lon1, lat2, lon2) {
     final Distance distance = new Distance();
     return distance(new LatLng(lat1, lon1), new LatLng(lat2, lon2));
   }
 
-  // build the button of a specific service in the main page of services by type
+  // Build the button of a specific service in the main page of services by type.
   Widget serviceTypeButton(String text, Icon icon) {
     return SizedBox.fromSize(
       size: Size(95, 95),
@@ -166,7 +167,7 @@ class _ServicesState extends State<Services> {
     );
   }
 
-  // build the main page of services by type
+  // Build the main page of services by type.
   Widget _buildServicesByTypePage() {
     FocusScope.of(context).requestFocus(FocusNode());
     return Directionality(
@@ -183,7 +184,7 @@ class _ServicesState extends State<Services> {
           ),
         ),
 
-        // build all the buttons of the specific services by type
+        // Build all the buttons of the specific services by type.
         child: Scrollbar(
           isAlwaysShown: true,
           controller: _servicesButtonsScrollController,
@@ -271,7 +272,7 @@ class _ServicesState extends State<Services> {
     );
   }
 
-  // build the page of the specific service
+  // Build the page of the specific service.
   Widget _buildSpecificServiceByTypePage() {
     return WillPopScope(
       onWillPop: () {
@@ -306,7 +307,7 @@ class _ServicesState extends State<Services> {
                 children: [
                   Container(
                     width: 170,
-                    // services sorting button
+                    // Services sorting button.
                     child: RaisedButton.icon(
                       icon: Icon(Icons.location_on),
                       textColor: Colors.white,
@@ -349,7 +350,7 @@ class _ServicesState extends State<Services> {
     );
   }
 
-  // build services by area page
+  // Build services by area page.
   Widget _buildServicesByAreaPage(List<Service> services) {
     _scrollController = ScrollController(
         initialScrollOffset: (widget.model.SelectedServiceIndex - 1) * 60.0);
@@ -383,7 +384,7 @@ class _ServicesState extends State<Services> {
     );
   }
 
-  // display all the services in the specific area
+  // Display all the services in the specific area.
   Widget _showServicesByArea(String area, List<Service> services) {
     List<Service> servicesInArea = [];
     for (int i = 0; i < services.length; i++) {
@@ -394,7 +395,7 @@ class _ServicesState extends State<Services> {
     if (!_isSearchPressed) {
       return Column();
     }
-    // if there are no services in the specific area, show a message that no services found
+    // If there are no services in the specific area, show a message that no services found.
     if (servicesInArea.length == 0) {
       return Center(
         child: Container(
@@ -416,7 +417,7 @@ class _ServicesState extends State<Services> {
     return _createServicesList(servicesInArea, "ServicesByArea");
   }
 
-  // sort the services by ascending order of their areas
+  // Sort the services by ascending order of their areas.
   void _sortInAscendingOrder(List<Service> servicesList) {
     servicesList.sort((service1, service2) {
       List<String> location1SplitNumber = service1.Area.split(" ");
@@ -437,7 +438,7 @@ class _ServicesState extends State<Services> {
     });
   }
 
-  // build a navigation button for services by type
+  // Build a navigation button for services by type.
   Widget _buildNavigationButton(
       String servicesBy, String selServiceLocationNumber) {
     SizedBox navigationButton = SizedBox();
@@ -475,9 +476,9 @@ class _ServicesState extends State<Services> {
     return navigationButton;
   }
 
-  // create a list of all the services - depending on the view of the services (by type or by area)
+  // Create a list of all the services - depending on the view of the services (by type or by area).
   Widget _createServicesList(List<Service> servicesList, String servicesBy) {
-    // sort the services in the desired way (relevant to services by type)
+    // Sort the services in the desired way (relevant to services by type).
     if (_sortingOrder == "Ascending") {
       _sortInAscendingOrder(servicesList);
     } else if (_sortingOrder == "Geographic") {
@@ -493,7 +494,7 @@ class _ServicesState extends State<Services> {
         int currExpansionTileIndex = expansionTileIndex;
         selServiceLocationNumber = service.Area;
         String serviceLocation = "";
-        // if the service is not is the area but near it
+        // If the service is not is the area but near it.
         if (!service.IsInArea) {
           serviceLocation += "בסמוך ל";
         }
@@ -501,14 +502,14 @@ class _ServicesState extends State<Services> {
         if (service.SpecificLocation != "") {
           serviceLocation += ", " + service.SpecificLocation;
         }
-        // fixing an issue in Hebrew UI
+        // Fixing an issue in Hebrew UI.
         serviceLocation = serviceLocation.replaceAll("קומה -1", "קומה 1-");
         String serviceTitle;
-        // if the service is a business, show it's name instead of it's type
+        // If the service is a business, show it's name instead of it's type.
         if (service.Type == "businesses") {
           BusinessService business = service;
           serviceTitle = business.Name;
-          // if the service is an academic service, show it's name instead of it's type
+          // If the service is an academic service, show it's name instead of it's type.
         } else if (service.Type == "academicServices") {
           AcademicService academicService = service;
           serviceTitle = academicService.Name;
@@ -523,7 +524,7 @@ class _ServicesState extends State<Services> {
           ),
           child: ExpansionTile(
             initiallyExpanded: _isTileExpanded(currExpansionTileIndex),
-            // if it's the last tile and there are more than 4 tiles, scroll down
+            // If it's the last tile and there are more than 4 tiles, scroll down.
             onExpansionChanged: (expanded) {
               if (expanded &&
                   servicesList.length > 4 &&
@@ -579,7 +580,7 @@ class _ServicesState extends State<Services> {
     );
   }
 
-  // if the given tile index is equal to the selected service index, then the tile is expanded
+  // If the given tile index is equal to the selected service index, then the tile is expanded.
   bool _isTileExpanded(int tileIndex) {
     if (widget.model.SelectedServiceIndex == tileIndex) {
       return true;
@@ -588,7 +589,7 @@ class _ServicesState extends State<Services> {
     }
   }
 
-  // build the content of the expansion tile of the service depending on the service type
+  // Build the content of the expansion tile of the service depending on the service type.
   List<Widget> expansionTileContent(
       Service service, int currExpansionTileIndex) {
     switch (service.Type) {
@@ -642,7 +643,7 @@ class _ServicesState extends State<Services> {
     }
   }
 
-  // build the content of machines service expansion tile
+  // Build the content of machines service expansion tile.
   List<Widget> machinesContent(Service service, int currExpansionTileIndex) {
     Widget milkInfo;
     if (service.Subtype == "מקרר") {
@@ -656,7 +657,7 @@ class _ServicesState extends State<Services> {
     ];
   }
 
-  // build the UI of milk for refrigerators
+  // Build the UI of milk for refrigerators.
   Widget _milkUI(MachineService service, int currExpansionTileIndex) {
     RefrigeratorService refrigerator = service;
     Widget milkInfo;
@@ -754,7 +755,7 @@ class _ServicesState extends State<Services> {
     );
   }
 
-  // milk availability report for registered users
+  // Milk availability report for registered users.
   void _registeredUserMilkReport(RefrigeratorService refrigerator,
       bool updatedMilkAvailability, int currExpansionTileIndex) {
     String alertText = "";
@@ -796,7 +797,7 @@ class _ServicesState extends State<Services> {
     );
   }
 
-  // milk availability report for guest users (that actually cannot report)
+  // Milk availability report for guest users (that actually cannot report).
   void _guestUserMilkReport() {
     showDialog(
         context: context,
@@ -819,7 +820,7 @@ class _ServicesState extends State<Services> {
         });
   }
 
-  // availability UI for machines service
+  // Availability UI for machines service.
   Widget _availabilityUI(MachineService service, int currExpansionTileIndex) {
     Widget availabilityInfo;
     Widget availabilityIcon;
@@ -895,7 +896,7 @@ class _ServicesState extends State<Services> {
     );
   }
 
-  // machines availability report for registered users
+  // Machines availability report for registered users.
   void _registeredUserAvailabilityReport(
       MachineService service, int currExpansionTileIndex) {
     String alertText = "";
@@ -954,7 +955,7 @@ class _ServicesState extends State<Services> {
     });
   }
 
-  // refrigerators availability report for registered users
+  // Refrigerators availability report for registered users.
   void _registeredUserRefrigeratorReport(MachineService service,
       bool updatedAvailability, currExpansionTileIndex) {
     if (updatedAvailability == true) {
@@ -1004,7 +1005,7 @@ class _ServicesState extends State<Services> {
     }
   }
 
-  // machines availability report for guest users (that actually cannot report)
+  // Machines availability report for guest users (that actually cannot report).
   void _guestUserAvailabilityReport() {
     showDialog(
         context: context,
@@ -1027,7 +1028,7 @@ class _ServicesState extends State<Services> {
         });
   }
 
-  // location search for services by area
+  // Location search for services by area.
   Widget _locationSearch() {
     return Container(
       decoration: BoxDecoration(
@@ -1069,7 +1070,7 @@ class _ServicesState extends State<Services> {
     );
   }
 
-  // build AutoCompleteTextField for services by area
+  // Build an AutoCompleteTextField for services by area.
   Widget _buildAutoCompleteTextField() {
     List<String> suggestions = [];
     _allServicesLocations.forEach((location) {
@@ -1128,7 +1129,7 @@ class _ServicesState extends State<Services> {
               _isNotPressable = false;
               _searchButtonColor = Colors.blue;
             });
-            // if no such location is exist
+            // If no such location is exist.
           } catch (err) {
             setState(() {
               _isNotPressable = true;
@@ -1137,7 +1138,7 @@ class _ServicesState extends State<Services> {
           }
         },
         itemBuilder: (context, area) {
-          // UI for the autocomplete row
+          // UI for the autocomplete row.
           return Center(
             child: Container(
               padding: const EdgeInsets.only(bottom: 5.0),
@@ -1152,7 +1153,7 @@ class _ServicesState extends State<Services> {
     );
   }
 
-  // show all the relevant services in the given location
+  // Show all the relevant services in the given location.
   void _searchPress() {
     FocusScope.of(context).requestFocus(new FocusNode());
     _title = Container(
@@ -1186,7 +1187,7 @@ class _ServicesState extends State<Services> {
                   color: Colors.blue,
                   label: Text("ניווט"),
                   onPressed: () async {
-                    // get the data of the location
+                    // Get the data of the location.
                     BarIlanLocation locationData = widget
                         .model.AllServicesLocations
                         .firstWhere((BarIlanLocation item) =>
@@ -1230,7 +1231,7 @@ class _ServicesState extends State<Services> {
     _searchButtonColor = Colors.grey;
   }
 
-  // backgroud images for the specific services by type
+  // Backgroud images for the specific services by type.
   Map<String, AssetImage> _mapServicesToImages() {
     Map<String, AssetImage> servicesToImages = {
       "בתי קפה ומסעדות": AssetImage("assets/resturants_and_coffee_shops.jpg"),
@@ -1256,7 +1257,7 @@ class _ServicesState extends State<Services> {
     return servicesToImages;
   }
 
-  // build a specific service by type page
+  // Build a specific service by type page.
   Widget _buildSpecificServiceTypePage(
       String serviceType, List<Service> services) {
     Map<String, AssetImage> servicesToImages = _mapServicesToImages();
@@ -1283,7 +1284,7 @@ class _ServicesState extends State<Services> {
     );
   }
 
-  // display all the services with the specified type
+  // Display all the services with the specified type.
   Widget _showServicesByType(
       String specificServiceType, List<Service> services) {
     List<Service> servicesByType = [];
@@ -1379,7 +1380,7 @@ class _ServicesState extends State<Services> {
     );
   }
 
-  // launch the specified URL if it can be handled by some app installed on the device
+  // Launch the specified URL if it can be handled by some app installed on the device.
   void _launchURL(String url) async {
     if (await canLaunch(url)) {
       await launch(url);

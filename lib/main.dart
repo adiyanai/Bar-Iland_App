@@ -49,8 +49,10 @@ class _MyAppState extends State<MyApp> {
     return ScopedModel<MainModel>(
       model: model,
       child: MaterialApp(
+        // Default visual properties, like colors fonts and shapes, for this app's material widgets.
         theme: ThemeData(highlightColor: Colors.blue),
         //home: AuthPage(),
+        // The application's top-level routing table.
         routes: {
           '/': (BuildContext context) =>
               !_isAuthenticated ? AuthPage() : HomePage(model),
