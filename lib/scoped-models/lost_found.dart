@@ -6,12 +6,19 @@ import 'package:scoped_model/scoped_model.dart';
 import 'package:http/http.dart' as http;
 
 class LostFoundModel extends Model {
+  // The URL of LostFound at the database.
   final _lostFoundURL = 'https://bar-iland-app.firebaseio.com/lostFound';
+  // The lost items that will be displayed at the lost board.
   List<LostFound> lostItems = [];
+  // The found items that will be displayed at the found board.
   List<LostFound> foundItems = [];
+  // The types of the lost and the found items.
   List<String> _lostFoundTypes = [];
+  // The possible locations of the lost and the found items on Bar Ilan University.
   List<BarIlanLocation> lostFoundLocations = [];
+  // Whether the data of the lost items is loading from or to the database.
   bool isLostLoading = false;
+  // Whether the data of the found items is loading from or to the database.
   bool isFoundLoading = false;
 
   List<LostFound> get LostItems {
@@ -30,7 +37,8 @@ class LostFoundModel extends Model {
     return lostFoundLocations;
   }
 
-  Future<bool> addLostFoundType({String lostFoundType = "אביזרי מחשב"}) async {
+  // Add a type of lost & found items to the database.
+  Future<bool> addLostFoundType({String lostFoundType}) async {
     isLostLoading = true;
     isFoundLoading = true;
     notifyListeners();
@@ -44,7 +52,6 @@ class LostFoundModel extends Model {
       if (response.statusCode != 200 && response.statusCode != 201) {
         isLostLoading = false;
         isFoundLoading = true;
-
         notifyListeners();
         return false;
       }
@@ -53,12 +60,12 @@ class LostFoundModel extends Model {
     } catch (error) {
       isLostLoading = false;
       isFoundLoading = true;
-
       notifyListeners();
       return false;
     }
   }
 
+  // Fetch the lost & found types from the database.
   Future<Null> fetchLostFoundTypes() {
     isLostLoading = true;
     isFoundLoading = true;
@@ -95,6 +102,7 @@ class LostFoundModel extends Model {
     });
   }
 
+  // Fetch the lost & found locations from the database.
   Future<Null> fetchLostFoundLocations() {
     isLostLoading = true;
     isFoundLoading = true;
@@ -145,6 +153,7 @@ class LostFoundModel extends Model {
     });
   }
 
+  // Fetch the lost items from the database.
   Future<Null> fetchLostItems() {
     isLostLoading = true;
     notifyListeners();
@@ -176,6 +185,7 @@ class LostFoundModel extends Model {
     });
   }
 
+  // Fetch the found items from the database.
   Future<Null> fetchFoundItems() {
     isFoundLoading = true;
     notifyListeners();
@@ -204,6 +214,7 @@ class LostFoundModel extends Model {
     });
   }
 
+  // Add a lost item to the database.
   Future<bool> addLost(
       String type,
       String subtype,
@@ -243,6 +254,7 @@ class LostFoundModel extends Model {
     return true;
   }
 
+  // Add a found item to the database.
   Future<bool> addFound(
       String type,
       String subtype,

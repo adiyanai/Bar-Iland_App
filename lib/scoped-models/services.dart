@@ -9,12 +9,19 @@ import 'package:http/http.dart' as http;
 import '../models/service.dart';
 
 class ConnectedServicesModel extends Model {
+  // All the possible locations of the services on Bar Ilan University.
   List<BarIlanLocation> allServicesLocations = [];
+  // All the locations of existing services on Bar Ilan University.
   List<String> servicesAreas = [];
+  // List of all the of existing services on Bar Ilan University.
   List<Service> services = [];
+  // Whether the data of the services loading from or to the database.
   bool _isServicesLoading = false;
+  // The index of the current selected service.
   int _selectedServiceIndex = 0;
+  // The current location of the user.
   Location _currentLocation = new Location();
+  // The response object of the user location.
   LocationData userLocation;
 }
 
@@ -36,6 +43,7 @@ class ServicesModel extends ConnectedServicesModel {
     _selectedServiceIndex = selectedServiceIndex;
   }
 
+  // Get the current location of the user.
   void getCurrentLocation() async {
     _isServicesLoading = true;
     notifyListeners();
@@ -47,6 +55,7 @@ class ServicesModel extends ConnectedServicesModel {
     notifyListeners();
   }
 
+  // Fetch all the possible locations of the services on Bar Ilan University.
   Future<Null> fetchServicesLocations() {
     _isServicesLoading = true;
     notifyListeners();
@@ -96,6 +105,7 @@ class ServicesModel extends ConnectedServicesModel {
     });
   }
 
+  // Fetch all the services on Bar Ilan University.
   Future<Null> fetchServices() {
     _isServicesLoading = true;
     notifyListeners();
@@ -227,7 +237,6 @@ class ServicesModel extends ConnectedServicesModel {
           }
         });
       });
-
       fetchedServiceList.sort((service1, service2) {
         int result =
             service1.SpecificLocation.compareTo(service2.SpecificLocation);
@@ -243,12 +252,13 @@ class ServicesModel extends ConnectedServicesModel {
     });
   }
 
+  // Add a machine service to the database.
   Future<bool> addMachineService({
-    String subtype = "מכונת צילום והדפסה",
-    String area = "בניין 504",
-    bool isInArea = true,
-    String specificLocation = "קומה -1, בסמוך לספריית כלכלה",
-    bool availability = true,
+    String subtype,
+    String area,
+    bool isInArea,
+    String specificLocation,
+    bool availability,
     //bool milk = true,
   }) async {
     _isServicesLoading = true;
@@ -282,15 +292,16 @@ class ServicesModel extends ConnectedServicesModel {
     return true;
   }
 
+  // Add a business service to the database.
   Future<bool> addBusinessService({
-    String subtype = "בית קפה",
-    String name = "עגלת קפה ג'ו",
-    String activityTime = "בעגלה ניתן לרכוש אוכל וקפה במחירים מוזלים.",
-    String phoneNumber = "",
-    String generalInfo = "",
-    String area = "בניין 107",
-    bool isInArea = false,
-    String specificLocation = "",
+    String subtype,
+    String name,
+    String activityTime,
+    String phoneNumber,
+    String generalInfo,
+    String area,
+    bool isInArea,
+    String specificLocation,
   }) async {
     _isServicesLoading = true;
     notifyListeners();
@@ -304,7 +315,6 @@ class ServicesModel extends ConnectedServicesModel {
       'specificLocation': specificLocation,
       'generalInfo': generalInfo,
     };
-
     final http.Response response = await http.post(
         'https://bar-iland-app.firebaseio.com/services/businesses.json',
         body: json.encode(serviceData));
@@ -318,14 +328,15 @@ class ServicesModel extends ConnectedServicesModel {
     return true;
   }
 
+  // Add an academic service to the database.
   Future<bool> addAcademicService({
-    String subtype = "ספריה",
-    String name = "ספריית כלכלה ומנהל עסקים",
-    String activityTime = "א'-ה': 19:45-09:00",
-    String phoneNumber = "03-5318975",
-    String mail = "gr.libecmb@biu.ac.il",
-    String website = "https://econ.biu.ac.il/node/3962",
-    String area = "בניין 504",
+    String subtype,
+    String name,
+    String activityTime,
+    String phoneNumber,
+    String mail,
+    String website,
+    String area,
     bool isInArea = true,
     String specificLocation = "",
   }) async {
@@ -342,7 +353,6 @@ class ServicesModel extends ConnectedServicesModel {
       'isInArea': isInArea,
       'specificLocation': specificLocation,
     };
-
     final http.Response response = await http.post(
         'https://bar-iland-app.firebaseio.com/services/academicServices.json',
         body: json.encode(serviceData));
@@ -356,20 +366,20 @@ class ServicesModel extends ConnectedServicesModel {
     return true;
   }
 
+  // Add a prayer service to the database.
   Future<bool> addPrayerService({
-    String subtype = "מניין",
-    String area = "בניין 506",
-    bool isInArea = true,
-    String specificLocation = "מעונות גרוז",
-    String shacharitPrayersWinter = "",
-    String minchaPrayersWinter = "",
-    String arvitPrayersWinter = "22:00\n",
-    String shacharitPrayersSummer = "",
-    String minchaPrayersSummer = "",
-    String arvitPrayersSummer = "22:00\n",
+    String subtype ,
+    String area,
+    bool isInArea,
+    String specificLocation,
+    String shacharitPrayersWinter,
+    String minchaPrayersWinter,
+    String arvitPrayersWinter,
+    String shacharitPrayersSummer,
+    String minchaPrayersSummer,
+    String arvitPrayersSummer,
   }) async {
     _isServicesLoading = true;
-
     notifyListeners();
     final Map<String, dynamic> serviceData = {
       'subtype': subtype,
@@ -383,7 +393,6 @@ class ServicesModel extends ConnectedServicesModel {
       'minchaPrayersSummer': minchaPrayersSummer,
       'arvitPrayersSummer': arvitPrayersSummer,
     };
-
     final http.Response response = await http.post(
         'https://bar-iland-app.firebaseio.com/services/prayerServices.json',
         body: json.encode(serviceData));
@@ -397,14 +406,14 @@ class ServicesModel extends ConnectedServicesModel {
     return true;
   }
 
+  // Add welfare service to the database.
     Future<bool> addWelfareService({
-    String subtype = "חדר הנקה",
-    String area = "בניין 405",
-    bool isInArea = true,
-    String specificLocation = "קומה 2, חדר 102",
+    String subtype,
+    String area,
+    bool isInArea,
+    String specificLocation,
   }) async {
-      List<String> contains = List();
-    contains.add("משטחי החתלה");
+    List<String> contains = List();
     _isServicesLoading = true;
     notifyListeners();
     final Map<String, dynamic> serviceData = {
@@ -414,7 +423,6 @@ class ServicesModel extends ConnectedServicesModel {
       'specificLocation': specificLocation,
       'contains': contains,
     };
-
     final http.Response response = await http.post(
         'https://bar-iland-app.firebaseio.com/services/welfare.json',
         body: json.encode(serviceData));
@@ -428,14 +436,15 @@ class ServicesModel extends ConnectedServicesModel {
     return true;
   }
 
+  // Add computer labs service to the database.
   Future<bool> addComputerLabsService({
-    String subtype = "מעבדת מחשבים",
-    String activityTime = "ימים א'-ה', 08:30 עד 16:00",
-    String phoneNumber = "03-5317895",
-    String mail = "",
-    String area = "בניין 404",
-    bool isInArea = true,
-    String specificLocation = "קומה שנייה וקומה שלישית",
+    String subtype,
+    String activityTime,
+    String phoneNumber,
+    String mail,
+    String area,
+    bool isInArea,
+    String specificLocation,
   }) async {
     _isServicesLoading = true;
     notifyListeners();
@@ -448,7 +457,6 @@ class ServicesModel extends ConnectedServicesModel {
       'isInArea': isInArea,
       'specificLocation': specificLocation,
     };
-
     final http.Response response = await http.post(
         'https://bar-iland-app.firebaseio.com/services/computersLabs.json',
         body: json.encode(serviceData));
@@ -462,6 +470,7 @@ class ServicesModel extends ConnectedServicesModel {
     return true;
   }
 
+  // Report about a refrigerator (includes availability report on the refrigerator and the milk within it).
   Future<bool> refrigeratorReport(RefrigeratorService refrigerator,
       bool updatedAvailability, bool milkAvailability) {
     _isServicesLoading = true;
@@ -505,6 +514,7 @@ class ServicesModel extends ConnectedServicesModel {
     });
   }
 
+  // Report about the availability of a general machine.
   Future<bool> availabiltyReport(Service service, bool updatedAvailability) {
     _isServicesLoading = true;
     notifyListeners();
@@ -549,16 +559,17 @@ class ServicesModel extends ConnectedServicesModel {
     });
   }
 
+  // Add security service to the database.
   Future<bool> addSecurityService({
-    String subtype = "שירותי אבטחה",
-    String weekdaysActivityTime = "06:30 עד 18:00",
-    String fridaysActivityTime = "06:30 עד 12:00",
-    String saturdaysActivityTime = "סגור",
-    String area = "שער 40",
-    bool isInArea = true,
-    String specificLocation = "",
-    String phoneNumber = "03-5317171",
-    String emergencyPhoneNumber = "03-5317777",
+    String subtype,
+    String weekdaysActivityTime,
+    String fridaysActivityTime,
+    String saturdaysActivityTime,
+    String area,
+    bool isInArea,
+    String specificLocation,
+    String phoneNumber,
+    String emergencyPhoneNumber,
   }) async {
     _isServicesLoading = true;
     notifyListeners();

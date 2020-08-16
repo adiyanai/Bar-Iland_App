@@ -5,13 +5,16 @@ import 'package:scoped_model/scoped_model.dart';
 import 'package:http/http.dart' as http;
 
 class ParkignsModel extends Model {
+  // List of all the parkings on Bar Ilan University and around it.
   List<Parking> _parkings = [];
+    // Whether the data of the parkings is loading from or to the database.
   bool isParkingsLoading = false;
 
   List<Parking> get Parkings {
      return List.from(_parkings);
   }
 
+  // Fetch the parkings from the database.
   Future<Null> fetchParkings() {
     isParkingsLoading = true;
     notifyListeners();
@@ -40,13 +43,14 @@ class ParkignsModel extends Model {
     });
   }
 
+  // Add a parking to the database.
     Future<bool> addParking({
-    String name = "חניון כלכלה - על בסיס שעתי",
-    String location = "",
-    String closestGate = "",
-    String price = "מחיר כניסה חד פעמי: 15.5 שקלים. לחברי אגודה המשלמים דמי רווחה: 9 שקלים.",
-    String lat = "",
-    String lon = "",
+    String name,
+    String location,
+    String closestGate,
+    String price,
+    String lat,
+    String lon,
   }) async {
     isParkingsLoading = true;
     notifyListeners();
@@ -58,7 +62,6 @@ class ParkignsModel extends Model {
       'lat': lat,
       'lon': lon,
     };
-
     final http.Response response = await http.post(
         'https://bar-iland-app.firebaseio.com/parkings.json',
         body: json.encode(parkingData));
