@@ -260,13 +260,17 @@ class _EventsCalendarState extends State<EventsCalendar> {
                 SizedBox(
                   height: 4,
                 ),
-                Row(crossAxisAlignment: CrossAxisAlignment.start,
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Container(padding: EdgeInsets.only(top: 3), child: Icon(
-                      Icons.location_on,
-                      size: 15,
-                      color: Colors.black54,
-                    ),),
+                    Container(
+                      padding: EdgeInsets.only(top: 3),
+                      child: Icon(
+                        Icons.location_on,
+                        size: 15,
+                        color: Colors.black54,
+                      ),
+                    ),
                     SizedBox(width: 3),
                     Container(
                       width: _screenWidth * 0.5,
