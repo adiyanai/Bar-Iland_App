@@ -104,8 +104,8 @@ class _ImportantLinksState extends State<ImportantLinks> {
                 .jumpTo(_scrollController.position.maxScrollExtent + 50);
             _scrollController.animateTo(
                 _scrollController.position.maxScrollExtent + 50,
-                duration: Duration(milliseconds: 3000),
-                curve: Curves.ease);
+                duration: Duration(milliseconds: 1000),
+                curve: Curves.fastLinearToSlowEaseIn);
           },
           leading: _mapFacultiesTypesToIcons()[faculty_type],
           backgroundColor: Color.fromRGBO(220, 250, 250, 0.1),
