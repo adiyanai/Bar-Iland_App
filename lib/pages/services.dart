@@ -353,18 +353,14 @@ class _ServicesState extends State<Services> {
   Widget _buildServicesByAreaPage(List<Service> services) {
     _scrollController = ScrollController(
         initialScrollOffset: (widget.model.SelectedServiceIndex - 1) * 60.0);
-    _servicesListView = Scrollbar(
-      isAlwaysShown: false,
+    _servicesListView = ListView(
       controller: _scrollController,
-      child: ListView(
-        controller: _scrollController,
-        children: <Widget>[
-          _displayedServicesByArea = _showServicesByArea(
-            (_selectedArea.split(" - "))[0],
-            services,
-          )
-        ],
-      ),
+      children: <Widget>[
+        _displayedServicesByArea = _showServicesByArea(
+          (_selectedArea.split(" - "))[0],
+          services,
+        )
+      ],
     );
     return Stack(
       children: <Widget>[
@@ -1377,15 +1373,9 @@ class _ServicesState extends State<Services> {
     }
     _scrollController = ScrollController(
         initialScrollOffset: (widget.model.SelectedServiceIndex - 1) * 100.0);
-    return Scrollbar(
-      isAlwaysShown: true,
+    return ListView(
       controller: _scrollController,
-      child: ListView(
-        controller: _scrollController,
-        children: <Widget>[
-          _createServicesList(servicesByType, "ServicesByType")
-        ],
-      ),
+      children: <Widget>[_createServicesList(servicesByType, "ServicesByType")],
     );
   }
 
