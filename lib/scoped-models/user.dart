@@ -9,7 +9,7 @@ import '../models/auth.dart';
 import '../models/connection.dart';
 
 class UserModel extends Model {
-  final API_KEY = 'AIzaSyBePDkpa3WV4UVazs9tRi0WnicXHsj2Ui0';
+  final API_KEY = '';
   User _authenticatedUser;
   bool _isUserLoading = false;
   Timer _authTimer;
