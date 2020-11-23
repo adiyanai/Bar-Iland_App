@@ -7,9 +7,10 @@ import 'package:rxdart/subjects.dart';
 import '../models/user.dart';
 import '../models/auth.dart';
 import '../models/connection.dart';
+import '../config.dart';
 
 class UserModel extends Model {
-  final API_KEY = 'AIzaSyBePDkpa3WV4UVazs9tRi0WnicXHsj2Ui0';
+  final API_KEY = Config().ApiKey;
   User _authenticatedUser;
   bool _isUserLoading = false;
   Timer _authTimer;
