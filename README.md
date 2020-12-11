@@ -3,6 +3,12 @@
 A social cross-platform mobile application for the students and visitors of Bar Ilan University.
 The application provides information about the university in many fields - events, services, etc., displays their different locations including a navigation service, enables real-time reporting by users and provides more services for the students' welfare, such as lost & found service, where the user can report an object found or lost at the university including its description, picture, and further details.
 
+### **Tech Stack**:
+* Dart
+* Flutter SDK & Framework
+* Firebase DB & Cloud Storage
+* HTTP & REST API
+
 ### Watch the corporate video on YouTube:
 [![](https://user-images.githubusercontent.com/45918740/99361647-161e1e00-28bb-11eb-9321-6a6a0bdf6dff.JPG)](https://youtu.be/LzVLXhbjTEs)
 
